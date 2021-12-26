@@ -1,4 +1,3 @@
-using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using YourProjectName.Data;
@@ -20,10 +19,10 @@ public class PlayerAccountController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> Get()
+    public async Task<IActionResult> Get([FromQuery]int? s, [FromQuery]int? c)
     {
-        if (_dbContext.PlayerAccounts.Any()) {
-            var ret = await _dbContext.PlayerAccounts.OrderBy(i => i.ID).Take(50).ToListAsync();
+        if (await _dbContext.PlayerAccounts.AnyAsync()) {
+            var ret = await _dbContext.PlayerAccounts.OrderBy(i => i.ID).Skip(s ?? 0).Take(c ?? 50).ToListAsync();
             return Ok(ret);
         }
         return NotFound();

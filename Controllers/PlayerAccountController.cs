@@ -1,4 +1,7 @@
+using System.Linq;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using YourProjectName.Data;
 
 namespace YourProjectName.Controllers;
 
@@ -8,32 +11,29 @@ public class PlayerAccountController : ControllerBase
 {
     readonly ILogger<PlayerAccountController> _logger;
 
-    public PlayerAccountController(ILogger<PlayerAccountController> logger)
+    readonly GameDbContext _dbContext;
+
+    public PlayerAccountController(GameDbContext dbContext, ILogger<PlayerAccountController> logger)
     {
+        _dbContext = dbContext;
         _logger = logger;
     }
 
     [HttpGet]
-    public IEnumerable<Models.PlayerAccount> Get()
+    public async Task<IActionResult> Get()
     {
-        return Enumerable.Range(1, 5).Select(index => {
-            var now = DateTime.Now.AddDays(index);
-            return new Models.PlayerAccount {
-                ID = index,
-                Since = now,
-                LastLogin = now,
-            };
-        });
+        if (_dbContext.PlayerAccounts.Any()) {
+            var ret = await _dbContext.PlayerAccounts.OrderBy(i => i.ID).Take(50).ToListAsync();
+            return Ok(ret);
+        }
+        return NotFound();
     }
 
     [HttpGet("{index}")]
-    public Models.PlayerAccount Get(int index)
+    public async Task<IActionResult> Get(int index)
     {
-        var now = DateTime.Now.AddDays(index);
-        return new Models.PlayerAccount {
-            ID = index,
-            Since = now,
-            LastLogin = now,
-        };
+        var ret = await _dbContext.PlayerAccounts.FirstOrDefaultAsync(i => i.ID == index);
+        if (ret != null) return Ok(ret);
+        return NotFound();
     }
 }

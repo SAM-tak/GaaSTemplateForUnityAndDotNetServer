@@ -1,7 +1,7 @@
 using System; // Unity needs this
 using MessagePack;
 
-namespace YourProjectName.Models
+namespace YourProjectName.Models // Unity cannot accpect 'namespace YourProjectName.Models;'
 {
     public enum PlayerStatus
     {
@@ -15,18 +15,18 @@ namespace YourProjectName.Models
     public record PlayerAccount
     {
         [Key(0)]
-        public long ID { get; init; }
+        public long ID { get; set; }
         [Key(1)]
-        public PlayerStatus Status { get; init; }
+        public PlayerStatus Status { get; set; }
         [Key(2)]
-        public DateTime Since { get; init; }
+        public DateTime Since { get; set; }
         [Key(3)]
-        public DateTime LastLogin { get; init; }
+        public DateTime LastLogin { get; set; }
         [Key(4)]
-        public DateTime? InactivateDate { get; init; }
+        public DateTime? InactivateDate { get; set; }
         [Key(5)]
-        public DateTime? BanDate { get; init; }
+        public DateTime? BanDate { get; set; }
         [Key(6)]
-        public DateTime? ExpireDate { get; init; }
+        public DateTime? ExpireDate { get; set; }
     }
 }

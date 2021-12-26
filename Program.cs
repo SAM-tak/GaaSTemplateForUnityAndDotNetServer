@@ -1,3 +1,4 @@
+using MessagePack;
 using MessagePack.AspNetCoreMvcFormatter;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -5,8 +6,9 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddRazorPages();
 builder.Services.AddControllers(option => {
-    option.OutputFormatters.Add(new MessagePackOutputFormatter());
-    option.InputFormatters.Add(new MessagePackInputFormatter());
+    var msgpackOption = MessagePackSerializerOptions.Standard.WithCompression(MessagePackCompression.Lz4BlockArray);
+    option.OutputFormatters.Add(new MessagePackOutputFormatter(msgpackOption));
+    option.InputFormatters.Add(new MessagePackInputFormatter(msgpackOption));
     // Mapモードの場合。アノテーションが要らなくなるのはいいが、メッセージが太るのでMessagepack使う意義が薄れると思う
     // var msgpackOption = MessagePackSerializerOptions.Standard.WithResolver(ContractlessStandardResolver.Instance);
     // option.OutputFormatters.Add(new MessagePackOutputFormatter(msgpackOption));

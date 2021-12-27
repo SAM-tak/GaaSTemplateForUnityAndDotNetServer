@@ -1,11 +1,17 @@
 using System.Data.Common;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using MessagePack;
 using MessagePack.AspNetCoreMvcFormatter;
-using Microsoft.EntityFrameworkCore;
 using YourProjectName.Data;
-using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddApiVersioning(options => {
+    options.AssumeDefaultVersionWhenUnspecified = true;
+    options.DefaultApiVersion = new ApiVersion(1, 0);
+});
 
 // https://stackoverflow.com/questions/4804086/is-there-any-connection-string-parser-in-c
 

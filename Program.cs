@@ -1,8 +1,28 @@
+using System.Data.Common;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using MessagePack;
 using MessagePack.AspNetCoreMvcFormatter;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddApiVersioning(options => {
+    options.AssumeDefaultVersionWhenUnspecified = true;
+    options.DefaultApiVersion = new ApiVersion(1, 0);
+});
+
+// https://stackoverflow.com/questions/4804086/is-there-any-connection-string-parser-in-c
+
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+var csBulder = new DbConnectionStringBuilder { ConnectionString = connectionString };
+// if(csBulder["server"] == null) {
+builder.Services.AddDbContext<YourGameServer.Data.GameDbContext>(options => options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+// }
+// else {
+//     // CPomelo.EntityFrameworkCore.MySql.Infrastructure.ServerType.MariaDb // 最新でこの定義の使い所がないがいいのか？
+//     builder.Services.AddDbContext<GameDbContext>(options => options.UseMySql(csBulder.ConnectionString, new MySqlServerVersion(new Version(10, 6, 5))));
+// }
 // Add services to the container.
 builder.Services.AddRazorPages();
 builder.Services.AddControllers(option => {

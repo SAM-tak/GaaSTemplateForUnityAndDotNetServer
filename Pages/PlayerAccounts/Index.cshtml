@@ -1,0 +1,66 @@
+@page
+@model YourGameServer.Pages.PlayerAccounts.IndexModel
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-page="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.PlayerAccount[0].Status)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PlayerAccount[0].Since)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PlayerAccount[0].LastLogin)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PlayerAccount[0].InactivateDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PlayerAccount[0].BanDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PlayerAccount[0].ExpireDate)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model.PlayerAccount) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Status)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Since)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.LastLogin)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.InactivateDate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.BanDate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ExpireDate)
+            </td>
+            <td>
+                <a asp-page="./Edit" asp-route-id="@item.ID">Edit</a> |
+                <a asp-page="./Details" asp-route-id="@item.ID">Details</a> |
+                <a asp-page="./Delete" asp-route-id="@item.ID">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

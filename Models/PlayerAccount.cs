@@ -1,13 +1,18 @@
 using System; // Unity needs this
+using System.ComponentModel;
 using MessagePack;
 
-namespace YourProjectName.Models // Unity cannot accpect 'namespace YourProjectName.Models;' yet
+namespace YourGameServer.Models // Unity cannot accpect 'namespace YourProjectName.Models;' yet
 {
     public enum PlayerStatus
     {
+        [Description("Active")]
         Active,
+        [Description("Inactive")]
         Inactive,
+        [Description("Banned")]
         Banned,
+        [Description("Expired")]
         Expired,
     }
 

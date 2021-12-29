@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using MessagePack;
 using MessagePack.AspNetCoreMvcFormatter;
+using YourProjectName.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 

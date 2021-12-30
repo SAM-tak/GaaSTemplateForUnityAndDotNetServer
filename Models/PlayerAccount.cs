@@ -20,19 +20,18 @@ namespace YourGameServer.Models // Unity cannot accpect 'namespace YourProjectNa
     public record PlayerAccount
     {
         [Key(0)]
-        public long ID { get; set; } // cannot use 'init', because MessagePack's generated static deserializer dosen't support it on Unity
-        // but all member must be as property, ASP.NET Json serializer ignore member field even though public
+        public long ID { get; init; }
         [Key(1)]
-        public PlayerStatus Status { get; set; }
+        public PlayerStatus Status { get; init; }
         [Key(2)]
-        public DateTime Since { get; set; }
+        public DateTime Since { get; init; }
         [Key(3)]
-        public DateTime LastLogin { get; set; }
+        public DateTime LastLogin { get; init; }
         [Key(4)]
-        public DateTime? InactivateDate { get; set; }
+        public DateTime? InactivateDate { get; init; }
         [Key(5)]
-        public DateTime? BanDate { get; set; }
+        public DateTime? BanDate { get; init; }
         [Key(6)]
-        public DateTime? ExpireDate { get; set; }
+        public DateTime? ExpireDate { get; init; }
     }
 }

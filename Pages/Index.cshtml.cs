@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.Logging;
 
 namespace YourGameServer.Pages;
 
@@ -14,6 +15,6 @@ public class IndexModel : PageModel
 
     public void OnGet()
     {
-
+        _logger.LogTrace("");
     }
 }

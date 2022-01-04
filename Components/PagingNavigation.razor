@@ -1,0 +1,75 @@
+@inject NavigationManager navMgr
+
+<nav aria-label="Page navigation @Model?.AspPage" style="@Style">
+  <ul class="pagination">
+    <li class="page-item @prevDisabled">
+      <a href="@navMgr.BasePath()?pageIndex=1" class="page-link" aria-label="Top">
+        <span aria-hidden="true">&Lt;</span>
+        <span class="sr-only">Top</span>
+      </a>
+    </li>
+    <li class="page-item @prevDisabled">
+      <a href="@navMgr.BasePath()?pageIndex=@(pageIndex - 1)" class="page-link" aria-label="Previous">
+        <span aria-hidden="true">&lt;</span>
+        <span class="sr-only">Previous</span>
+      </a>
+    </li>
+    @for(int i = backward; i < pageIndex; i++) {
+      <li class="page-item"><a href = "@navMgr.BasePath()?pageIndex=@i" class="page-link">@i</a></li>
+    }
+    <li class="page-item active"><a class="page-link">@pageIndex</a></li>
+    @for(int i = pageIndex + 1; i <= forward; i++) {
+      <li class="page-item"><a href = "@navMgr.BasePath()?pageIndex=@i" class="page-link">@i</a></li>
+    }
+    <li class="page-item @nextDisabled">
+      <a href="@navMgr.BasePath()?pageIndex=@(pageIndex + 1)" class="page-link" aria-label="Next">
+        <span aria-hidden="true">&gt;</span>
+        <span class="sr-only">Next</span>
+      </a>
+    </li>
+    <li class="page-item @nextDisabled">
+      <a href="@navMgr.BasePath()?pageIndex=@totalPageCount" class="page-link @nextDisabled" aria-label="Last">
+        <span aria-hidden="true">&Gt;</span>
+        <span class="sr-only">Last</span>
+      </a>
+    </li>
+  </ul>
+</nav>
+
+@code{
+    [Parameter]
+    public PagingNavigationModel Model { get; set; }
+    [Parameter]
+    public int Width { get; init; } = 15;
+    [Parameter]
+    public string Style { get; init; }
+
+    string prevDisabled = "";
+    string nextDisabled = "";
+    int pageIndex;
+    int totalPageCount;
+    int backward;
+    int forward;
+
+    protected override void OnInitialized()
+    {
+        if(!Model?.List.HasPreviousPage ?? true) prevDisabled = "disabled";
+        if(!Model?.List.HasNextPage ?? true) nextDisabled = "disabled";
+        pageIndex = Model?.List.PageIndex ?? 1;
+        totalPageCount = Model?.List.TotalPages ?? 1;
+        backward = Math.Max(1, pageIndex - Width);
+        forward = Math.Min(pageIndex + Width - 1, totalPageCount);
+        if(forward - backward > Width) {
+            if(forward - pageIndex < Width / 2) {
+                backward = Math.Max(1, forward - Width);
+            }
+            else if(pageIndex - backward <= Width / 2) {
+                forward = Math.Min(backward + Width - 1, totalPageCount);
+            }
+            else {
+                backward = Math.Max(1, pageIndex - Width / 2);
+                forward = Math.Min(pageIndex + (Width + 1) / 2 - 1, totalPageCount);
+            }
+        }
+    }
+}

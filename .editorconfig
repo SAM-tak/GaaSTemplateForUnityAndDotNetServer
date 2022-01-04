@@ -1,10 +1,11 @@
 root = true
 
-[*.cs]
+[*]
 indent_style = space
-indent_size = 4
-end_of_line = lf
 charset = utf-8
+
+[*.cs]
+end_of_line = lf
 csharp_style_var_when_type_is_apparent=true:silent
 csharp_style_var_for_built_in_types=true:silent
 csharp_indent_case_contents=true
@@ -18,9 +19,15 @@ csharp_new_line_before_finally=true
 csharp_style_namespace_declaration=file_scoped:suggestion
 
 [*.{cs,vb}]
+indent_size = 4
 dotnet_style_allow_multiple_blank_lines_experimental=false:silent
 
 [*.{cshtml,html}]
-indent_style = space
 end_of_line = lf
-charset = utf-8
+indent_size = 4
+
+[*.razor]
+indent_size = 4
+
+[*.tt]
+end_of_line = crlf

@@ -4,39 +4,63 @@
 @{
     ViewData["Title"] = "Index";
 }
+<style>
+    .secret-col {
+        min-width: 50px;
+        max-width: 180px;
+        white-space: normal;
+        overflow-wrap: break-word;
+    }
+</style>
 
 <h1>Index</h1>
 
-<p>
+<p style="position: sticky;top: 5rem;background-color: #fff">
     <a asp-page="Create">Create New</a>
 </p>
+<component type="typeof(PagingNavigation)" param-Model="@(new PagingNavigationModel(Model.PlayerAccounts))" param-Width="20" param-Style="@("position:sticky;top: 7rem;background-color: #fff")" render-mode="ServerPrerendered" />
 <table class="table">
-    <thead>
+    <thead style="position: sticky;top: 10rem;background-color: #fff">
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.PlayerAccount[0].Status)
+                @Html.DisplayNameFor(model => model.PlayerAccounts[0].PlayerId)
+            </th>
+            <th class="secret-col">
+                @Html.DisplayNameFor(model => model.PlayerAccounts[0].Secret)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.PlayerAccount[0].Since)
+                @Html.DisplayNameFor(model => model.PlayerAccounts[0].Status)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.PlayerAccount[0].LastLogin)
+                @Html.DisplayNameFor(model => model.PlayerAccounts[0].Since)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.PlayerAccount[0].InactivateDate)
+                @Html.DisplayNameFor(model => model.PlayerAccounts[0].LastLogin)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.PlayerAccount[0].BanDate)
+                @Html.DisplayNameFor(model => model.PlayerAccounts[0].InactivateDate)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.PlayerAccount[0].ExpireDate)
+                @Html.DisplayNameFor(model => model.PlayerAccounts[0].BanDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PlayerAccounts[0].ExpireDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PlayerAccounts[0].ProfileId)
             </th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model.PlayerAccount) {
+@foreach (var item in Model.PlayerAccounts) {
         <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.PlayerId)
+            </td>
+            <td class="secret-col">
+                @Html.DisplayFor(modelItem => item.Secret)
+            </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Status)
             </td>
@@ -56,9 +80,12 @@
                 @Html.DisplayFor(modelItem => item.ExpireDate)
             </td>
             <td>
-                <a asp-page="./Edit" asp-route-id="@item.ID">Edit</a> |
-                <a asp-page="./Details" asp-route-id="@item.ID">Details</a> |
-                <a asp-page="./Delete" asp-route-id="@item.ID">Delete</a>
+                @Html.DisplayFor(modelItem => item.ProfileId)
+            </td>
+            <td>
+                <a asp-page="./Edit" asp-route-id="@item.Id">Edit</a> |
+                <a asp-page="./Details" asp-route-id="@item.Id">Details</a> |
+                <a asp-page="./Delete" asp-route-id="@item.Id">Delete</a>
             </td>
         </tr>
 }

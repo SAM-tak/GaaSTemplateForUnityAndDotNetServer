@@ -1,4 +1,3 @@
-#nullable disable
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,9 +12,9 @@ namespace YourGameServer.Pages.PlayerAccounts
 {
     public class DetailsModel : PageModel
     {
-        private readonly GameDbContext _context;
+        private readonly YourGameServer.Data.GameDbContext _context;
 
-        public DetailsModel(GameDbContext context)
+        public DetailsModel(YourGameServer.Data.GameDbContext context)
         {
             _context = context;
         }
@@ -29,7 +28,7 @@ namespace YourGameServer.Pages.PlayerAccounts
                 return NotFound();
             }
 
-            PlayerAccount = await _context.PlayerAccounts.FirstOrDefaultAsync(m => m.ID == id);
+            PlayerAccount = await _context.PlayerAccounts.FirstOrDefaultAsync(m => m.Id == id);
 
             if (PlayerAccount == null)
             {

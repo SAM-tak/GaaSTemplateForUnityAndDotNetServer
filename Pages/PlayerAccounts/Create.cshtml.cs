@@ -1,4 +1,3 @@
-#nullable disable
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,9 +12,9 @@ namespace YourGameServer.Pages.PlayerAccounts
 {
     public class CreateModel : PageModel
     {
-        private readonly GameDbContext _context;
+        private readonly YourGameServer.Data.GameDbContext _context;
 
-        public CreateModel(GameDbContext context)
+        public CreateModel(YourGameServer.Data.GameDbContext context)
         {
             _context = context;
         }

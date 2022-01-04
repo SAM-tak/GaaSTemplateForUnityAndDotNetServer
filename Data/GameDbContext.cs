@@ -1,4 +1,6 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Design;
+using YourGameServer.Models;
 
 namespace YourGameServer.Data;
 
@@ -8,10 +10,9 @@ public class GameDbContext : DbContext
     {
     }
 
-    public DbSet<Models.PlayerAccount> PlayerAccounts { get; set; } = null!;
+    public DbSet<PlayerAccount> PlayerAccounts { get; set; }
 
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
-    {
-        modelBuilder.Entity<Models.PlayerAccount>().ToTable("PlayerAccount");
-    }
+    public DbSet<PlayerProfile> PlayerProfiles { get; set; }
+
+    public DbSet<PlayerDevice> PlayerDevices { get; set; }
 }

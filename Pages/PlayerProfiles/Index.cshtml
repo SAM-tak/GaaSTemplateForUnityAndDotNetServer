@@ -1,0 +1,55 @@
+@page
+@model YourGameServer.Pages.PlayerProfiles.IndexModel
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p style="position: sticky;top: 5rem;background-color: #fff">
+    <a asp-page="Create">Create New</a>
+</p>
+<component type="typeof(PagingNavigation)" param-Model="@(new PagingNavigationModel(Model.PlayerProfiles))" param-Width="20" param-Style="@("position:sticky;top: 7rem;background-color: #fff")" render-mode="ServerPrerendered" />
+<table class="table">
+    <thead style="position: sticky;top: 10rem;background-color: #fff">
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.PlayerProfiles[0].Owner)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PlayerProfiles[0].Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PlayerProfiles[0].Motto)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PlayerProfiles[0].IconBlobId)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model.PlayerProfiles) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Owner.Id)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Motto)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.IconBlobId)
+            </td>
+            <td>
+                <a asp-page="./Edit" asp-route-id="@item.Id">Edit</a> |
+                <a asp-page="./Details" asp-route-id="@item.Id">Details</a> |
+                <a asp-page="./Delete" asp-route-id="@item.Id">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

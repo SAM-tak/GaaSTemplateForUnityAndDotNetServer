@@ -1,4 +1,3 @@
-#nullable disable
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,9 +13,9 @@ namespace YourGameServer.Pages.PlayerAccounts
 {
     public class EditModel : PageModel
     {
-        private readonly GameDbContext _context;
+        private readonly YourGameServer.Data.GameDbContext _context;
 
-        public EditModel(GameDbContext context)
+        public EditModel(YourGameServer.Data.GameDbContext context)
         {
             _context = context;
         }
@@ -31,7 +30,7 @@ namespace YourGameServer.Pages.PlayerAccounts
                 return NotFound();
             }
 
-            PlayerAccount = await _context.PlayerAccounts.FirstOrDefaultAsync(m => m.ID == id);
+            PlayerAccount = await _context.PlayerAccounts.FirstOrDefaultAsync(m => m.Id == id);
 
             if (PlayerAccount == null)
             {
@@ -57,7 +56,7 @@ namespace YourGameServer.Pages.PlayerAccounts
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!PlayerAccountExists(PlayerAccount.ID))
+                if (!PlayerAccountExists(PlayerAccount.Id))
                 {
                     return NotFound();
                 }
@@ -72,7 +71,7 @@ namespace YourGameServer.Pages.PlayerAccounts
 
         private bool PlayerAccountExists(long id)
         {
-            return _context.PlayerAccounts.Any(e => e.ID == id);
+            return _context.PlayerAccounts.Any(e => e.Id == id);
         }
     }
 }

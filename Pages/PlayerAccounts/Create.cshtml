@@ -1,6 +1,5 @@
 @page
 @model YourGameServer.Pages.PlayerAccounts.CreateModel
-@using YourGameServer.Models
 
 @{
     ViewData["Title"] = "Create";
@@ -15,8 +14,18 @@
         <form method="post">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
+                <label asp-for="PlayerAccount.PlayerId" class="control-label"></label>
+                <input asp-for="PlayerAccount.PlayerId" class="form-control" />
+                <span asp-validation-for="PlayerAccount.PlayerId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlayerAccount.Secret" class="control-label"></label>
+                <input asp-for="PlayerAccount.Secret" class="form-control" />
+                <span asp-validation-for="PlayerAccount.Secret" class="text-danger"></span>
+            </div>
+            <div class="form-group">
                 <label asp-for="PlayerAccount.Status" class="control-label"></label>
-                <select asp-for="PlayerAccount.Status" asp-items="@Html.GetEnumSelectList<PlayerStatus>()" class="form-control"></select>
+                <select asp-for="PlayerAccount.Status" class="form-control"></select>
                 <span asp-validation-for="PlayerAccount.Status" class="text-danger"></span>
             </div>
             <div class="form-group">
@@ -45,6 +54,11 @@
                 <span asp-validation-for="PlayerAccount.ExpireDate" class="text-danger"></span>
             </div>
             <div class="form-group">
+                <label asp-for="PlayerAccount.ProfileId" class="control-label"></label>
+                <input asp-for="PlayerAccount.ProfileId" class="form-control" />
+                <span asp-validation-for="PlayerAccount.ProfileId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />
             </div>
         </form>
@@ -55,6 +69,3 @@
     <a asp-page="Index">Back to List</a>
 </div>
 
-@section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-}

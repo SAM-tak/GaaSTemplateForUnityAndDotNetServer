@@ -1,4 +1,3 @@
-#nullable disable
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,18 +12,18 @@ namespace YourGameServer.Pages.PlayerAccounts
 {
     public class IndexModel : PageModel
     {
-        private readonly GameDbContext _context;
+        private readonly YourGameServer.Data.GameDbContext _context;
 
-        public IndexModel(GameDbContext context)
+        public IndexModel(YourGameServer.Data.GameDbContext context)
         {
             _context = context;
         }
 
-        public IList<PlayerAccount> PlayerAccount { get;set; }
+        public PaginatedList<PlayerAccount> PlayerAccounts { get;set; }
 
-        public async Task OnGetAsync()
+        public async Task OnGetAsync(int pageIndex = 1, int? maxCount = null)
         {
-            PlayerAccount = await _context.PlayerAccounts.ToListAsync();
+            PlayerAccounts = await PaginatedList<PlayerAccount>.CreateAsync(_context.PlayerAccounts, pageIndex, maxCount ?? 20);
         }
     }
 }

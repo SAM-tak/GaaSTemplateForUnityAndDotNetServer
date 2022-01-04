@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.Logging;
 
 namespace YourGameServer.Pages;
 
@@ -8,7 +9,7 @@ namespace YourGameServer.Pages;
 [IgnoreAntiforgeryToken]
 public class ErrorModel : PageModel
 {
-    public string? RequestId { get; set; }
+    public string RequestId { get; set; }
 
     public bool ShowRequestId => !string.IsNullOrEmpty(RequestId);
 
@@ -21,7 +22,7 @@ public class ErrorModel : PageModel
 
     public void OnGet()
     {
+        _logger.LogTrace("");
         RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
     }
 }
-

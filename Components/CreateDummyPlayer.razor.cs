@@ -30,7 +30,7 @@ partial class CreateDummyPlayer
         for(int i = 0; i < createDummyPlayerModel.Count; ++i) {
             latestLUID = await LUID.NewLUIDStringAsync(null);
             //Console.WriteLine($"New LUID {luid.id1} {luid.id0} {latestLUID}");
-            var playerAccount = await PlayerAccountsController.CreateAsync(context, new AccountCreationModel {
+            var playerAccount = await SignInController.CreateAccountAsync(context, new AccountCreationRequest {
                 DeviceType = (DeviceType)Random.Shared.Next(2),
                 DeviceId = Guid.NewGuid().ToString("N")
             });

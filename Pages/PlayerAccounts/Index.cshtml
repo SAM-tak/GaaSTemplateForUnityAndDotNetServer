@@ -25,9 +25,6 @@
             <th>
                 @Html.DisplayNameFor(model => model.PlayerAccounts[0].PlayerId)
             </th>
-            <th class="secret-col">
-                @Html.DisplayNameFor(model => model.PlayerAccounts[0].Secret)
-            </th>
             <th>
                 @Html.DisplayNameFor(model => model.PlayerAccounts[0].Status)
             </th>
@@ -57,9 +54,6 @@
         <tr>
             <td>
                 @Html.DisplayFor(modelItem => item.PlayerId)
-            </td>
-            <td class="secret-col">
-                @Html.DisplayFor(modelItem => item.Secret)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Status)

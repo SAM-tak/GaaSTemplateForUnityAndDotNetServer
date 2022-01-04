@@ -6,11 +6,13 @@ using System.Threading.Tasks;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Extensions.Configuration;
 using YourGameServer.Models;
 using YourGameServer.Data;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using System.Security.Claims;
 
 namespace YourGameServer.Controllers;
 
@@ -19,45 +21,27 @@ namespace YourGameServer.Controllers;
 public class TokenController : ControllerBase
 {
     readonly GameDbContext _context;
-    public TokenController(GameDbContext context)
+    readonly JwtTokenGenarator _jwt;
+    public TokenController(GameDbContext context, JwtTokenGenarator jwt)
     {
         _context = context;
+        _jwt = jwt;
     }
 
     [AllowAnonymous]
     [HttpPost]
-    public async Task<ActionResult<string>> SignUp([FromBody] AccountCreationModel signUp)
+    public async Task<ActionResult<string>> Login([FromBody] TokenRequest login)
     {
-        if(!string.IsNullOrWhiteSpace(signUp.DeviceId)) {
-            var playerAccount = await PlayerAccountsController.CreateAsync(_context, signUp);
-            await _context.SaveChangesAsync();
-            return Ok(playerAccount.PlayerId);
+        var playerAccount = await _context.PlayerAccounts.Include(i => i.DeviceList).FirstOrDefaultAsync(i => i.PlayerId == login.PlayerId);
+        if(playerAccount != null) {
+            var playerDevice = playerAccount.DeviceList.FirstOrDefault(i => i.DeviceId == login.DeviceId);
+            if(playerDevice != null) {
+                playerAccount.LastLogin = playerDevice.LastUsed = DateTime.UtcNow;
+                _context.Entry(playerAccount).State = EntityState.Modified;
+                await _context.SaveChangesAsync();
+                return Ok(_jwt.CreateToken(playerAccount.Id));
+            }
         }
         return BadRequest();
-    }
-
-    [AllowAnonymous]
-    [HttpPost]
-    public async Task<ActionResult<string>> Login([FromBody] TokenRequestModel login)
-    {
-        var playerAccount = await _context.PlayerAccounts.FirstOrDefaultAsync(i => i.PlayerId == login.PlayerId);
-        if(playerAccount != null && playerAccount.DeviceList.Any(i => i.DeviceId == login.DeviceId)) {
-            return Ok(BuildToken(playerAccount.Id.ToString(), playerAccount.Secret));
-        }
-        return BadRequest();
-    }
-
-    //token生成関数
-    private static string BuildToken(string id, byte[] secret)
-    {
-        var key = new SymmetricSecurityKey(secret);
-        var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-        var token = new JwtSecurityToken(
-            issuer: "YourGameServer",
-            audience: id,
-            expires: DateTime.Now.AddMinutes(30),
-            signingCredentials: creds
-        );
-        return new JwtSecurityTokenHandler().WriteToken(token);
     }
 }

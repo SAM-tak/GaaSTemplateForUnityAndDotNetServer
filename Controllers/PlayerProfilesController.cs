@@ -10,8 +10,9 @@ using YourGameServer.Models;
 
 namespace YourGameServer.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/[controller]/{playerid}")]
     [ApiController]
+    [ApiAuth]
     public class PlayerProfilesController : ControllerBase
     {
         private readonly GameDbContext _context;
@@ -21,21 +22,26 @@ namespace YourGameServer.Controllers
             _context = context;
         }
 
-        // GET: api/PlayerProfiles
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<PlayerProfile>>> GetPlayerProfiles()
-        {
-            return await _context.PlayerProfiles.ToListAsync();
-        }
-
         // GET: api/PlayerProfiles/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<PlayerProfile>> GetPlayerProfile(long id)
-        {
-            var playerProfile = await _context.PlayerProfiles.FindAsync(id);
+        // [HttpGet]
+        // public async Task<ActionResult<IEnumerable<PlayerProfile>>> GetPlayerProfiles()
+        // {
+        //     return await _context.PlayerProfiles.ToListAsync();
+        // }
 
-            if (playerProfile == null)
-            {
+        // GET: api/PlayerProfiles/5/9
+        [HttpGet("{id}")]
+        public async Task<ActionResult<PlayerProfile>> GetPlayerProfile(string playerId, long id)
+        {
+            var playerProfile = await _context.PlayerProfiles.FindAsync(
+                await _context.PlayerAccounts.Where(x => x.PlayerId == playerId).Select(i => i.Id).FirstOrDefaultAsync()
+            );
+
+            if(id != playerProfile.Id) {
+                return BadRequest();
+            }
+
+            if(playerProfile == null) {
                 return NotFound();
             }
 
@@ -45,27 +51,22 @@ namespace YourGameServer.Controllers
         // PUT: api/PlayerProfiles/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutPlayerProfile(long id, PlayerProfile playerProfile)
+        public async Task<IActionResult> PutPlayerProfile(string playerId, long id, PlayerProfile playerProfile)
         {
-            if (id != playerProfile.Id)
-            {
+            if(id != playerProfile.Id) {
                 return BadRequest();
             }
 
             _context.Entry(playerProfile).State = EntityState.Modified;
 
-            try
-            {
+            try {
                 await _context.SaveChangesAsync();
             }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!PlayerProfileExists(id))
-                {
+            catch(DbUpdateConcurrencyException) {
+                if(!PlayerProfileExists(id)) {
                     return NotFound();
                 }
-                else
-                {
+                else {
                     throw;
                 }
             }
@@ -73,7 +74,7 @@ namespace YourGameServer.Controllers
             return NoContent();
         }
 
-        // POST: api/PlayerProfiles
+        // POST: api/PlayerProfiles/playerid
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         public async Task<ActionResult<PlayerProfile>> PostPlayerProfile(PlayerProfile playerProfile)
@@ -89,8 +90,7 @@ namespace YourGameServer.Controllers
         public async Task<IActionResult> DeletePlayerProfile(long id)
         {
             var playerProfile = await _context.PlayerProfiles.FindAsync(id);
-            if (playerProfile == null)
-            {
+            if(playerProfile == null) {
                 return NotFound();
             }
 

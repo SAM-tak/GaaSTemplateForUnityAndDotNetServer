@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using MessagePack;
+using Microsoft.EntityFrameworkCore;
 using KeyAttribute = MessagePack.KeyAttribute;
 
 namespace YourGameServer.Models // Unity cannot accpect 'namespace YourProjectName.Models;' yet
@@ -20,14 +21,13 @@ namespace YourGameServer.Models // Unity cannot accpect 'namespace YourProjectNa
     }
 
     [MessagePackObject]
+    [Index(nameof(PlayerId))]
     public record PlayerAccount
     {
         [Key(0)]
         public long Id { get; init; }
         [Key(1), MaxLength(16)]
         public string PlayerId { get; init; }
-        [Key(2), MaxLength(64)]
-        public byte[] Secret { get; set; }
         [IgnoreMember]
         public List<PlayerDevice> DeviceList { get; init; }
         [Key(4)]

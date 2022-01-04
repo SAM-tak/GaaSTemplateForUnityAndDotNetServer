@@ -19,8 +19,12 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System;
 using System.IO;
+using System.Linq;
 
 var builder = WebApplication.CreateBuilder(args);
+
+var jwtTokenGenarator = new JwtTokenGenarator(builder.Configuration, builder.Environment);
+builder.Services.AddSingleton<JwtTokenGenarator>(i => jwtTokenGenarator);
 
 builder.Services.AddApiVersioning(options => {
     options.AssumeDefaultVersionWhenUnspecified = true;
@@ -51,16 +55,7 @@ builder.Services.AddAuthentication(options => {
     options.ClientSecret = googleAuthNSection["ClientSecret"];
     options.SaveTokens = true;
 })
-.AddJwtBearer(options => options.TokenValidationParameters = new TokenValidationParameters {
-    ValidateIssuer = true,
-    ValidateAudience = true,
-    ValidateLifetime = true,
-    ValidateIssuerSigningKey = true,
-    ValidIssuer = "YourGameServer",
-    ValidAudience = "YourGameClient",
-    RequireExpirationTime = true,
-    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration.GetSection("Authentication:JWT")["SecretKey"]))
-})
+.AddJwtBearer(options => options.TokenValidationParameters = jwtTokenGenarator.TokenValidationParameters)
 //.AddMicrosoftIdentityWebApp(builder.Configuration)
 ;
 //builder.Services.AddAuthentication().AddScheme<AuthenticationSchemeOptions, ApiAuthHandler>("Api", null);

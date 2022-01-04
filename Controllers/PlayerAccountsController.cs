@@ -39,7 +39,7 @@ public class PlayerAccountsController : ControllerBase
         return NotFound();
     }
 
-    // GET: api/PlayerAccounts/5
+    // GET: api/PlayerAccounts/1/5
     [HttpGet("{id}")]
     public async Task<ActionResult<PlayerAccount>> GetPlayerAccount(long id)
     {
@@ -81,13 +81,11 @@ public class PlayerAccountsController : ControllerBase
     // POST: api/PlayerAccounts
     // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
     [HttpPost]
-    [Authorize]
     public async Task<ActionResult<PlayerAccount>> PostPlayerAccount(PlayerAccount playerAccount)
     {
         var playerId = await LUID.NewLUIDStringAsync(async (i) => ! await _context.PlayerAccounts.AnyAsync(x => x.PlayerId == i));
         _context.PlayerAccounts.Add(playerAccount with {
-            PlayerId = playerId,
-            Secret = RandomNumberGenerator.GetBytes(32)
+            PlayerId = playerId
         });
         await _context.SaveChangesAsync();
 
@@ -112,26 +110,5 @@ public class PlayerAccountsController : ControllerBase
     private bool PlayerAccountExists(long id)
     {
         return _context.PlayerAccounts.Any(e => e.Id == id);
-    }
-
-    public static async Task<PlayerAccount> CreateAsync(GameDbContext context, AccountCreationModel accountCreationModel)
-    {
-        var playerId = await LUID.NewLUIDStringAsync(async (i) => !await context.PlayerAccounts.AnyAsync(x => x.PlayerId == i));
-        var curDateTime = DateTime.UtcNow;
-        return new PlayerAccount {
-            PlayerId = playerId,
-            Secret = RandomNumberGenerator.GetBytes(32),
-            DeviceList = new() {
-                new() {
-                    DeviceType = accountCreationModel.DeviceType,
-                    DeviceId = accountCreationModel.DeviceId,
-                    Since = curDateTime,
-                    LastUsed = curDateTime,
-                }
-            },
-            Since = curDateTime,
-            LastLogin = curDateTime,
-            Profile = new()
-        };
     }
 }

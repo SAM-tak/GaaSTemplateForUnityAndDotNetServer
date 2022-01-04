@@ -10,8 +10,9 @@ using YourGameServer.Models;
 
 namespace YourGameServer.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/[controller]/{playerid}")]
     [ApiController]
+    [ApiAuth]
     public class PlayerDevicesController : ControllerBase
     {
         private readonly GameDbContext _context;
@@ -21,16 +22,17 @@ namespace YourGameServer.Controllers
             _context = context;
         }
 
-        // GET: api/PlayerDevices
+        // GET: api/PlayerDevices/9
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<PlayerDevice>>> GetPlayerDevice()
+        public async Task<ActionResult<IEnumerable<PlayerDevice>>> GetPlayerDevice(string playerId)
         {
-            return await _context.PlayerDevices.ToListAsync();
+            var playerIntId = await _context.PlayerAccounts.Where(x => x.PlayerId == playerId).Select(i => i.Id).FirstOrDefaultAsync();
+            return await _context.PlayerDevices.Where(i => i.OwnerId == playerIntId).ToListAsync();
         }
 
-        // GET: api/PlayerDevices/5
+        // GET: api/PlayerDevices/9/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<PlayerDevice>> GetPlayerDevice(long id)
+        public async Task<ActionResult<PlayerDevice>> GetPlayerDevice(string playerId, long id)
         {
             var playerDevice = await _context.PlayerDevices.FindAsync(id);
 
@@ -39,15 +41,19 @@ namespace YourGameServer.Controllers
                 return NotFound();
             }
 
+            if(await _context.PlayerAccounts.Where(x => x.PlayerId == playerId).Select(i => i.Id).FirstOrDefaultAsync() != playerDevice.OwnerId) {
+                return BadRequest();
+            }
+
             return playerDevice;
         }
 
-        // PUT: api/PlayerDevices/5
+        // PUT: api/PlayerDevices/9/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutPlayerDevice(long id, PlayerDevice playerDevice)
+        public async Task<IActionResult> PutPlayerDevice(string playerId, long id, PlayerDevice playerDevice)
         {
-            if (id != playerDevice.Id)
+            if (id != playerDevice.Id || await _context.PlayerAccounts.Where(x => x.PlayerId == playerId).Select(i => i.Id).FirstOrDefaultAsync() != playerDevice.OwnerId)
             {
                 return BadRequest();
             }
@@ -76,22 +82,29 @@ namespace YourGameServer.Controllers
         // POST: api/PlayerDevices
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<PlayerDevice>> PostPlayerDevice(PlayerDevice playerDevice)
+        public async Task<ActionResult<PlayerDevice>> PostPlayerDevice(string playerId, PlayerDevice playerDevice)
         {
+            if(await _context.PlayerAccounts.Where(x => x.PlayerId == playerId).Select(i => i.Id).FirstOrDefaultAsync() != playerDevice.OwnerId) {
+                return BadRequest();
+            }
             _context.PlayerDevices.Add(playerDevice);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetPlayerDevice", new { id = playerDevice.Id }, playerDevice);
         }
 
-        // DELETE: api/PlayerDevices/5
+        // DELETE: api/PlayerDevices/9/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeletePlayerDevice(long id)
+        public async Task<IActionResult> DeletePlayerDevice(string playerId, long id)
         {
             var playerDevice = await _context.PlayerDevices.FindAsync(id);
             if (playerDevice == null)
             {
                 return NotFound();
+            }
+
+            if(await _context.PlayerAccounts.Where(x => x.PlayerId == playerId).Select(i => i.Id).FirstOrDefaultAsync() != playerDevice.OwnerId) {
+                return BadRequest();
             }
 
             _context.PlayerDevices.Remove(playerDevice);

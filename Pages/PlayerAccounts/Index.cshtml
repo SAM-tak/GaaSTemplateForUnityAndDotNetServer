@@ -4,14 +4,6 @@
 @{
     ViewData["Title"] = "Index";
 }
-<style>
-    .secret-col {
-        min-width: 50px;
-        max-width: 180px;
-        white-space: normal;
-        overflow-wrap: break-word;
-    }
-</style>
 
 <h1>Index</h1>
 
@@ -23,7 +15,7 @@
     <thead style="position: sticky;top: 10rem;background-color: #fff">
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.PlayerAccounts[0].PlayerId)
+                @Html.DisplayNameFor(model => model.PlayerAccounts[0].Luid)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.PlayerAccounts[0].Status)
@@ -53,7 +45,7 @@
 @foreach (var item in Model.PlayerAccounts) {
         <tr>
             <td>
-                @Html.DisplayFor(modelItem => item.PlayerId)
+                @Html.DisplayFor(modelItem => item.Luid)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Status)

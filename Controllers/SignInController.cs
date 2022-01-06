@@ -31,14 +31,14 @@ public class SignInController : ControllerBase
 
     [AllowAnonymous]
     [HttpPost]
-    public async Task<ActionResult<AccountCreationResult>> SignUp([FromBody] AccountCreationRequest signin)
+    public async Task<ActionResult<AccountCreationResult>> SignUp([FromBody][FromForm] AccountCreationRequest signin)
     {
         if(!string.IsNullOrWhiteSpace(signin.DeviceId)) {
             var playerAccount = await CreateAccountAsync(_context, signin);
             await _context.AddAsync(playerAccount);
             await _context.SaveChangesAsync();
             return Ok(new AccountCreationResult {
-                PlayerId = playerAccount.PlayerId,
+                Id = playerAccount.Id,
                 Token = _jwt.CreateToken(playerAccount.Id)
             });
         }
@@ -47,10 +47,10 @@ public class SignInController : ControllerBase
 
     public static async Task<PlayerAccount> CreateAccountAsync(GameDbContext context, AccountCreationRequest accountCreationModel)
     {
-        var playerId = await LUID.NewLUIDStringAsync(async (i) => !await context.PlayerAccounts.AnyAsync(x => x.PlayerId == i));
+        var playerId = await LUID.NewLUIDStringAsync(async (i) => !await context.PlayerAccounts.AnyAsync(x => x.Luid == i));
         var curDateTime = DateTime.UtcNow;
         return new PlayerAccount {
-            PlayerId = playerId,
+            Luid = playerId,
             DeviceList = new() {
                 new() {
                     DeviceType = accountCreationModel.DeviceType,

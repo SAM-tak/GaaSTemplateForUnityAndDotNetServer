@@ -15,8 +15,7 @@ namespace YourGameServer.Migrations
                 {
                     Id = table.Column<long>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    PlayerId = table.Column<string>(type: "TEXT", maxLength: 16, nullable: true),
-                    Secret = table.Column<byte[]>(type: "BLOB", maxLength: 64, nullable: true),
+                    Luid = table.Column<string>(type: "TEXT", maxLength: 16, nullable: true),
                     Status = table.Column<int>(type: "INTEGER", nullable: false),
                     Since = table.Column<DateTime>(type: "TEXT", nullable: false),
                     LastLogin = table.Column<DateTime>(type: "TEXT", nullable: false),
@@ -74,6 +73,11 @@ namespace YourGameServer.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PlayerAccounts_Luid",
+                table: "PlayerAccounts",
+                column: "Luid");
 
             migrationBuilder.CreateIndex(
                 name: "IX_PlayerDevices_OwnerId",

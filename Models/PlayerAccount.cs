@@ -1,14 +1,17 @@
-using System; // Unity needs this
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
 using MessagePack;
 using Microsoft.EntityFrameworkCore;
+using UnityEngine;
 using KeyAttribute = MessagePack.KeyAttribute;
 
 namespace YourGameServer.Models // Unity cannot accpect 'namespace YourProjectName.Models;' yet
 {
-    public enum PlayerStatus
+    public enum PlayerAccountStatus
     {
         [Description("Active")]
         Active,
@@ -21,17 +24,17 @@ namespace YourGameServer.Models // Unity cannot accpect 'namespace YourProjectNa
     }
 
     [MessagePackObject]
-    [Index(nameof(PlayerId))]
+    [Index(nameof(Luid))]
     public record PlayerAccount
     {
         [Key(0)]
         public long Id { get; init; }
         [Key(1), MaxLength(16)]
-        public string PlayerId { get; init; }
+        public string Luid { get; init; }
         [IgnoreMember]
         public List<PlayerDevice> DeviceList { get; init; }
         [Key(4)]
-        public PlayerStatus Status { get; set; }
+        public PlayerAccountStatus Status { get; set; }
         [Key(5)]
         public DateTime Since { get; init; }
         [Key(6)]

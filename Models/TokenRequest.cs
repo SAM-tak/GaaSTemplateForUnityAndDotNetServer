@@ -8,8 +8,12 @@ namespace YourGameServer.Models // Unity cannot accpect 'namespace YourProjectNa
     public record TokenRequest
     {
         [Key(0)]
-        public string PlayerId { get; init; }
+        public long Id { get; init; }
         [Key(1)]
+        public DeviceType DeviceType { get; init; }
+        [Key(2)]
         public string DeviceId { get; init; } // Unity's SystemInfo.deviceUniqueIdentifier
+        [Key(3)]
+        public string NewDeviceId { get; init; } // Unity's SystemInfo.deviceUniqueIdentifier
     }
 }

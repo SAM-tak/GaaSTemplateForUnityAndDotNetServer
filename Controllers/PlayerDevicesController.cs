@@ -10,7 +10,7 @@ using YourGameServer.Models;
 
 namespace YourGameServer.Controllers
 {
-    [Route("api/[controller]/{playerid}")]
+    [Route("api/{pid}/[controller]")]
     [ApiController]
     [ApiAuth]
     public class PlayerDevicesController : ControllerBase
@@ -22,18 +22,23 @@ namespace YourGameServer.Controllers
             _context = context;
         }
 
-        // GET: api/PlayerDevices/9
+        // GET: api/101/PlayerDevices
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<PlayerDevice>>> GetPlayerDevice(string playerId)
+        public async Task<ActionResult<IEnumerable<PlayerDevice>>> GetPlayerDevices(long pid)
         {
-            var playerIntId = await _context.PlayerAccounts.Where(x => x.PlayerId == playerId).Select(i => i.Id).FirstOrDefaultAsync();
-            return await _context.PlayerDevices.Where(i => i.OwnerId == playerIntId).ToListAsync();
+            return await _context.PlayerDevices.Where(i => i.OwnerId == pid).ToListAsync();
         }
 
-        // GET: api/PlayerDevices/9/5
+        // GET: api/101/PlayerDevices/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<PlayerDevice>> GetPlayerDevice(string playerId, long id)
+        public async Task<ActionResult<PlayerDevice>> GetPlayerDevice(long? pid, long id)
         {
+            if(pid is null) {
+                throw new ArgumentNullException(nameof(pid));
+            }
+
+            Console.WriteLine($"User = {User.Identity}");
+
             var playerDevice = await _context.PlayerDevices.FindAsync(id);
 
             if (playerDevice == null)
@@ -41,19 +46,19 @@ namespace YourGameServer.Controllers
                 return NotFound();
             }
 
-            if(await _context.PlayerAccounts.Where(x => x.PlayerId == playerId).Select(i => i.Id).FirstOrDefaultAsync() != playerDevice.OwnerId) {
+            if(pid != playerDevice.OwnerId) {
                 return BadRequest();
             }
 
             return playerDevice;
         }
 
-        // PUT: api/PlayerDevices/9/5
+        // PUT: api/101/PlayerDevices/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutPlayerDevice(string playerId, long id, PlayerDevice playerDevice)
+        public async Task<IActionResult> PutPlayerDevice(long pid, long id, PlayerDevice playerDevice)
         {
-            if (id != playerDevice.Id || await _context.PlayerAccounts.Where(x => x.PlayerId == playerId).Select(i => i.Id).FirstOrDefaultAsync() != playerDevice.OwnerId)
+            if (id != playerDevice.Id || pid != playerDevice.OwnerId)
             {
                 return BadRequest();
             }
@@ -79,12 +84,12 @@ namespace YourGameServer.Controllers
             return NoContent();
         }
 
-        // POST: api/PlayerDevices
+        // POST: api/PlayerDevices/{playerId}
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<PlayerDevice>> PostPlayerDevice(string playerId, PlayerDevice playerDevice)
+        public async Task<ActionResult<PlayerDevice>> PostPlayerDevice(long pid, PlayerDevice playerDevice)
         {
-            if(await _context.PlayerAccounts.Where(x => x.PlayerId == playerId).Select(i => i.Id).FirstOrDefaultAsync() != playerDevice.OwnerId) {
+            if(pid != playerDevice.OwnerId) {
                 return BadRequest();
             }
             _context.PlayerDevices.Add(playerDevice);
@@ -93,9 +98,9 @@ namespace YourGameServer.Controllers
             return CreatedAtAction("GetPlayerDevice", new { id = playerDevice.Id }, playerDevice);
         }
 
-        // DELETE: api/PlayerDevices/9/5
+        // DELETE: api/101/PlayerDevices/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeletePlayerDevice(string playerId, long id)
+        public async Task<IActionResult> DeletePlayerDevice(long pid, long id)
         {
             var playerDevice = await _context.PlayerDevices.FindAsync(id);
             if (playerDevice == null)
@@ -103,7 +108,7 @@ namespace YourGameServer.Controllers
                 return NotFound();
             }
 
-            if(await _context.PlayerAccounts.Where(x => x.PlayerId == playerId).Select(i => i.Id).FirstOrDefaultAsync() != playerDevice.OwnerId) {
+            if(pid != playerDevice.OwnerId) {
                 return BadRequest();
             }
 

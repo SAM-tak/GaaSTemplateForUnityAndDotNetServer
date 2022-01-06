@@ -35,7 +35,7 @@ namespace YourGameServer.Migrations
                     b.Property<DateTime>("LastLogin")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("PlayerId")
+                    b.Property<string>("Luid")
                         .HasMaxLength(16)
                         .HasColumnType("TEXT");
 
@@ -50,7 +50,7 @@ namespace YourGameServer.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("PlayerId");
+                    b.HasIndex("Luid");
 
                     b.ToTable("PlayerAccounts");
                 });

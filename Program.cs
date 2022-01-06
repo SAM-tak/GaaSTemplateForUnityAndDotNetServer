@@ -1,3 +1,6 @@
+using System;
+using System.IO;
+using System.Security;
 using System.Data.Common;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -6,30 +9,27 @@ using MessagePack.AspNetCoreMvcFormatter;
 using Microsoft.AspNetCore.Rewrite;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.Identity.Web.UI;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using YourGameServer;
 using YourGameServer.Data;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
-using System;
-using System.IO;
-using System.Linq;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var jwtTokenGenarator = new JwtTokenGenarator(builder.Configuration, builder.Environment);
-builder.Services.AddSingleton<JwtTokenGenarator>(i => jwtTokenGenarator);
+builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddApiVersioning(options => {
     options.AssumeDefaultVersionWhenUnspecified = true;
     options.DefaultApiVersion = new ApiVersion(1, 0);
 });
+
+var jwtTokenGenarator = new JwtTokenGenarator(builder.Configuration);
+if(builder.Environment.IsProduction() && jwtTokenGenarator.ExpireMinutes <= 0) throw new SecurityException("Jwt.ExpireMinute must be over 0 in production.");
+builder.Services.AddSingleton(i => jwtTokenGenarator);
+//builder.AddJwtTokenGenarator();
 
 // https://stackoverflow.com/questions/4804086/is-there-any-connection-string-parser-in-c
 
@@ -44,8 +44,10 @@ else {
 }
 // Add services to the container.
 builder.Services.AddAuthentication(options => {
-    options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
+    if(builder.Environment.IsDevelopment()) {
+        options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
+    }
 })
 .AddCookie()
 .AddCookie("OpenIdConnect")
@@ -82,6 +84,9 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+
+jwtTokenGenarator._serviceProvider = app.Services;
+//app.UseJwtTokenGenarator();
 
 // Configure the HTTP request pipeline.
 if(app.Environment.IsDevelopment()) {

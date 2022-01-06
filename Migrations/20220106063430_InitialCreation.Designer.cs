@@ -11,8 +11,8 @@ using YourGameServer.Data;
 namespace YourGameServer.Migrations
 {
     [DbContext(typeof(SqliteGameDbContext))]
-    [Migration("20220104144738_AddIndex")]
-    partial class AddIndex
+    [Migration("20220106063430_InitialCreation")]
+    partial class InitialCreation
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -37,7 +37,7 @@ namespace YourGameServer.Migrations
                     b.Property<DateTime>("LastLogin")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("PlayerId")
+                    b.Property<string>("Luid")
                         .HasMaxLength(16)
                         .HasColumnType("TEXT");
 
@@ -52,7 +52,7 @@ namespace YourGameServer.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("PlayerId");
+                    b.HasIndex("Luid");
 
                     b.ToTable("PlayerAccounts");
                 });

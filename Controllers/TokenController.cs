@@ -30,13 +30,23 @@ public class TokenController : ControllerBase
 
     [AllowAnonymous]
     [HttpPost]
-    public async Task<ActionResult<string>> Login([FromBody] TokenRequest login)
+    public async Task<ActionResult<string>> Login([FromBody][FromForm] TokenRequest login)
     {
-        var playerAccount = await _context.PlayerAccounts.Include(i => i.DeviceList).FirstOrDefaultAsync(i => i.PlayerId == login.PlayerId);
+        var playerAccount = await _context.PlayerAccounts.Include(i => i.DeviceList).FirstOrDefaultAsync(i => i.Id == login.Id);
         if(playerAccount != null) {
-            var playerDevice = playerAccount.DeviceList.FirstOrDefault(i => i.DeviceId == login.DeviceId);
+            var playerDevice = playerAccount.DeviceList.FirstOrDefault(i => i.DeviceType == login.DeviceType && i.DeviceId == login.DeviceId);
             if(playerDevice != null) {
-                playerAccount.LastLogin = playerDevice.LastUsed = DateTime.UtcNow;
+                playerAccount.LastLogin = DateTime.UtcNow;
+                if(!string.IsNullOrEmpty(login.NewDeviceId) && login.NewDeviceId != login.DeviceId) {
+                    playerDevice = new PlayerDevice {
+                        DeviceType = login.DeviceType,
+                        DeviceId = login.NewDeviceId,
+                        Since = playerAccount.LastLogin,
+                        LastUsed = playerAccount.LastLogin,
+                    };
+                    playerAccount.DeviceList.Add(playerDevice);
+                }
+                playerDevice.LastUsed = playerAccount.LastLogin;
                 _context.Entry(playerAccount).State = EntityState.Modified;
                 await _context.SaveChangesAsync();
                 return Ok(_jwt.CreateToken(playerAccount.Id));

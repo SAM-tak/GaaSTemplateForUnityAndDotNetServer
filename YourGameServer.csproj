@@ -32,4 +32,8 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
   </ItemGroup>
 
+  <Target Name="EchoDebugInfo" BeforeTargets="CoreCompile">
+      <Message Importance="high" Text="Just before building, current compile defines are $(DefineConstants)"></Message>
+  </Target>
+  
 </Project>

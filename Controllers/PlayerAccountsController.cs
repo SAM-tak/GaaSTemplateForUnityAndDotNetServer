@@ -25,7 +25,7 @@ public class PlayerAccountsController : ControllerBase
 
     // GET: api/101/PlayerAccounts?id=111&id=112&id=113
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<PlayerAccount>>> GetPlayerAccounts(long? pid, [FromQuery] long[] id
+    public async Task<ActionResult<IEnumerable<PlayerAccount.Masked>>> GetPlayerAccounts(long? pid, [FromQuery] long[] id
 #if DEBUG
         , [FromQuery] int? s, [FromQuery] int? c
 #endif
@@ -37,13 +37,16 @@ public class PlayerAccountsController : ControllerBase
 
         Console.WriteLine($"User = {User.Identity.Name} {User.Identity.IsAuthenticated}");
         //var idList = ids.Split('&').Distinct().ToArray();
-        if(await _context.PlayerAccounts.AnyAsync()) {
-            if(id != null && id.Length > 0) return await _context.PlayerAccounts.Where(i => id.Contains(i.Id)).ToListAsync();
-#if DEBUG
-            return await _context.PlayerAccounts.Skip(s ?? 0).Take(c ?? 1).ToListAsync();
-#endif
+        if(!await _context.PlayerAccounts.AnyAsync()) {
+            return NotFound();
         }
-        return NotFound();
+
+        if(id != null && id.Length > 0) {
+            return await _context.PlayerAccounts.Where(i => id.Contains(i.Id) && i.Status < PlayerAccountStatus.Banned).Select(i => i.MakeMasked()).ToListAsync();
+        }
+#if DEBUG
+        return await _context.PlayerAccounts.Skip(s ?? 0).Take(c ?? 1).Select(i => i.MakeMasked()).ToListAsync();
+#endif
     }
 
     // GET: api/101/PlayerAccounts/self
@@ -59,7 +62,7 @@ public class PlayerAccountsController : ControllerBase
         return playerAccount;
     }
 
-    // PUT: api/PlayerAccounts/5
+    // PUT: api/101/PlayerAccounts
     // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
     [HttpPut]
     public async Task<IActionResult> PutPlayerAccount(long pid, PlayerAccount playerAccount)
@@ -85,19 +88,19 @@ public class PlayerAccountsController : ControllerBase
         return NoContent();
     }
 
-    // POST: api/PlayerAccounts
+    // POST: api/101/PlayerAccounts
     // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-    [HttpPost]
-    public async Task<ActionResult<PlayerAccount>> PostPlayerAccount(PlayerAccount playerAccount)
-    {
-        var playerId = await LUID.NewLUIDStringAsync(async (i) => ! await _context.PlayerAccounts.AnyAsync(x => x.Luid == i));
-        _context.PlayerAccounts.Add(playerAccount with {
-            Luid = playerId
-        });
-        await _context.SaveChangesAsync();
+    // [HttpPost]
+    // public async Task<ActionResult<PlayerAccount>> PostPlayerAccount(PlayerAccount playerAccount)
+    // {
+    //     var playerId = await LUID.NewLUIDStringAsync(async (i) => ! await _context.PlayerAccounts.AnyAsync(x => x.Luid == i));
+    //     _context.PlayerAccounts.Add(playerAccount with {
+    //         Luid = playerId
+    //     });
+    //     await _context.SaveChangesAsync();
 
-        return CreatedAtAction("GetPlayerAccount", new { id = playerAccount.Id }, playerAccount);
-    }
+    //     return CreatedAtAction("GetPlayerAccount", new { id = playerAccount.Id }, playerAccount);
+    // }
 
     // DELETE: api/101/PlayerAccounts
     [HttpDelete]
@@ -108,7 +111,9 @@ public class PlayerAccountsController : ControllerBase
             return NotFound();
         }
 
-        _context.PlayerAccounts.Remove(playerAccount);
+        //_context.PlayerAccounts.Remove(playerAccount);
+        playerAccount.Status = PlayerAccountStatus.Expired;
+        _context.Entry(playerAccount).State = EntityState.Modified;
         await _context.SaveChangesAsync();
 
         return NoContent();

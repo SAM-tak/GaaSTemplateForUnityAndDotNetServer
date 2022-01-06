@@ -30,7 +30,7 @@ public class TokenController : ControllerBase
 
     [AllowAnonymous]
     [HttpPost]
-    public async Task<ActionResult<string>> Login([FromBody][FromForm] TokenRequest login)
+    public async Task<ActionResult<string>> Login([FromBody] TokenRequest login)
     {
         var playerAccount = await _context.PlayerAccounts.Include(i => i.DeviceList).FirstOrDefaultAsync(i => i.Id == login.Id);
         if(playerAccount != null) {

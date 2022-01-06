@@ -31,7 +31,7 @@ public class SignInController : ControllerBase
 
     [AllowAnonymous]
     [HttpPost]
-    public async Task<ActionResult<AccountCreationResult>> SignUp([FromBody][FromForm] AccountCreationRequest signin)
+    public async Task<ActionResult<AccountCreationResult>> SignUp([FromBody] AccountCreationRequest signin)
     {
         if(!string.IsNullOrWhiteSpace(signin.DeviceId)) {
             var playerAccount = await CreateAccountAsync(_context, signin);

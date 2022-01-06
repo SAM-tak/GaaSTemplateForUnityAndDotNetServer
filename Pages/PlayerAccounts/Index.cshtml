@@ -35,9 +35,6 @@
             <th>
                 @Html.DisplayNameFor(model => model.PlayerAccounts[0].ExpireDate)
             </th>
-            <th>
-                @Html.DisplayNameFor(model => model.PlayerAccounts[0].ProfileId)
-            </th>
             <th></th>
         </tr>
     </thead>
@@ -64,9 +61,6 @@
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.ExpireDate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ProfileId)
             </td>
             <td>
                 <a asp-page="./Edit" asp-route-id="@item.Id">Edit</a> |

@@ -11,7 +11,7 @@ using YourGameServer.Data;
 namespace YourGameServer.Migrations
 {
     [DbContext(typeof(SqliteGameDbContext))]
-    [Migration("20220106063430_InitialCreation")]
+    [Migration("20220106124307_InitialCreation")]
     partial class InitialCreation
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -40,9 +40,6 @@ namespace YourGameServer.Migrations
                     b.Property<string>("Luid")
                         .HasMaxLength(16)
                         .HasColumnType("TEXT");
-
-                    b.Property<long>("ProfileId")
-                        .HasColumnType("INTEGER");
 
                     b.Property<DateTime>("Since")
                         .HasColumnType("TEXT");

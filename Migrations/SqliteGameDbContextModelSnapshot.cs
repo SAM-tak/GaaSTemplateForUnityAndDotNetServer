@@ -39,9 +39,6 @@ namespace YourGameServer.Migrations
                         .HasMaxLength(16)
                         .HasColumnType("TEXT");
 
-                    b.Property<long>("ProfileId")
-                        .HasColumnType("INTEGER");
-
                     b.Property<DateTime>("Since")
                         .HasColumnType("TEXT");
 

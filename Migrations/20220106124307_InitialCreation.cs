@@ -21,8 +21,7 @@ namespace YourGameServer.Migrations
                     LastLogin = table.Column<DateTime>(type: "TEXT", nullable: false),
                     InactivateDate = table.Column<DateTime>(type: "TEXT", nullable: true),
                     BanDate = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    ExpireDate = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    ProfileId = table.Column<long>(type: "INTEGER", nullable: false)
+                    ExpireDate = table.Column<DateTime>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {

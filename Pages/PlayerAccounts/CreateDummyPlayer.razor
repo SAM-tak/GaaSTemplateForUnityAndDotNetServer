@@ -1,21 +1,15 @@
 @inject NavigationManager navigationManager
 @inject GameDbContext context
 
-<MudText Typo="Typo.h4" GutterBottom="true">Create Dummy Players</MudText>
-
-<MudText>Latest LUID: @latestLUID</MudText>
-
-<MudGrid>
-    <MudItem xs="12" sm="6" md="4">
-        <MudNumericField @bind-Value="Count" Label="Count" Variant="Variant.Text" Min="1" Max="9999" />
-    </MudItem>
-    <MudItem xs="12" sm="6" md="4">
-        <MudButton Variant="Variant.Filled" Color="Color.Primary" Disabled="@buttonDisabled" @onclick="Execute" >Execute</MudButton>
-    </MudItem>
-</MudGrid>
-<MudContainer>
-    <MudButton Variant="Variant.Filled" Color="Color.Secondary" Disabled="@buttonDisabled" @onclick="DeleteAll">Delete All</MudButton>
-</MudContainer>
+<MudPaper Class="pa-4 mr-16">
+    <MudText Typo="Typo.h6" GutterBottom="true">Create Dummy Players</MudText>
+    <MudText>Latest LUID: @latestLUID</MudText>
+    <MudGrid Class="pa-8">
+        <MudNumericField Label="Count" Variant="Variant.Text" Min="1" Max="9999" @bind-Value="Count" />
+        <MudButton Class="pl-4 ml-8" Variant="Variant.Filled" Color="Color.Primary" Disabled="@buttonDisabled" @onclick="Execute">Execute</MudButton>
+        <MudButton Class="pl-4 ml-8" Variant="Variant.Filled" Color="Color.Secondary" Disabled="@buttonDisabled" @onclick="DeleteAll">Delete All</MudButton>
+    </MudGrid>
+</MudPaper>
 
 @code {
     public int Count { get; set; } = 300;

@@ -1,6 +1,5 @@
 ﻿@inherits LayoutComponentBase
 
-
 <MudThemeProvider Theme="_theme" />
 <MudDialogProvider />
 <MudSnackbarProvider />
@@ -40,6 +39,20 @@
                 <MudListItem Text="Logout" Icon="@Icons.Material.Outlined.Login" Href="/pages/authentication/login" />
             </ChildContent>
         </MudMenu>
+@* @if (context.User?.Identity?.IsAuthenticated == true) { *@
+<AuthorizeView>
+    <Authorized>
+        <MudMenu Direction="Direction.Left" OffsetX="true" Dense="true" Class="mt-1 ml-4">
+            <ActivatorContent>
+                <MudText>@context.User?.Identity?.Name</MudText>
+            </ActivatorContent>
+            <ChildContent>
+                <MudListItem Text="Sign Out" Icon="@Icons.Material.Outlined.Login" Href="/controllers/auth/signout" />
+            </ChildContent>
+        </MudMenu>
+    </Authorized>
+</AuthorizeView>
+@* } *@
     </MudAppBar>
     <MudDrawer @bind-Open="_drawerOpen" Elevation="25" ClipMode="DrawerClipMode.Always">
         <NavMenu />

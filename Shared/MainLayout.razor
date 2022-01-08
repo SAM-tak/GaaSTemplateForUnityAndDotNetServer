@@ -1,5 +1,7 @@
 ﻿@inherits LayoutComponentBase
 
+@inject IHttpContextAccessor accessor
+
 <MudThemeProvider Theme="_theme" />
 <MudDialogProvider />
 <MudSnackbarProvider />
@@ -39,20 +41,16 @@
                 <MudListItem Text="Logout" Icon="@Icons.Material.Outlined.Login" Href="/pages/authentication/login" />
             </ChildContent>
         </MudMenu>
-@* @if (context.User?.Identity?.IsAuthenticated == true) { *@
-<AuthorizeView>
-    <Authorized>
+@if (accessor.HttpContext?.User?.Identity?.IsAuthenticated == true) {
         <MudMenu Direction="Direction.Left" OffsetX="true" Dense="true" Class="mt-1 ml-4">
             <ActivatorContent>
-                <MudText>@context.User?.Identity?.Name</MudText>
+                <MudText>@accessor.HttpContext?.User?.Identity?.Name</MudText>
             </ActivatorContent>
             <ChildContent>
                 <MudListItem Text="Sign Out" Icon="@Icons.Material.Outlined.Login" Href="/controllers/auth/signout" />
             </ChildContent>
         </MudMenu>
-    </Authorized>
-</AuthorizeView>
-@* } *@
+}
     </MudAppBar>
     <MudDrawer @bind-Open="_drawerOpen" Elevation="25" ClipMode="DrawerClipMode.Always">
         <NavMenu />
@@ -72,7 +70,6 @@
         </MudContainer>
     </MudMainContent>
 </MudLayout>
-
 
 @code {
     private MudBlazorAdminDashboard _theme = new();

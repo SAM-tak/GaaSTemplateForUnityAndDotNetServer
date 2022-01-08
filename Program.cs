@@ -16,6 +16,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using YourGameServer;
 using YourGameServer.Data;
+using MudBlazor.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,7 +31,7 @@ builder.AddJwtTokenGenarator();
 
 // https://stackoverflow.com/questions/4804086/is-there-any-connection-string-parser-in-c
 
-var connectionString = builder.Configuration.GetConnectionString(builder.Configuration["GameDbConnectionString"]);
+var connectionString = builder.Configuration.GetConnectionString(builder.Configuration["GameDbConnectionStringKey"]);
 var dbcsb = new DbConnectionStringBuilder() { ConnectionString = connectionString };
 if(dbcsb.ContainsKey("Data Source") && Path.GetExtension(dbcsb["Data Source"].ToString()) == ".db") {
     builder.Services.AddDbContext<GameDbContext>(options => options.UseSqlite(connectionString));
@@ -63,7 +64,7 @@ builder.Services.AddAuthorization(options => {
     options.AddPolicy("AllowOtherPlayer", new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build());
 });
 
-builder.Services.AddControllersWithViews(options => {
+builder.Services.AddControllers(options => {
     var msgpackOption = MessagePackSerializerOptions.Standard.WithCompression(MessagePackCompression.Lz4BlockArray);
     options.OutputFormatters.Add(new MessagePackOutputFormatter(msgpackOption));
     options.InputFormatters.Add(new MessagePackInputFormatter(msgpackOption));
@@ -79,6 +80,7 @@ builder.Services.AddServerSideBlazor();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddMudServices();
 
 var app = builder.Build();
 
@@ -89,7 +91,7 @@ if(app.Environment.IsDevelopment()) {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-if(app.Environment.IsProduction()) {
+else {
     app.UseExceptionHandler("/Error");
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
@@ -100,8 +102,8 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapDefaultControllerRoute();
-app.MapRazorPages();
 app.MapBlazorHub();
+app.MapFallbackToPage("/_Host");
 
 // app.UseRewriter(new RewriteOptions().Add(context => { // AddMicrosoftIdentityUI使うとこんなことしなきゃいけなくなる
 //     if (context.HttpContext.Request.Path == "/MicrosoftIdentity/Account/SignOut") {

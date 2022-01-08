@@ -36,10 +36,12 @@ public class SignInController : ControllerBase
         if(!string.IsNullOrWhiteSpace(signin.DeviceId)) {
             var playerAccount = await CreateAccountAsync(_context, signin);
             await _context.AddAsync(playerAccount);
+            playerAccount.CurrentDeviceId = playerAccount.DeviceList[0].Id;
             await _context.SaveChangesAsync();
             return Ok(new AccountCreationResult {
                 Id = playerAccount.Id,
-                Token = _jwt.CreateToken(playerAccount.Id)
+                DeviceId = playerAccount.CurrentDeviceId,
+                Token = _jwt.CreateToken(playerAccount.Id, playerAccount.CurrentDeviceId)
             });
         }
         return BadRequest();

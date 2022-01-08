@@ -87,7 +87,7 @@ public class PlayerProfilesController : ControllerBase
         return CreatedAtAction("GetPlayerProfile", new { id = playerProfile.Id }, playerProfile);
     }
 
-    // DELETE: api/101/PlayerProfiles/5
+    // DELETE: api/101/PlayerProfiles
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeletePlayerProfile(long pid, long id)
     {

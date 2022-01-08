@@ -31,12 +31,8 @@ namespace YourGameServer.Controllers
 
         // GET: api/101/PlayerDevices/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<PlayerDevice>> GetPlayerDevice(long? pid, long id)
+        public async Task<ActionResult<PlayerDevice>> GetPlayerDevice(long pid, long id)
         {
-            if(pid is null) {
-                throw new ArgumentNullException(nameof(pid));
-            }
-
             Console.WriteLine($"User = {User.Identity}");
 
             var playerDevice = await _context.PlayerDevices.FindAsync(id);

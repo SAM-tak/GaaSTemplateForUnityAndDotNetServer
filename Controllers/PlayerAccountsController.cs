@@ -42,7 +42,8 @@ public class PlayerAccountsController : ControllerBase
         }
 
         if(id != null && id.Length > 0) {
-            return await _context.PlayerAccounts.Where(i => id.Contains(i.Id) && i.Status < PlayerAccountStatus.Banned).Select(i => i.MakeMasked()).ToListAsync();
+            return await _context.PlayerAccounts.Include(i => i.Profile)
+                .Where(i => id.Contains(i.Id) && i.Status < PlayerAccountStatus.Banned).Select(i => i.MakeMasked()).ToListAsync();
         }
 #if DEBUG
         return await _context.PlayerAccounts.Skip(s ?? 0).Take(c ?? 1).Select(i => i.MakeMasked()).ToListAsync();

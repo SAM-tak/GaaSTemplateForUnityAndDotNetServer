@@ -3,14 +3,10 @@ using System.Text;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
-using System.Security.Claims;
-using System.Security.Cryptography;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Http;
 using System.Linq;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.Hosting;
-using System.Security;
+using YourGameServer.Data;
 using Microsoft.AspNetCore.Routing;
 
 namespace YourGameServer;
@@ -42,10 +38,20 @@ public class JwtTokenGenarator
                 if(_serviceProvider != null) {
                     var serviceScopeFactory = _serviceProvider.GetRequiredService<IServiceScopeFactory>();
                     using var scope = serviceScopeFactory.CreateScope();
-                    //var context = scope.ServiceProvider.GetService<GameDbContext>();
                     var httpContextAccessor = scope.ServiceProvider.GetService<IHttpContextAccessor>();
                     var pid = (string)httpContextAccessor.HttpContext.GetRouteValue("pid");
-                    return string.IsNullOrEmpty(pid) || audiences.Any(i => i == $"{validationParameters.ValidAudience}/{pid}");
+                    var deviceIdString = httpContextAccessor.HttpContext.Request.Headers["DeviceId"];
+                    if(!string.IsNullOrEmpty(pid) && !string.IsNullOrEmpty(deviceIdString)
+                    && audiences.Any(i => i == $"{validationParameters.ValidAudience}/{pid}/{deviceIdString}")) {
+                        var playerId = long.Parse(pid);
+                        var deviceId = long.Parse(deviceIdString);
+                        var context = scope.ServiceProvider.GetService<GameDbContext>();
+                        var playerAccount = context.PlayerAccounts.Find(playerId);
+                        if (playerAccount != null)
+                        {
+                            return playerAccount.CurrentDeviceId == deviceId;
+                        }
+                    }
                 }
                 return false;
             }
@@ -56,13 +62,14 @@ public class JwtTokenGenarator
     /// <summary>
     /// Create SecurityToken By Symmetry Key
     /// </summary>
-    /// <param name="id">Table index id</param>
+    /// <param name="playerId">Player Account Table index id</param>
+    /// <param name="deviceId">Device Id</param>
     /// <returns>Token string</returns>
-    public string CreateToken(long id)
+    public string CreateToken(long playerId, long deviceId)
     {
         var token = new JwtSecurityToken(
             issuer: TokenValidationParameters.ValidIssuer,
-            audience: $"{TokenValidationParameters.ValidAudience}/{id}",
+            audience: $"{TokenValidationParameters.ValidAudience}/{playerId}/{deviceId}",
             expires: ExpireMinutes > 0 ? DateTime.Now.AddMinutes(ExpireMinutes) : null,
             signingCredentials: SigningCredentials
         );

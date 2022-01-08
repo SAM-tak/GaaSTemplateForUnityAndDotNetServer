@@ -47,9 +47,13 @@ public class TokenController : ControllerBase
                     playerAccount.DeviceList.Add(playerDevice);
                 }
                 playerDevice.LastUsed = playerAccount.LastLogin;
+                playerAccount.CurrentDeviceId = playerDevice.Id;
                 _context.Entry(playerAccount).State = EntityState.Modified;
                 await _context.SaveChangesAsync();
-                return Ok(_jwt.CreateToken(playerAccount.Id));
+                return Ok(new TokenRequestResult {
+                    DeviceId = playerDevice.Id,
+                    Token = _jwt.CreateToken(playerAccount.Id, playerDevice.Id)
+                });
             }
         }
         return BadRequest();

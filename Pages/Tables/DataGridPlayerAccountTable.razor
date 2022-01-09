@@ -1,10 +1,10 @@
-@page "/tables/altplayeraccount"
+@page "/tables/datagridplayeraccount"
 
 @inject YourGameServer.Data.GameDbContext dbContext
 @inject MudBlazor.ISnackbar snackBar
 
 @* <MudDataGrid Items="(new PlayerAccount[] { playerAccount })" ReadOnly="false" EditMode="DataGridEditMode.Inline" StartedCommittingItemChanges="@(async () => await Create())"> *@
-<MudDataGrid Items="(new PlayerAccount[] { playerAccount })" ReadOnly="false" EditMode="DataGridEditMode.Inline">
+<MudDataGrid Items="(new PlayerAccount[] { playerAccount })" ReadOnly="false" EditMode="DataGridEditMode.Inline" @onsubmit="Create">
     <ToolBarContent>
         <MudText Typo="Typo.h6">Create</MudText>
     </ToolBarContent>
@@ -19,8 +19,8 @@
     </Columns>
 </MudDataGrid>
 <br />
-@* <MudDataGrid Items="dbContext.PlayerAccounts" FixedHeader="true" ReadOnly="_readOnly" Sortable="true" Filterable="true" QuickFilter="_quickFilter" EditMode="DataGridEditMode.Inline" StartedCommittingItemChanges="@(async () => await Save())"> *@
-<MudDataGrid Items="dbContext.PlayerAccounts" FixedHeader="true" ReadOnly="_readOnly" Sortable="true" Filterable="true" QuickFilter="_quickFilter" EditMode="DataGridEditMode.Inline">
+@* <MudDataGrid Items="dbContext.PlayerAccounts" FixedHeader="true" ReadOnly="_readOnly" Sortable="true" Filterable="true" QuickFilter="QuickFilter" EditMode="DataGridEditMode.Inline" StartedCommittingItemChanges="@(async () => await Save())"> *@
+<MudDataGrid Items="dbContext.PlayerAccounts" FixedHeader="true" ReadOnly="_readOnly" Sortable="true" Filterable="true" QuickFilter="QuickFilter" EditMode="DataGridEditMode.Inline" @onsubmit="Save">
     <ToolBarContent>
         <MudText Typo="Typo.h5">PlayerAccount</MudText>
         <MudSpacer />
@@ -52,7 +52,8 @@
     
     PlayerAccount playerAccount = new();
 
-    private Func<PlayerAccount, bool> _quickFilter => x => {
+    bool QuickFilter(PlayerAccount x)
+    {
         if (string.IsNullOrWhiteSpace(_searchString))
             return true;
 
@@ -63,13 +64,6 @@
             return true;
 
         return false;
-    };
-
-    async Task Save()
-    {
-        dbContext.Entry(playerAccount).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
-        await dbContext.SaveChangesAsync();
-        snackBar.Add("PlayerAccount Saved.", Severity.Success);
     }
 
     async Task Create()
@@ -77,13 +71,20 @@
         dbContext.Add(playerAccount);
         await dbContext.SaveChangesAsync();
         playerAccount = new PlayerAccount();
-        snackBar.Add("PlayerAccount Saved.", Severity.Success);
+        snackBar.Add($"New PlayerAccount (id:{playerAccount.Id}) Created.", Severity.Success);
+    }
+
+    async Task Save()
+    {
+        dbContext.Entry(playerAccount).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+        await dbContext.SaveChangesAsync();
+        snackBar.Add($"PlayerAccount (id:{playerAccount.Id}) Saved.", Severity.Success);
     }
 
     async Task Delete()
     {
         dbContext.PlayerAccounts.Remove(playerAccount);
         await dbContext.SaveChangesAsync();
-        snackBar.Add("PlayerAccount Deleted.", Severity.Success);
+        snackBar.Add($"PlayerAccount (id:{playerAccount.Id}) Deleted.", Severity.Success);
     }
 }

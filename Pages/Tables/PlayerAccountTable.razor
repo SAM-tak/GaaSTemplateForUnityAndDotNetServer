@@ -1,15 +1,12 @@
 @page "/tables/playeraccount"
 
 @inject YourGameServer.Data.GameDbContext dbContext
+@inject MudBlazor.IScrollManager scrollManager
+@inject MudBlazor.IDialogService dialogService
 @inject MudBlazor.ISnackbar snackBar
 
-<MudCard Elevation="25">
-    <MudCardHeader>
-        <CardHeaderContent>
-            <MudText Typo="Typo.h6">Add / Edit PlayerAccount</MudText>
-        </CardHeaderContent>
-    </MudCardHeader>
-    <MudCardContent>
+<MudExpansionPanels MultiExpansion="true" DisableBorders="true" Elevation="0">
+    <MudExpansionPanel id="playeraccount-edit-panel" Text="Add / Edit PlayerAccount" @bind-IsExpanded="_editPanelExpanded">
         @if (playerAccount.Id > 0)
         {
             <MudTextField Value="@playerAccount.Id" Label="Id" ReadOnly="true" Margin="Margin.Normal" />
@@ -43,47 +40,49 @@
             }
         </MudButton>
         <MudButton Variant="Variant.Filled" OnClick="Clear">Clear</MudButton>
-    </MudCardContent>
-</MudCard>
-<br />
-<MudTable Elevation="25" Items="dbContext.PlayerAccounts" Filter="Search" @bind-customer="playerAccount">
-    <ToolBarContent>
-        <MudText Typo="Typo.h6">PlayerAccount</MudText>
-        <MudSpacer />
-        <MudTextField @bind-Value="_searchString" Placeholder="Search for Students..." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
-    </ToolBarContent>
-    <HeaderContent>
-        <MudTh>Id</MudTh>
-        <MudTh>Luid</MudTh>
-        <MudTh>CurrentDeviceId</MudTh>
-        <MudTh>Status</MudTh>
-        <MudTh>Since</MudTh>
-        <MudTh>LastLogin</MudTh>
-        <MudTh>InactivateDate</MudTh>
-        <MudTh>BanDate</MudTh>
-        <MudTh>ExpireDate</MudTh>
-    </HeaderContent>
-    <RowTemplate>
-        <MudTd DataLabel="Id">@context.Id</MudTd>
-        <MudTd DataLabel="Luid">@context.Luid</MudTd>
-        <MudTd DataLabel="CurrentDeviceId">@context.CurrentDeviceId</MudTd>
-        <MudTd DataLabel="Status">@context.Status</MudTd>
-        <MudTd DataLabel="Since">@context.Since.ToShortDateString()</MudTd>
-        <MudTd DataLabel="LastLogin">@context.LastLogin.ToShortDateString()</MudTd>
-        <MudTd DataLabel="InactivateDate">@context.InactivateDate?.ToShortDateString()</MudTd>
-        <MudTd DataLabel="BanDate">@context.BanDate?.ToShortDateString()</MudTd>
-        <MudTd DataLabel="ExpireDate">@context.ExpireDate?.ToShortDateString()</MudTd>
-        <MudTd DataLabel="">
-            <MudFab @onclick="@(() => Edit(@context))" Color="Color.Primary" Icon="@Icons.Material.Filled.Edit" Size="Size.Small" IconSize="Size.Small" />
-            <MudFab @onclick="@(async () => await Delete(@context))" Color="Color.Secondary" Icon="@Icons.Material.Filled.Delete" Size="Size.Small" IconSize="Size.Small" />
-        </MudTd>
-    </RowTemplate>
-    <PagerContent>
-        <MudTablePager />
-    </PagerContent>
-</MudTable>
+    </MudExpansionPanel>
+    <MudExpansionPanel Text="PlayerAccount" @bind-IsExpanded="_listPanelExpanded">
+        <MudTable Items="dbContext.PlayerAccounts" Filter="Search" @bind-customer="playerAccount">
+            <ToolBarContent>
+                <MudTextField @bind-Value="_searchString" Placeholder="Search for Students..." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+            </ToolBarContent>
+            <HeaderContent>
+                <MudTh>Id</MudTh>
+                <MudTh>Luid</MudTh>
+                <MudTh>CurrentDeviceId</MudTh>
+                <MudTh>Status</MudTh>
+                <MudTh>Since</MudTh>
+                <MudTh>LastLogin</MudTh>
+                <MudTh>InactivateDate</MudTh>
+                <MudTh>BanDate</MudTh>
+                <MudTh>ExpireDate</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="Id">@context.Id</MudTd>
+                <MudTd DataLabel="Luid">@context.Luid</MudTd>
+                <MudTd DataLabel="CurrentDeviceId">@context.CurrentDeviceId</MudTd>
+                <MudTd DataLabel="Status">@context.Status</MudTd>
+                <MudTd DataLabel="Since">@context.Since.ToShortDateString()</MudTd>
+                <MudTd DataLabel="LastLogin">@context.LastLogin.ToShortDateString()</MudTd>
+                <MudTd DataLabel="InactivateDate">@context.InactivateDate?.ToShortDateString()</MudTd>
+                <MudTd DataLabel="BanDate">@context.BanDate?.ToShortDateString()</MudTd>
+                <MudTd DataLabel="ExpireDate">@context.ExpireDate?.ToShortDateString()</MudTd>
+                <MudTd DataLabel="">
+                    <MudFab @onclick="@(async () => await Edit(@context))" Color="Color.Primary" Icon="@Icons.Material.Filled.Edit" Size="Size.Small" IconSize="Size.Small" />
+                    <MudFab @onclick="@(async () => await Delete(@context))" Color="Color.Secondary" Icon="@Icons.Material.Filled.Delete" Size="Size.Small" IconSize="Size.Small" />
+                </MudTd>
+            </RowTemplate>
+            <PagerContent>
+                <MudTablePager />
+            </PagerContent>
+        </MudTable>
+    </MudExpansionPanel>
+</MudExpansionPanels>
 
 @code {
+    bool _editPanelExpanded = true;
+    bool _listPanelExpanded = true;
+
     string _searchString = "";
     
     PlayerAccount playerAccount = new();
@@ -106,30 +105,39 @@
     {
         this.playerAccount = new();
     }
-    void Edit(PlayerAccount playerAccount)
+
+    async Task Edit(PlayerAccount playerAccount)
     {
         this.playerAccount = playerAccount;
+        _editPanelExpanded = true;
+        await scrollManager.ScrollToTopAsync("playeraccount-edit-panel", ScrollBehavior.Smooth);
+    }
+    async Task Create(PlayerAccount playerAccount)
+    {
+        dbContext.Add(playerAccount);
+        await dbContext.SaveChangesAsync();
+        playerAccount = new PlayerAccount();
+        snackBar.Add($"New PlayerAccount (id:{playerAccount.Id}) Created.", Severity.Success);
     }
 
     async Task Save(PlayerAccount playerAccount)
     {
         dbContext.Entry(playerAccount).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
         await dbContext.SaveChangesAsync();
-        snackBar.Add("PlayerAccount Saved.", Severity.Success);
-    }
-
-    async Task Create(PlayerAccount playerAccount)
-    {
-        dbContext.Add(playerAccount);
-        await dbContext.SaveChangesAsync();
-        playerAccount = new PlayerAccount();
-        snackBar.Add("PlayerAccount Saved.", Severity.Success);
+        snackBar.Add($"PlayerAccount (id:{playerAccount.Id}) Saved.", Severity.Success);
     }
 
     async Task Delete(PlayerAccount playerAccount)
     {
-        dbContext.PlayerAccounts.Remove(playerAccount);
-        await dbContext.SaveChangesAsync();
-        snackBar.Add("PlayerAccount Deleted.", Severity.Success);
+        var parameters = new DialogParameters();
+        parameters.Add("ContentText", "Do you really want to delete these records? This process cannot be undone.");
+        parameters.Add("ButtonText", "Delete");
+        parameters.Add("Color", Color.Error);
+
+        if (!(await dialogService.Show<ConfirmDialog>("Delete", parameters, new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall }).Result).Cancelled) {
+            dbContext.PlayerAccounts.Remove(playerAccount);
+            await dbContext.SaveChangesAsync();
+            snackBar.Add($"PlayerAccount (id:{playerAccount.Id}) Deleted.", Severity.Success);
+        }
     }
 }

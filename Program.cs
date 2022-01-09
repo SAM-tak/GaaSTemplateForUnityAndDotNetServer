@@ -1,19 +1,12 @@
-using System;
-using System.IO;
 using System.Security;
 using System.Data.Common;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MessagePack;
 using MessagePack.AspNetCoreMvcFormatter;
-using Microsoft.AspNetCore.Rewrite;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
 using YourGameServer;
 using YourGameServer.Data;
 using MudBlazor.Services;
@@ -47,7 +40,7 @@ builder.Services.AddAuthentication(options => {
         options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
     }
 })
-.AddCookie()
+.AddCookie() // this is neccesary
 .AddCookie("OpenIdConnect")
 .AddGoogle(options => {
     IConfigurationSection googleAuthNSection = builder.Configuration.GetSection("Authentication:Google");
@@ -75,12 +68,13 @@ builder.Services.AddControllers(options => {
 })
 //.AddMicrosoftIdentityUI() // 今のところ役に立ってない
 ;
+builder.Services.AddControllers();
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
+builder.Services.AddMudServices();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddMudServices();
 
 var app = builder.Build();
 
@@ -104,11 +98,5 @@ app.UseAuthorization();
 app.MapDefaultControllerRoute();
 app.MapBlazorHub();
 app.MapFallbackToPage("/_Host");
-
-// app.UseRewriter(new RewriteOptions().Add(context => { // AddMicrosoftIdentityUI使うとこんなことしなきゃいけなくなる
-//     if (context.HttpContext.Request.Path == "/MicrosoftIdentity/Account/SignOut") {
-//         context.HttpContext.Response.Redirect("/");
-//     }
-// }));
 
 app.Run();

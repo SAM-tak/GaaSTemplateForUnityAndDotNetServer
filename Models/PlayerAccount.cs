@@ -33,7 +33,7 @@ namespace YourGameServer.Models // Unity cannot accpect 'namespace YourProjectNa
         [Key(0)]
         public ulong Id { get; init; }
         [Key(1), MaxLength(16)]
-        public string Code { get; init; }
+        public string Code { get; set; }
         [IgnoreMember]
         [JsonIgnore]
         public List<PlayerDevice> DeviceList { get; init; }

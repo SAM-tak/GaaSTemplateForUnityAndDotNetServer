@@ -57,7 +57,7 @@
         if (string.IsNullOrWhiteSpace(_searchString))
             return true;
 
-        if (x.Luid.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+        if (x.Code.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
             return true;
 
         if ($"{x.Id} {x.Since} {x.LastLogin}".Contains(_searchString))

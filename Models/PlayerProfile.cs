@@ -42,7 +42,7 @@ namespace YourGameServer.Models // Unity cannot accpect 'namespace YourProjectNa
             [Key(1)]
             public string Motto { get; set; }
             [Key(2)]
-            public ulong IconBlobId { get; init; }
+            public ulong IconBlobId { get; set; }
         }
     }
 }

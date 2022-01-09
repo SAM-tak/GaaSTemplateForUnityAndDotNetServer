@@ -15,7 +15,7 @@
         {
             <MudText Label="Id" Margin="Margin.Normal">New Item</MudText>
         }
-        <MudTextField Value="@playerAccount.Luid" Label="Luid" ReadOnly="true" Margin="Margin.Normal" />
+        <MudTextField Value="@playerAccount.Code" Label="Luid" ReadOnly="true" Margin="Margin.Normal" />
         <MudNumericField @bind-Value="playerAccount.CurrentDeviceId" Label="CurrentDeviceId" Margin="Margin.Normal" />
         <MudSelect @bind-Value="playerAccount.Status" Label="Status" Margin="Margin.Normal">
             @foreach (PlayerAccountStatus item in Enum.GetValues(typeof(PlayerAccountStatus)))
@@ -30,14 +30,7 @@
         <MudDatePicker @bind-Date="playerAccount.ExpireDate" Label="ExpireDate" Margin="Margin.Normal" />
         <br />
         <MudButton Variant="Variant.Filled" Color="Color.Success" OnClick="@(async () => await Save(playerAccount))">
-            @if (playerAccount.Id > 0)
-            {
-                @: Save Change
-            }
-            else
-            {
-                @: Create New
-            }
+            @(playerAccount.Id > 0 ? "Save Change" : "Create New")
         </MudButton>
         <MudButton Variant="Variant.Filled" OnClick="Clear">Clear</MudButton>
     </MudExpansionPanel>
@@ -59,7 +52,7 @@
             </HeaderContent>
             <RowTemplate>
                 <MudTd DataLabel="Id">@context.Id</MudTd>
-                <MudTd DataLabel="Luid">@context.Luid</MudTd>
+                <MudTd DataLabel="Luid">@context.Code</MudTd>
                 <MudTd DataLabel="CurrentDeviceId">@context.CurrentDeviceId</MudTd>
                 <MudTd DataLabel="Status">@context.Status</MudTd>
                 <MudTd DataLabel="Since">@context.Since.ToShortDateString()</MudTd>
@@ -82,9 +75,7 @@
 @code {
     bool _editPanelExpanded = true;
     bool _listPanelExpanded = true;
-
     string _searchString = "";
-    
     PlayerAccount playerAccount = new();
     
     private bool Search(PlayerAccount x)
@@ -92,7 +83,7 @@
         if (string.IsNullOrWhiteSpace(_searchString))
             return true;
 
-        if (x.Luid.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+        if (x.Code.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
             return true;
 
         if ($"{x.Id} {x.Since} {x.LastLogin}".Contains(_searchString))

@@ -13,7 +13,7 @@
             <MudIcon Icon="@Icons.Custom.Brands.MudBlazor" Size="Size.Large" />
         </MudHidden>
         <MudHidden Breakpoint="Breakpoint.MdAndUp">
-            <MudIconButton Icon="@Icons.Material.Outlined.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
+            <MudIconButton Icon="@Icons.Material.Outlined.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="DrawerToggle" />
         </MudHidden>
         <MudHidden Breakpoint="Breakpoint.Xs">
             <MudText Typo="Typo.h6" Class="ml-4">YourGameServer</MudText>
@@ -36,7 +36,7 @@
                 <MudText>@HttpContextAccessor.HttpContext?.User?.Identity?.Name</MudText>
             </ActivatorContent>
             <ChildContent>
-                <MudListItem Text="Sign Out" Icon="@Icons.Material.Outlined.Login" OnClick="@SignOut" />
+                <MudNavLink Icon="@Icons.Material.Outlined.Login" Href="/Auth/SignOut">Sign Out</MudNavLink>
             </ChildContent>
         </MudMenu>
     </MudAppBar>
@@ -49,14 +49,23 @@
                 <MudIconButton Icon="@Icons.Material.Outlined.Menu" Color="Color.Inherit" OnClick="@((e) => DrawerToggle())" Class="ml-3" />
                 <MudBreadcrumbs Items="_items"></MudBreadcrumbs>
                 <MudSpacer />
-                <MudButton Variant="Variant.Text" Link="https://mudblazor.com/" Style="color:#594AE2;">MudBlazor</MudButton>
-                <MudButton Variant="Variant.Text" Link="https://github.com/Garderoben/YourGameServers" Style="color:#424242;" Class="mr-3">Source Code</MudButton>
             </MudToolBar>
         </MudHidden>
         <MudContainer MaxWidth="MaxWidth.False" Class="mt-4">
             @Body
+            <MudGrid Class="docs-footer">
+                <MudItem xs="12">
+                    <MudToolBar DisableGutters="true" Dense="true">
+                        <MudText Typo="Typo.body1">Copyright © 2021-2022 GaaS Template For Unity & .NET.</MudText>
+                        <MudIconButton Icon="@Icons.Custom.Brands.GitHub" Color="Color.Inherit" Edge="Edge.End" Link="https://github.com/SAM-tak/GaaSTemplateForUnityAndDotNetServer"/>
+                    </MudToolBar>
+                </MudItem>
+            </MudGrid>
         </MudContainer>
     </MudMainContent>
+    <MudScrollToTop TopOffset="400" Style="z-index:2000;">
+        <MudFab Icon="@Icons.Material.Filled.KeyboardArrowUp" Color="Color.Primary"/>
+    </MudScrollToTop>
 </MudLayout>
 
 @code {
@@ -79,9 +88,4 @@
         new BreadcrumbItem("Personal", href: "#"),
         new BreadcrumbItem("Dashboard", href: "#"),
     };
-
-    private void SignOut()
-    {
-        NavigationManager.NavigateTo("/Auth/SignOut", true);
-    }
 }

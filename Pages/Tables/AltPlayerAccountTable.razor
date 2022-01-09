@@ -1,0 +1,89 @@
+@page "/tables/altplayeraccount"
+
+@inject YourGameServer.Data.GameDbContext dbContext
+@inject MudBlazor.ISnackbar snackBar
+
+@* <MudDataGrid Items="(new PlayerAccount[] { playerAccount })" ReadOnly="false" EditMode="DataGridEditMode.Inline" StartedCommittingItemChanges="@(async () => await Create())"> *@
+<MudDataGrid Items="(new PlayerAccount[] { playerAccount })" ReadOnly="false" EditMode="DataGridEditMode.Inline">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">Create</MudText>
+    </ToolBarContent>
+    <Columns>
+        <Column T="PlayerAccount" Field="Luid" />
+        <Column T="PlayerAccount" Field="CurrentDeviceId" />
+        <Column T="PlayerAccount" Field="Status" />
+        <Column T="PlayerAccount" Field="LastLogin" />
+        <Column T="PlayerAccount" Field="InactivateDate" />
+        <Column T="PlayerAccount" Field="BanDate" />
+        <Column T="PlayerAccount" Field="ExpireDate" />
+    </Columns>
+</MudDataGrid>
+<br />
+@* <MudDataGrid Items="dbContext.PlayerAccounts" FixedHeader="true" ReadOnly="_readOnly" Sortable="true" Filterable="true" QuickFilter="_quickFilter" EditMode="DataGridEditMode.Inline" StartedCommittingItemChanges="@(async () => await Save())"> *@
+<MudDataGrid Items="dbContext.PlayerAccounts" FixedHeader="true" ReadOnly="_readOnly" Sortable="true" Filterable="true" QuickFilter="_quickFilter" EditMode="DataGridEditMode.Inline">
+    <ToolBarContent>
+        <MudText Typo="Typo.h5">PlayerAccount</MudText>
+        <MudSpacer />
+        <MudTextField @bind-Value="_searchString" Placeholder="Search" Adornment="Adornment.Start" Immediate="true" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" />
+    </ToolBarContent>
+    <Columns>
+        <Column T="PlayerAccount" Field="Id" IsEditable="false" />
+        <Column T="PlayerAccount" Field="Luid" />
+        <Column T="PlayerAccount" Field="CurrentDeviceId" />
+        <Column T="PlayerAccount" Field="Status" />
+        <Column T="PlayerAccount" Field="LastLogin" />
+        <Column T="PlayerAccount" Field="InactivateDate" />
+        <Column T="PlayerAccount" Field="BanDate" />
+        <Column T="PlayerAccount" Field="ExpireDate" />
+    </Columns>
+    <PagerContent>
+        <MudDataGridPager T="PlayerAccount" />
+    </PagerContent>
+</MudDataGrid>
+
+<div class="d-flex flex-wrap mt-4">
+    <MudSwitch @bind-Checked="@_readOnly" Color="Color.Primary">Read Only</MudSwitch>
+</div>
+
+@code {
+    bool _readOnly;
+
+    string _searchString = "";
+    
+    PlayerAccount playerAccount = new();
+
+    private Func<PlayerAccount, bool> _quickFilter => x => {
+        if (string.IsNullOrWhiteSpace(_searchString))
+            return true;
+
+        if (x.Luid.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        if ($"{x.Id} {x.Since} {x.LastLogin}".Contains(_searchString))
+            return true;
+
+        return false;
+    };
+
+    async Task Save()
+    {
+        dbContext.Entry(playerAccount).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+        await dbContext.SaveChangesAsync();
+        snackBar.Add("PlayerAccount Saved.", Severity.Success);
+    }
+
+    async Task Create()
+    {
+        dbContext.Add(playerAccount);
+        await dbContext.SaveChangesAsync();
+        playerAccount = new PlayerAccount();
+        snackBar.Add("PlayerAccount Saved.", Severity.Success);
+    }
+
+    async Task Delete()
+    {
+        dbContext.PlayerAccounts.Remove(playerAccount);
+        await dbContext.SaveChangesAsync();
+        snackBar.Add("PlayerAccount Deleted.", Severity.Success);
+    }
+}

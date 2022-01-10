@@ -19,7 +19,7 @@
     <MudSelect T="PlayerAccountStatus" @bind-Value="playerAccount.Status" Label="Status" Margin="Margin.Normal">
         @foreach (PlayerAccountStatus item in Enum.GetValues(typeof(PlayerAccountStatus)))
         {
-            <MudSelectItem Value="@item">@(item.ToString())</MudSelectItem>
+            <MudSelectItem Value="@item">@item.ToString()</MudSelectItem>
         }
     </MudSelect>
     <MudGrid>
@@ -68,11 +68,11 @@
     </MudButton>
     <MudButton Variant="Variant.Filled" OnClick="Clear">Clear</MudButton>
 </MudExpansionPanel>
-<MudTable Items="dbContext.PlayerAccounts" Filter="Search" @bind-customer="playerAccount">
+<MudTable Items="dbContext.PlayerAccounts" Filter="Search">
     <ToolBarContent>
         <MudText Typo="Typo.h6">@ListPanelText</MudText>
         <MudSpacer />
-        <MudTextField @bind-Value="_searchString" Placeholder="Search for PlayerAccounts..." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" />
+        <MudTextField @bind-Value="_searchString" Placeholder="@PlaceholderText" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" />
     </ToolBarContent>
     <HeaderContent>
         <MudTh>Id</MudTh>
@@ -113,6 +113,7 @@
     static readonly string EditPanelId =  $"{nameof(PlayerAccount).ToLower()}-edit-panel";
     static readonly string EditPanelText = $"Add / Edit {nameof(PlayerAccount)}";
     static readonly string ListPanelText = nameof(PlayerAccount);
+    static readonly string PlaceholderText = $"Search for {nameof(PlayerAccount)}...";
 
     private bool Search(PlayerAccount x)
     {

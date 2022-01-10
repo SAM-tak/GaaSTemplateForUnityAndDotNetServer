@@ -1,8 +1,3 @@
-#nullable disable
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using YourGameServer.Data;
@@ -88,7 +83,7 @@ public class PlayerAccountsController : ControllerBase
         return NoContent();
     }
 
-    // POST: api/101/PlayerAccounts
+    // POST: api/PlayerAccounts
     // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
     // [HttpPost]
     // public async Task<ActionResult<PlayerAccount>> PostPlayerAccount(PlayerAccount playerAccount)

@@ -14,7 +14,7 @@ public class AuthController : Controller
     {
         var referer = Request.Headers.ContainsKey("Referer") ? Request.Headers["Referer"].ToString() : null;
         Console.WriteLine($"Request.Headers['Referer'] = {referer}");
-        if(referer != null && referer.Contains("Auth/SignOut")) referer = null;
+        if(referer != null && referer.Contains("Auth/LogOut")) referer = null;
         //return SignOut(new AuthenticationProperties { RedirectUri = Request.Headers["Referer"] }, "Cookies", "OpenIdConnect");
         await HttpContext.SignOutAsync(OpenIdConnectDefaults.AuthenticationScheme);
         await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);

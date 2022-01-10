@@ -22,21 +22,13 @@
             <MudText Typo="Typo.subtitle2">YourGameServer</MudText>
         </MudHidden>
         <MudSpacer />
-        <MudMenu Icon="@Icons.Material.Outlined.Translate" Color="Color.Inherit" Direction="Direction.Bottom" OffsetY="true" Dense="true">
-            <MudMenuItem>English</MudMenuItem>
-            <MudMenuItem>Swedish</MudMenuItem>
-            <MudMenuItem>Old Norse</MudMenuItem>
-        </MudMenu>
-        <MudMenu Icon="@Icons.Material.Outlined.Widgets" Color="Color.Inherit" Direction="Direction.Bottom" OffsetY="true" Dense="true">
-            <MudMenuItem Link="https://mudblazor.com/">MudBlazor</MudMenuItem>
-            <MudMenuItem Link="https://github.com/Garderoben/YourGameServers">Source Code</MudMenuItem>
-        </MudMenu>
         <MudMenu Direction="Direction.Left" OffsetX="true" Dense="true" Class="mt-1 ml-4">
             <ActivatorContent>
                 <MudText>@HttpContextAccessor.HttpContext?.User?.Identity?.Name</MudText>
             </ActivatorContent>
             <ChildContent>
-                <MudNavLink Icon="@Icons.Material.Outlined.Login" Href="/Auth/SignOut">Sign Out</MudNavLink>
+                @* Dont use Href="/Auth/LogOut", use NavigateTo instead. 'cos Href NavLink make wrong referer *@
+                <MudNavLink Icon="@Icons.Material.Outlined.Login" OnClick="LogOut">Log Out</MudNavLink>
             </ChildContent>
         </MudMenu>
     </MudAppBar>
@@ -56,7 +48,7 @@
             <MudGrid Class="docs-footer">
                 <MudItem xs="12">
                     <MudToolBar DisableGutters="true" Dense="true">
-                        <MudText Typo="Typo.body1">Copyright © 2021-2022 GaaS Template For Unity & .NET.</MudText>
+                        <MudText Typo="Typo.body1">GaaS Template For Unity & .NET Copyright © 2021-2022 SAM-tak.</MudText>
                         <MudIconButton Icon="@Icons.Custom.Brands.GitHub" Color="Color.Inherit" Edge="Edge.End" Link="https://github.com/SAM-tak/GaaSTemplateForUnityAndDotNetServer"/>
                     </MudToolBar>
                 </MudItem>
@@ -83,9 +75,15 @@
         StateHasChanged();
     }
 
-    private List<BreadcrumbItem> _items = new List<BreadcrumbItem>
+    List<BreadcrumbItem> _items = new List<BreadcrumbItem>
     {
         new BreadcrumbItem("Personal", href: "#"),
         new BreadcrumbItem("Dashboard", href: "#"),
     };
+
+    // just for correct referer
+    void LogOut()
+    {
+        NavigationManager.NavigateTo("/Auth/LogOut", true);
+    }
 }

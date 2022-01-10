@@ -76,7 +76,7 @@ public class PlayerProfilesController : ControllerBase
         return NoContent();
     }
 
-    // POST: api/101/PlayerProfiles
+    // POST: api/PlayerProfiles
     // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
     [HttpPost]
     public async Task<ActionResult<PlayerProfile>> PostPlayerProfile([FromHeader] ulong playerId, PlayerProfile playerProfile)
@@ -90,7 +90,7 @@ public class PlayerProfilesController : ControllerBase
         return CreatedAtAction("GetPlayerProfile", new { id = playerProfile.Id }, playerProfile);
     }
 
-    // DELETE: api/101/PlayerProfiles
+    // DELETE: api/PlayerProfiles
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeletePlayerProfile([FromHeader] ulong playerId, ulong id)
     {

@@ -43,9 +43,9 @@ namespace YourGameServer.Models // Unity cannot accpect 'namespace YourProjectNa
         [Key(2)]
         public PlayerAccountStatus Status { get; set; }
         [Key(3)]
-        public DateTime Since { get; init; }
+        public DateTime? Since { get; set; }
         [Key(4)]
-        public DateTime LastLogin { get; set; }
+        public DateTime? LastLogin { get; set; }
         [Key(5)]
         public DateTime? InactivateDate { get; set; }
         [Key(6)]
@@ -76,9 +76,9 @@ namespace YourGameServer.Models // Unity cannot accpect 'namespace YourProjectNa
             [Key(1)]
             public PlayerAccountStatus Status { get; set; }
             [Key(2)]
-            public DateTime Since { get; init; }
+            public DateTime? Since { get; set; }
             [Key(3)]
-            public DateTime LastLogin { get; set; }
+            public DateTime? LastLogin { get; set; }
             [Key(4)]
             public PlayerProfile.Masked Profile { get; init; }
         }

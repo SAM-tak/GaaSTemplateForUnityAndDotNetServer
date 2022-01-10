@@ -29,18 +29,18 @@ namespace YourGameServer.Models // Unity cannot accpect 'namespace YourProjectNa
         [Key(0)]
         public ulong Id { get; init; }
         [Key(1)]
-        public ulong OwnerId { get; init; }
+        public ulong OwnerId { get; set; }
         [IgnoreMember]
         [JsonIgnore]
         [ForeignKey("OwnerId")]
         public PlayerAccount Owner { get; init; }
         [Key(2)]
-        public DeviceType DeviceType { get; init; }
+        public DeviceType DeviceType { get; set; }
         [Key(3)]
-        public string DeviceId { get; init; }
+        public string DeviceId { get; set; }
         [Key(4)]
-        public DateTime Since { get; init; }
+        public DateTime? Since { get; set; }
         [Key(5)]
-        public DateTime LastUsed { get; set; }
+        public DateTime? LastUsed { get; set; }
     }
 }

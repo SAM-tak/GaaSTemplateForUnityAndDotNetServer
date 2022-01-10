@@ -1,0 +1,121 @@
+@page "/tables/playerprofile"
+
+@inject YourGameServer.Data.GameDbContext dbContext
+@inject MudBlazor.IScrollManager scrollManager
+@inject MudBlazor.IDialogService dialogService
+@inject MudBlazor.ISnackbar snackBar
+
+<MudExpansionPanels MultiExpansion="true" DisableBorders="true" Elevation="0">
+    <MudExpansionPanel id="@EditPanelId" Text="@EditPanelText" @bind-IsExpanded="_editPanelExpanded">
+        @if (playerProfile.Id > 0)
+        {
+            <MudNumericField Value="@playerProfile.Id" Label="Id" ReadOnly="true" Margin="Margin.Normal" />
+        }
+        else
+        {
+            <MudText Label="Id" Margin="Margin.Normal">New Item</MudText>
+        }
+        <MudNumericField @bind-Value="playerProfile.OwnerId" Label="OwnerId" Margin="Margin.Normal" />
+        <MudTextField @bind-Value="playerProfile.Name" Label="Name" Margin="Margin.Normal" />
+        <MudTextField @bind-Value="playerProfile.Motto" Label="Motto" Margin="Margin.Normal" />
+        <MudNumericField @bind-Value="playerProfile.IconBlobId" Label="IconBlobId" Margin="Margin.Normal" />
+        <br />
+        <MudButton Variant="Variant.Filled" Color="Color.Success" OnClick="@(async () => await Save(playerProfile))">
+            @(playerProfile.Id > 0 ? "Save Change" : "Create New")
+        </MudButton>
+        <MudButton Variant="Variant.Filled" OnClick="Clear">Clear</MudButton>
+    </MudExpansionPanel>
+    <MudExpansionPanel Text="@ListPanelText" @bind-IsExpanded="_listPanelExpanded">
+        <MudTable Items="dbContext.PlayerProfiles" Filter="Search" @bind-customer="playerProfile">
+            <ToolBarContent>
+                <MudTextField @bind-Value="_searchString" Placeholder="Search for PlayerProfiles..." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+            </ToolBarContent>
+            <HeaderContent>
+                <MudTh>Id</MudTh>
+                <MudTh>OwnerId</MudTh>
+                <MudTh>Name</MudTh>
+                <MudTh>Motto</MudTh>
+                <MudTh>IconBlobId</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="Id">@context.Id</MudTd>
+                <MudTd DataLabel="OwnerId">@context.OwnerId</MudTd>
+                <MudTd DataLabel="Name">@context.Name</MudTd>
+                <MudTd DataLabel="Motto">@context.Motto</MudTd>
+                <MudTd DataLabel="IconBlobId">@context.IconBlobId</MudTd>
+                <MudTd DataLabel="">
+                    <MudFab @onclick="@(async () => await Edit(@context))" Color="Color.Primary" Icon="@Icons.Material.Filled.Edit" Size="Size.Small" IconSize="Size.Small" />
+                    <MudFab @onclick="@(async () => await Delete(@context))" Color="Color.Secondary" Icon="@Icons.Material.Filled.Delete" Size="Size.Small" IconSize="Size.Small" />
+                </MudTd>
+            </RowTemplate>
+            <PagerContent>
+                <MudTablePager />
+            </PagerContent>
+        </MudTable>
+    </MudExpansionPanel>
+</MudExpansionPanels>
+
+@code {
+    bool _editPanelExpanded = false;
+    bool _listPanelExpanded = true;
+    string _searchString = "";
+    PlayerProfile playerProfile = new();
+
+    static readonly string EditPanelId =  $"{nameof(PlayerProfile).ToLower()}-edit-panel";
+    static readonly string EditPanelText = $"Add / Edit {nameof(PlayerProfile)}";
+    static readonly string ListPanelText = nameof(PlayerProfile);
+
+    private bool Search(PlayerProfile x)
+    {
+        if (string.IsNullOrWhiteSpace(_searchString)) return true;
+
+        if (x.Name.Contains(_searchString, StringComparison.OrdinalIgnoreCase)) return true;
+
+        if (x.Motto.Contains(_searchString, StringComparison.OrdinalIgnoreCase)) return true;
+
+        if ($"{x.Id} {x.IconBlobId}".Contains(_searchString)) return true;
+
+        return false;
+    }
+
+    void Clear()
+    {
+        playerProfile = new();
+    }
+
+    async Task Edit(PlayerProfile playerProfile)
+    {
+        this.playerProfile = playerProfile;
+        _editPanelExpanded = true;
+        await scrollManager.ScrollToTopAsync(EditPanelId, ScrollBehavior.Smooth);
+    }
+
+    async Task Create(PlayerProfile playerProfile)
+    {
+        dbContext.Add(playerProfile);
+        await dbContext.SaveChangesAsync();
+        playerProfile = new PlayerProfile();
+        snackBar.Add($"New {nameof(PlayerProfile)} (id:{playerProfile.Id}) Created.", Severity.Success);
+    }
+
+    async Task Save(PlayerProfile playerProfile)
+    {
+        dbContext.Entry(playerProfile).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+        await dbContext.SaveChangesAsync();
+        snackBar.Add($"{nameof(PlayerProfile)} (id:{playerProfile.Id}) Saved.", Severity.Success);
+    }
+
+    async Task Delete(PlayerProfile playerProfile)
+    {
+        var parameters = new DialogParameters();
+        parameters.Add("ContentText", $"Do you really want to delete this records? This process cannot be undone.\n{playerProfile}");
+        parameters.Add("ButtonText", "Delete");
+        parameters.Add("Color", Color.Error);
+
+        if (!(await dialogService.Show<ConfirmDialog>("Delete", parameters, new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall }).Result).Cancelled) {
+            dbContext.PlayerProfiles.Remove(playerProfile);
+            await dbContext.SaveChangesAsync();
+            snackBar.Add($"{nameof(PlayerProfile)} (id:{playerProfile.Id}) Deleted.", Severity.Success);
+        }
+    }
+}

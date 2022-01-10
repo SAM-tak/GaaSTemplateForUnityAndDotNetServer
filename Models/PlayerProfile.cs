@@ -11,7 +11,7 @@ namespace YourGameServer.Models // Unity cannot accpect 'namespace YourProjectNa
         [Key(0)]
         public ulong Id { get; init; }
         [Key(1)]
-        public ulong OwnerId { get; init; }
+        public ulong OwnerId { get; set; }
         [IgnoreMember]
         [ForeignKey("OwnerId")]
         public PlayerAccount Owner { get; init; }
@@ -20,7 +20,7 @@ namespace YourGameServer.Models // Unity cannot accpect 'namespace YourProjectNa
         [Key(3)]
         public string Motto { get; set; }
         [Key(4)]
-        public ulong IconBlobId { get; init; }
+        public ulong IconBlobId { get; set; }
         [IgnoreMember]
         public IconBlob IconBlob { get; init; }
 

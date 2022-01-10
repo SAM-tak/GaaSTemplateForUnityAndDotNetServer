@@ -20,7 +20,7 @@ namespace YourGameServer.Models // Unity cannot accpect 'namespace YourProjectNa
         [Key(3)]
         public ConsumableStatus Status { get; set; }
         [Key(4)]
-        public DateTime Period { get; set; }
+        public DateTime? Period { get; set; }
         [Key(5)]
         public DateTime? UsedDate { get; set; }
         [Key(6)]

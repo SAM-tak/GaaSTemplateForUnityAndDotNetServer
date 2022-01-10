@@ -1,0 +1,127 @@
+@page "/tables/playerdevice"
+
+@inject YourGameServer.Data.GameDbContext dbContext
+@inject MudBlazor.IScrollManager scrollManager
+@inject MudBlazor.IDialogService dialogService
+@inject MudBlazor.ISnackbar snackBar
+
+<MudExpansionPanels MultiExpansion="true" DisableBorders="true" Elevation="0">
+    <MudExpansionPanel id="@EditPanelId" Text="@EditPanelText" @bind-IsExpanded="_editPanelExpanded">
+        @if (playerDevice.Id > 0)
+        {
+            <MudNumericField Value="@playerDevice.Id" Label="Id" ReadOnly="true" Margin="Margin.Normal" />
+        }
+        else
+        {
+            <MudText Label="Id" Margin="Margin.Normal">New Item</MudText>
+        }
+        <MudNumericField @bind-Value="playerDevice.OwnerId" Label="OwnerId" Margin="Margin.Normal" />
+        <MudSelect @bind-Value="playerDevice.DeviceType" Label="DeviceType" Margin="Margin.Normal">
+            @foreach (DeviceType item in Enum.GetValues(typeof(DeviceType)))
+            {
+                <MudSelectItem Value="@item">@(item.ToString())</MudSelectItem>
+            }
+        </MudSelect>
+        <MudTextField @bind-Value="playerDevice.DeviceId" Label="DeviceId" Margin="Margin.Normal" />
+        <MudDatePicker @bind-Date="playerDevice.Since" Label="Since" Margin="Margin.Normal"/>
+        <MudDatePicker @bind-Date="playerDevice.LastUsed" Label="LastUsed" Margin="Margin.Normal" />
+        <br />
+        <MudButton Variant="Variant.Filled" Color="Color.Success" OnClick="@(async () => await Save(playerDevice))">
+            @(playerDevice.Id > 0 ? "Save Change" : "Create New")
+        </MudButton>
+        <MudButton Variant="Variant.Filled" OnClick="Clear">Clear</MudButton>
+    </MudExpansionPanel>
+    <MudExpansionPanel Text="@ListPanelText" @bind-IsExpanded="_listPanelExpanded">
+        <MudTable Items="dbContext.PlayerDevices" Filter="Search" @bind-customer="playerDevice">
+            <ToolBarContent>
+                <MudTextField @bind-Value="_searchString" Placeholder="Search for PlayerDevices..." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+            </ToolBarContent>
+            <HeaderContent>
+                <MudTh>Id</MudTh>
+                <MudTh>OwnerId</MudTh>
+                <MudTh>DeviceType</MudTh>
+                <MudTh>DeviceId</MudTh>
+                <MudTh>Since</MudTh>
+                <MudTh>LastUsed</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="Id">@context.Id</MudTd>
+                <MudTd DataLabel="OwnerId">@context.OwnerId</MudTd>
+                <MudTd DataLabel="DeviceType">@context.DeviceType</MudTd>
+                <MudTd DataLabel="DeviceId">@context.DeviceId</MudTd>
+                <MudTd DataLabel="Since">@context.Since?.ToShortDateString()</MudTd>
+                <MudTd DataLabel="LastUsed">@context.LastUsed?.ToShortDateString()</MudTd>
+                <MudTd DataLabel="">
+                    <MudFab @onclick="@(async () => await Edit(@context))" Color="Color.Primary" Icon="@Icons.Material.Filled.Edit" Size="Size.Small" IconSize="Size.Small" />
+                    <MudFab @onclick="@(async () => await Delete(@context))" Color="Color.Secondary" Icon="@Icons.Material.Filled.Delete" Size="Size.Small" IconSize="Size.Small" />
+                </MudTd>
+            </RowTemplate>
+            <PagerContent>
+                <MudTablePager />
+            </PagerContent>
+        </MudTable>
+    </MudExpansionPanel>
+</MudExpansionPanels>
+
+@code {
+    bool _editPanelExpanded = false;
+    bool _listPanelExpanded = true;
+    string _searchString = "";
+    PlayerDevice playerDevice = new();
+
+    static readonly string EditPanelId =  $"{nameof(PlayerDevice).ToLower()}-edit-panel";
+    static readonly string EditPanelText = $"Add / Edit {nameof(PlayerDevice)}";
+    static readonly string ListPanelText = nameof(PlayerDevice);
+
+    private bool Search(PlayerDevice x)
+    {
+        if (string.IsNullOrWhiteSpace(_searchString)) return true;
+
+        if (x.DeviceId.Contains(_searchString, StringComparison.OrdinalIgnoreCase)) return true;
+
+        if ($"{x.Id} {x.OwnerId} {x.Since} {x.LastUsed}".Contains(_searchString)) return true;
+
+        return false;
+    }
+
+    void Clear()
+    {
+        playerDevice = new();
+    }
+
+    async Task Edit(PlayerDevice playerDevice)
+    {
+        this.playerDevice = playerDevice;
+        _editPanelExpanded = true;
+        await scrollManager.ScrollToTopAsync(EditPanelId, ScrollBehavior.Smooth);
+    }
+
+    async Task Create(PlayerDevice playerDevice)
+    {
+        dbContext.Add(playerDevice);
+        await dbContext.SaveChangesAsync();
+        playerDevice = new PlayerDevice();
+        snackBar.Add($"New {nameof(PlayerDevice)} (id:{playerDevice.Id}) Created.", Severity.Success);
+    }
+
+    async Task Save(PlayerDevice playerDevice)
+    {
+        dbContext.Entry(playerDevice).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+        await dbContext.SaveChangesAsync();
+        snackBar.Add($"{nameof(PlayerDevice)} (id:{playerDevice.Id}) Saved.", Severity.Success);
+    }
+
+    async Task Delete(PlayerDevice playerDevice)
+    {
+        var parameters = new DialogParameters();
+        parameters.Add("ContentText", $"Do you really want to delete this records? This process cannot be undone.\n{playerDevice}");
+        parameters.Add("ButtonText", "Delete");
+        parameters.Add("Color", Color.Error);
+
+        if (!(await dialogService.Show<ConfirmDialog>("Delete", parameters, new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall }).Result).Cancelled) {
+            dbContext.PlayerDevices.Remove(playerDevice);
+            await dbContext.SaveChangesAsync();
+            snackBar.Add($"{nameof(PlayerDevice)} (id:{playerDevice.Id}) Deleted.", Severity.Success);
+        }
+    }
+}

@@ -10,7 +10,7 @@ using YourGameServer.Models;
 
 namespace YourGameServer.Controllers;
 
-[Route("api/{pid}/[controller]")]
+[Route("api/[controller]")]
 [ApiController]
 [ApiAuth]
 public class PlayerProfilesController : ControllerBase
@@ -22,37 +22,40 @@ public class PlayerProfilesController : ControllerBase
         _context = context;
     }
 
-    // GET: api/101/PlayerProfiles?id=102&id=103&id=104
+    // GET: api/PlayerProfiles?id=102&id=103&id=104
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<PlayerProfile>>> GetPlayerProfiles(long? pid, [FromQuery] long[] id)
+    public async Task<ActionResult<IEnumerable<PlayerProfile>>> GetPlayerProfiles([FromHeader] ulong playerId, [FromQuery] ulong[] id)
     {
-        if(pid is null) {
-            throw new ArgumentNullException(nameof(pid));
-        }
-
-        return await _context.PlayerAccounts.Where(x => id.Any(i => i == x.Id)).Select(i => i.Profile).ToListAsync();
+        return await _context.PlayerProfiles.Where(x => id.Any(i => i == x.Id)).Select(i => i.OwnerId == playerId ? i : i /* return masked data...*/).ToListAsync();
     }
 
-    // GET: api/101/PlayerProfiles/self
-    [HttpGet("self")]
-    public async Task<ActionResult<PlayerProfile>> GetPlayerProfile(long pid)
+    // GET: api/PlayerProfiles/5
+    [HttpGet("{id}")]
+    public async Task<ActionResult<PlayerProfile>> GetPlayerProfile([FromHeader] ulong playerId, ulong id)
     {
-        var playerProfile = await _context.PlayerProfiles.Where(i => i.OwnerId == pid).FirstOrDefaultAsync();
+        var playerProfile = await _context.PlayerProfiles.FindAsync(id);
 
         if(playerProfile == null) {
             return NotFound();
         }
 
+        if(playerId != playerProfile.OwnerId) {
+            // return masked data...
+        }
+
         return playerProfile;
     }
 
-    // PUT: api/101/PlayerProfiles
+    // PUT: api/PlayerProfiles/id
     // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-    [HttpPut]
-    public async Task<IActionResult> PutPlayerProfile(long? pid, PlayerProfile playerProfile)
+    [HttpPut("{id}")]
+    public async Task<IActionResult> PutPlayerProfile([FromHeader] ulong playerId, [FromQuery] ulong id, PlayerProfile playerProfile)
     {
-        var id = await _context.PlayerProfiles.Where(i => i.OwnerId == pid).Select(i => i.Id).FirstOrDefaultAsync(); // 0 is invalid value
-        if(pid != playerProfile.OwnerId || id != playerProfile.Id) {
+        if(!PlayerProfileExists(id)) {
+            return NotFound();
+        }
+
+        if(playerId != playerProfile.OwnerId || id != playerProfile.Id) {
             return BadRequest();
         }
 
@@ -76,9 +79,9 @@ public class PlayerProfilesController : ControllerBase
     // POST: api/101/PlayerProfiles
     // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
     [HttpPost]
-    public async Task<ActionResult<PlayerProfile>> PostPlayerProfile(long pid, PlayerProfile playerProfile)
+    public async Task<ActionResult<PlayerProfile>> PostPlayerProfile([FromHeader] ulong playerId, PlayerProfile playerProfile)
     {
-        if(pid != playerProfile.OwnerId) {
+        if(playerId != playerProfile.OwnerId) {
             return BadRequest();
         }
         _context.PlayerProfiles.Add(playerProfile);
@@ -89,13 +92,13 @@ public class PlayerProfilesController : ControllerBase
 
     // DELETE: api/101/PlayerProfiles
     [HttpDelete("{id}")]
-    public async Task<IActionResult> DeletePlayerProfile(long pid, long id)
+    public async Task<IActionResult> DeletePlayerProfile([FromHeader] ulong playerId, ulong id)
     {
         var playerProfile = await _context.PlayerProfiles.FindAsync(id);
         if(playerProfile == null) {
             return NotFound();
         }
-        if(pid != playerProfile.OwnerId) {
+        if(playerId != playerProfile.OwnerId) {
             return BadRequest();
         }
 
@@ -105,7 +108,7 @@ public class PlayerProfilesController : ControllerBase
         return NoContent();
     }
 
-    private bool PlayerProfileExists(long id)
+    private bool PlayerProfileExists(ulong id)
     {
         return _context.PlayerProfiles.Any(e => e.Id == id);
     }

@@ -354,3 +354,5 @@ MigrationBackup/
 /game.db
 /game.db-shm
 /game.db-wal
+
+Migrations/

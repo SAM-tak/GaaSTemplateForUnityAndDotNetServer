@@ -10,7 +10,7 @@ using YourGameServer.Models;
 
 namespace YourGameServer.Controllers;
 
-[Route("api/{pid}/[controller]")]
+[Route("api/[controller]")]
 //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 [ApiAuth]
 [ApiController]
@@ -23,20 +23,15 @@ public class PlayerAccountsController : ControllerBase
         _context = context;
     }
 
-    // GET: api/101/PlayerAccounts?id=111&id=112&id=113
+    // GET: api/PlayerAccounts?id=111&id=112&id=113
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<PlayerAccount.Masked>>> GetPlayerAccounts(long? pid, [FromQuery] long[] id
+    public async Task<ActionResult<IEnumerable<PlayerAccount.Masked>>> GetPlayerAccounts([FromHeader] ulong playerId, [FromQuery] ulong[] id
 #if DEBUG
         , [FromQuery] int? s, [FromQuery] int? c
 #endif
     )
     {
-        if(pid is null) {
-            throw new ArgumentNullException(nameof(pid));
-        }
-
-        Console.WriteLine($"User = {User.Identity.Name} {User.Identity.IsAuthenticated}");
-        //var idList = ids.Split('&').Distinct().ToArray();
+        //Console.WriteLine($"User = {User.Identity.Name} {User.Identity.IsAuthenticated}");
         if(!await _context.PlayerAccounts.AnyAsync()) {
             return NotFound();
         }
@@ -50,11 +45,15 @@ public class PlayerAccountsController : ControllerBase
 #endif
     }
 
-    // GET: api/101/PlayerAccounts/self
-    [HttpGet("self")]
-    public async Task<ActionResult<PlayerAccount>> GetPlayerAccount(long pid)
+    // GET: api/PlayerAccounts/5
+    [HttpGet("{id}")]
+    public async Task<ActionResult<PlayerAccount>> GetPlayerAccount([FromHeader] ulong playerId, ulong id)
     {
-        var playerAccount = await _context.PlayerAccounts.FindAsync(pid);
+        if(playerId != id) {
+            return BadRequest();
+        }
+
+        var playerAccount = await _context.PlayerAccounts.FindAsync(playerId);
 
         if(playerAccount == null) {
             return NotFound();
@@ -63,12 +62,12 @@ public class PlayerAccountsController : ControllerBase
         return playerAccount;
     }
 
-    // PUT: api/101/PlayerAccounts
+    // PUT: api/PlayerAccounts/5
     // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-    [HttpPut]
-    public async Task<IActionResult> PutPlayerAccount(long pid, PlayerAccount playerAccount)
+    [HttpPut("{id}")]
+    public async Task<IActionResult> PutPlayerAccount([FromHeader] ulong playerId, ulong id, PlayerAccount playerAccount)
     {
-        if(pid != playerAccount.Id) {
+        if(playerId != id || playerId != playerAccount.Id) {
             return BadRequest();
         }
 
@@ -78,7 +77,7 @@ public class PlayerAccountsController : ControllerBase
             await _context.SaveChangesAsync();
         }
         catch(DbUpdateConcurrencyException) {
-            if(!PlayerAccountExists(pid)) {
+            if(!PlayerAccountExists(playerId)) {
                 return NotFound();
             }
             else {
@@ -103,11 +102,14 @@ public class PlayerAccountsController : ControllerBase
     //     return CreatedAtAction("GetPlayerAccount", new { id = playerAccount.Id }, playerAccount);
     // }
 
-    // DELETE: api/101/PlayerAccounts
-    [HttpDelete]
-    public async Task<IActionResult> DeletePlayerAccount(long pid)
+    // DELETE: api/PlayerAccounts/5
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeletePlayerAccount([FromHeader] ulong playerId, ulong id)
     {
-        var playerAccount = await _context.PlayerAccounts.FindAsync(pid);
+        if(id != playerId) {
+            return BadRequest();
+        }
+        var playerAccount = await _context.PlayerAccounts.FindAsync(playerId);
         if(playerAccount == null) {
             return NotFound();
         }
@@ -120,7 +122,7 @@ public class PlayerAccountsController : ControllerBase
         return NoContent();
     }
 
-    private bool PlayerAccountExists(long id)
+    private bool PlayerAccountExists(ulong id)
     {
         return _context.PlayerAccounts.Any(e => e.Id == id);
     }

@@ -27,19 +27,19 @@ namespace YourGameServer.Models // Unity cannot accpect 'namespace YourProjectNa
     }
 
     [MessagePackObject]
-    [Index(nameof(Luid))]
+    [Index(nameof(Code))]
     public record PlayerAccount
     {
         [Key(0)]
-        public long Id { get; init; }
+        public ulong Id { get; init; }
         [Key(1), MaxLength(16)]
-        public string Luid { get; init; }
+        public string Code { get; init; }
         [IgnoreMember]
         [JsonIgnore]
         public List<PlayerDevice> DeviceList { get; init; }
         [IgnoreMember]
         [JsonIgnore]
-        public long CurrentDeviceId { get; set; }
+        public ulong CurrentDeviceId { get; set; }
         [Key(2)]
         public PlayerAccountStatus Status { get; set; }
         [Key(3)]
@@ -72,7 +72,7 @@ namespace YourGameServer.Models // Unity cannot accpect 'namespace YourProjectNa
         public record Masked
         {
             [Key(0)]
-            public long Id { get; init; }
+            public ulong Id { get; init; }
             [Key(1)]
             public PlayerAccountStatus Status { get; set; }
             [Key(2)]

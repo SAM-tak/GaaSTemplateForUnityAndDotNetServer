@@ -22,7 +22,7 @@ namespace YourGameServer.Pages.PlayerDevices
         [BindProperty]
         public PlayerDevice PlayerDevice { get; set; }
 
-        public async Task<IActionResult> OnGetAsync(long? id)
+        public async Task<IActionResult> OnGetAsync(ulong? id)
         {
             if (id == null)
             {

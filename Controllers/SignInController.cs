@@ -1,18 +1,10 @@
 using System;
-using System.Text;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using System.IdentityModel.Tokens.Jwt;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.Extensions.Configuration;
 using YourGameServer.Models;
 using YourGameServer.Data;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using System.Security.Claims;
 
 namespace YourGameServer.Controllers;
 
@@ -49,10 +41,10 @@ public class SignInController : ControllerBase
 
     public static async Task<PlayerAccount> CreateAccountAsync(GameDbContext context, AccountCreationRequest accountCreationModel)
     {
-        var playerId = await LUID.NewLUIDStringAsync(async (i) => !await context.PlayerAccounts.AnyAsync(x => x.Luid == i));
+        var code = await LUID.NewLUIDStringAsync(async (i) => !await context.PlayerAccounts.AnyAsync(x => x.Code == i));
         var curDateTime = DateTime.UtcNow;
         return new PlayerAccount {
-            Luid = playerId,
+            Code = code,
             DeviceList = new() {
                 new() {
                     DeviceType = accountCreationModel.DeviceType,

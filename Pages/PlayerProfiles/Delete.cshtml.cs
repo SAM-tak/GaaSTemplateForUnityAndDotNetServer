@@ -22,7 +22,7 @@ namespace YourGameServer.Pages.PlayerProfiles
         [BindProperty]
         public PlayerProfile PlayerProfile { get; set; }
 
-        public async Task<IActionResult> OnGetAsync(long? id)
+        public async Task<IActionResult> OnGetAsync(ulong? id)
         {
             if (id == null)
             {
@@ -39,7 +39,7 @@ namespace YourGameServer.Pages.PlayerProfiles
             return Page();
         }
 
-        public async Task<IActionResult> OnPostAsync(long? id)
+        public async Task<IActionResult> OnPostAsync(ulong? id)
         {
             if (id == null)
             {

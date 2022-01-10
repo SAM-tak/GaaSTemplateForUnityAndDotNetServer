@@ -26,10 +26,7 @@ builder.Services.AddApiVersioning(options => {
     options.DefaultApiVersion = new ApiVersion(1, 0);
 });
 
-var jwtTokenGenarator = new JwtTokenGenarator(builder.Configuration);
-if(builder.Environment.IsProduction() && jwtTokenGenarator.ExpireMinutes <= 0) throw new SecurityException("Jwt.ExpireMinute must be over 0 in production.");
-builder.Services.AddSingleton(i => jwtTokenGenarator);
-//builder.AddJwtTokenGenarator();
+builder.AddJwtTokenGenarator();
 
 // https://stackoverflow.com/questions/4804086/is-there-any-connection-string-parser-in-c
 
@@ -57,7 +54,7 @@ builder.Services.AddAuthentication(options => {
     options.ClientSecret = googleAuthNSection["ClientSecret"];
     options.SaveTokens = true;
 })
-.AddJwtBearer(options => options.TokenValidationParameters = jwtTokenGenarator.TokenValidationParameters)
+.AddJwtBearer(options => options.TokenValidationParameters = JwtTokenGenarator.TokenValidationParameters)
 //.AddMicrosoftIdentityWebApp(builder.Configuration)
 ;
 //builder.Services.AddAuthentication().AddScheme<AuthenticationSchemeOptions, ApiAuthHandler>("Api", null);
@@ -85,8 +82,7 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-jwtTokenGenarator._serviceProvider = app.Services;
-//app.UseJwtTokenGenarator();
+app.UseJwtTokenGenarator();
 
 // Configure the HTTP request pipeline.
 if(app.Environment.IsDevelopment()) {

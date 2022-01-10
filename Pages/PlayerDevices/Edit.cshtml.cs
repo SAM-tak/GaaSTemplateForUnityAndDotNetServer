@@ -23,7 +23,7 @@ namespace YourGameServer.Pages.PlayerDevices
         [BindProperty]
         public PlayerDevice PlayerDevice { get; set; }
 
-        public async Task<IActionResult> OnGetAsync(long? id)
+        public async Task<IActionResult> OnGetAsync(ulong? id)
         {
             if (id == null)
             {
@@ -71,7 +71,7 @@ namespace YourGameServer.Pages.PlayerDevices
             return RedirectToPage("./Index");
         }
 
-        private bool PlayerDeviceExists(long id)
+        private bool PlayerDeviceExists(ulong id)
         {
             return _context.PlayerDevices.Any(e => e.Id == id);
         }

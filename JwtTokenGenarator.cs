@@ -1,29 +1,33 @@
 using System;
+using System.Linq;
 using System.Text;
+using System.Security;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Http;
-using System.Linq;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Hosting;
 using YourGameServer.Data;
-using Microsoft.AspNetCore.Routing;
 
 namespace YourGameServer;
 
 public class JwtTokenGenarator
 {
-    public TokenValidationParameters TokenValidationParameters { get; init; }
-    public SigningCredentials SigningCredentials { get; init; }
+    public static TokenValidationParameters TokenValidationParameters { get; private set; }
 
     public int ExpireMinutes { get; }
 
+    SigningCredentials SigningCredentials { get; set; }
     internal IServiceProvider _serviceProvider;
 
-    public JwtTokenGenarator(IConfiguration config)
+    public JwtTokenGenarator(IConfiguration config, IWebHostEnvironment environment)
     {
         var jwtConfig = config.GetSection("Jwt");
         ExpireMinutes = jwtConfig.GetValue<int>("ExpireMinutes");
+        if(environment.IsProduction() && ExpireMinutes <= 0) throw new SecurityException("Jwt.ExpireMinute must be over 0 in production.");
         TokenValidationParameters = new TokenValidationParameters {
             ValidateIssuer = true,
             ValidateAudience = true,
@@ -39,12 +43,12 @@ public class JwtTokenGenarator
                     var serviceScopeFactory = _serviceProvider.GetRequiredService<IServiceScopeFactory>();
                     using var scope = serviceScopeFactory.CreateScope();
                     var httpContextAccessor = scope.ServiceProvider.GetService<IHttpContextAccessor>();
-                    var pid = (string)httpContextAccessor.HttpContext.GetRouteValue("pid");
+                    var playerIdString = httpContextAccessor.HttpContext.Request.Headers["PlayerId"];
                     var deviceIdString = httpContextAccessor.HttpContext.Request.Headers["DeviceId"];
-                    if(!string.IsNullOrEmpty(pid) && !string.IsNullOrEmpty(deviceIdString)
-                    && audiences.Any(i => i == $"{validationParameters.ValidAudience}/{pid}/{deviceIdString}")) {
-                        var playerId = long.Parse(pid);
-                        var deviceId = long.Parse(deviceIdString);
+                    if(!string.IsNullOrEmpty(playerIdString) && !string.IsNullOrEmpty(deviceIdString)
+                    && audiences.Any(i => i == $"{validationParameters.ValidAudience}/{playerIdString}/{deviceIdString}")) {
+                        var playerId = ulong.Parse(playerIdString);
+                        var deviceId = ulong.Parse(deviceIdString);
                         var context = scope.ServiceProvider.GetService<GameDbContext>();
                         var playerAccount = context.PlayerAccounts.Find(playerId);
                         if (playerAccount != null)
@@ -65,7 +69,7 @@ public class JwtTokenGenarator
     /// <param name="playerId">Player Account Table index id</param>
     /// <param name="deviceId">Device Id</param>
     /// <returns>Token string</returns>
-    public string CreateToken(long playerId, long deviceId)
+    public string CreateToken(ulong playerId, ulong deviceId)
     {
         var token = new JwtSecurityToken(
             issuer: TokenValidationParameters.ValidIssuer,
@@ -77,22 +81,21 @@ public class JwtTokenGenarator
     }
 }
 
-// internal static class WebApplicationBuilderJwtTokenGenaratorExtention
-// {
-//     public static WebApplicationBuilder AddJwtTokenGenarator(this WebApplicationBuilder builder)
-//     {
-//         var jwtTokenGenarator = new JwtTokenGenarator(builder.Configuration);
-//         if(builder.Environment.IsProduction() && jwtTokenGenarator.ExpireMinutes <= 0) throw new SecurityException("Jwt.ExpireMinute must be over 0 in production.");
-//         builder.Services.AddSingleton(i => jwtTokenGenarator);
-//         return builder;
-//     }
-// }
+internal static class WebApplicationBuilderJwtTokenGenaratorExtention
+{
+    public static WebApplicationBuilder AddJwtTokenGenarator(this WebApplicationBuilder builder)
+    {
+        var jwtTokenGenarator = new JwtTokenGenarator(builder.Configuration, builder.Environment);
+        builder.Services.AddSingleton(i => jwtTokenGenarator);
+        return builder;
+    }
+}
 
-// internal static class ApplicationBuilderJwtTokenGenaratorExtention
-// {
-//     public static IApplicationBuilder UseJwtTokenGenarator(this IApplicationBuilder app)
-//     {
-//         app.ApplicationServices.GetService<JwtTokenGenarator>()._serviceProvider = app.ApplicationServices;
-//         return app;
-//     }
-// }
+internal static class ApplicationBuilderJwtTokenGenaratorExtention
+{
+    public static IApplicationBuilder UseJwtTokenGenarator(this IApplicationBuilder app)
+    {
+        app.ApplicationServices.GetService<JwtTokenGenarator>()._serviceProvider = app.ApplicationServices;
+        return app;
+    }
+}

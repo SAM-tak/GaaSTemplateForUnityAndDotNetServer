@@ -9,9 +9,9 @@ namespace YourGameServer.Models // Unity cannot accpect 'namespace YourProjectNa
     public record PlayerOwnedFreeServiceToken
     {
         [Key(0)]
-        public long Id { get; init; }
+        public ulong Id { get; init; }
         [Key(1)]
-        public long OwnerId { get; init; }
+        public ulong OwnerId { get; init; }
         [IgnoreMember]
         [ForeignKey("OwnerId")]
         public PlayerAccount Owner { get; init; }

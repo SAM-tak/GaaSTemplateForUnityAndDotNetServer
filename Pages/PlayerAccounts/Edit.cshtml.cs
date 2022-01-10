@@ -23,7 +23,7 @@ namespace YourGameServer.Pages.PlayerAccounts
         [BindProperty]
         public PlayerAccount PlayerAccount { get; set; }
 
-        public async Task<IActionResult> OnGetAsync(long? id)
+        public async Task<IActionResult> OnGetAsync(ulong? id)
         {
             if (id == null)
             {
@@ -69,7 +69,7 @@ namespace YourGameServer.Pages.PlayerAccounts
             return RedirectToPage("./Index");
         }
 
-        private bool PlayerAccountExists(long id)
+        private bool PlayerAccountExists(ulong id)
         {
             return _context.PlayerAccounts.Any(e => e.Id == id);
         }

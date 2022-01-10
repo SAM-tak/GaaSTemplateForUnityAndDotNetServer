@@ -21,7 +21,7 @@ namespace YourGameServer.Pages.PlayerProfiles
 
         public PlayerProfile PlayerProfile { get; set; }
 
-        public async Task<IActionResult> OnGetAsync(long? id)
+        public async Task<IActionResult> OnGetAsync(ulong? id)
         {
             if (id == null)
             {

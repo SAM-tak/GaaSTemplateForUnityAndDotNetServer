@@ -21,7 +21,7 @@ namespace YourGameServer.Pages.PlayerAccounts
 
         public PlayerAccount PlayerAccount { get; set; }
 
-        public async Task<IActionResult> OnGetAsync(long? id)
+        public async Task<IActionResult> OnGetAsync(ulong? id)
         {
             if (id == null)
             {

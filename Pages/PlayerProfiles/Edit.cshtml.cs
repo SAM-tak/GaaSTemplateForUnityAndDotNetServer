@@ -23,7 +23,7 @@ namespace YourGameServer.Pages.PlayerProfiles
         [BindProperty]
         public PlayerProfile PlayerProfile { get; set; }
 
-        public async Task<IActionResult> OnGetAsync(long? id)
+        public async Task<IActionResult> OnGetAsync(ulong? id)
         {
             if (id == null)
             {
@@ -71,7 +71,7 @@ namespace YourGameServer.Pages.PlayerProfiles
             return RedirectToPage("./Index");
         }
 
-        private bool PlayerProfileExists(long id)
+        private bool PlayerProfileExists(ulong id)
         {
             return _context.PlayerProfiles.Any(e => e.Id == id);
         }

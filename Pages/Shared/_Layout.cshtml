@@ -32,19 +32,14 @@
                   <a class="nav-link text-dark" href="/Counter">Counter</a>
               </li> *@
           </ul>
-@if (User?.Identity?.IsAuthenticated == true) {
           <ul class="nav navbar-nav navbar-right">
             <li class="nav-item"><p class="navbar-text">@User?.Identity?.Name</p></li>
             <li>
-              @* <a class="nav-link text-dark" asp-area="MicrosoftIdentity" asp-controller="Account" asp-action="SignOut">
-                  Sign Out<span class="glyphicon glyphicon-log-out"></span>
-              </a> *@
-              <a class="nav-link text-dark" asp-area="" asp-controller="Auth" asp-action="SignOut">
+              <a class="nav-link text-dark" asp-area="" asp-controller="Auth" asp-action="LogOut">
                 Sign Out<span class="glyphicon glyphicon-log-out"></span>
               </a>
             </li>
           </ul>
-}
         </div>
       </div>
     </nav>

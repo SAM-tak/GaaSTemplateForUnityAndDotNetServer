@@ -12,7 +12,7 @@ namespace YourGameServer.Controllers;
 /// </summary>
 public class AuthController : Controller
 {
-    public new async Task<IActionResult> SignOut()
+    public async Task<IActionResult> LogOut()
     {
         var referer = Request.Headers["Referer"].ToString();
         Console.WriteLine($"Request.Headers['Referer'] = {referer}");

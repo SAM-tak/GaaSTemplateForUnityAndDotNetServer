@@ -15,7 +15,7 @@
     <thead style="position: sticky;top: 10rem;background-color: #fff">
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.PlayerAccounts[0].Luid)
+                @Html.DisplayNameFor(model => model.PlayerAccounts[0].Code)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.PlayerAccounts[0].Status)
@@ -42,7 +42,7 @@
 @foreach (var item in Model.PlayerAccounts) {
         <tr>
             <td>
-                @Html.DisplayFor(modelItem => item.Luid)
+                @Html.DisplayFor(modelItem => item.Code)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Status)

@@ -1,10 +1,8 @@
-using System;
-using System.Linq;
 using System.Security.Cryptography;
-using System.Threading.Tasks;
 
 namespace YourGameServer;
 
+[Serializable]
 public struct LUID : IEquatable<LUID>
 {
     public ulong id0;
@@ -112,26 +110,26 @@ public struct LUID : IEquatable<LUID>
     {
         var mid = (id1 & 0x1) << 4 | (int)(id0 >> 5 * 12) & 0x1F;
         return new string(new char[] {
-                validCharacters[id1 >> 5 * 2 + 1],
-                validCharacters[id1 >> 5 + 1 & 0x1F],
-                validCharacters[id1 >> 1 & 0x1F],
-                validCharacters[mid],
+            validCharacters[id1 >> 5 * 2 + 1],
+            validCharacters[id1 >> 5 + 1 & 0x1F],
+            validCharacters[id1 >> 1 & 0x1F],
+            validCharacters[mid],
 
-                validCharacters[id0 >> 5 * 11 & 0x1F],
-                validCharacters[id0 >> 5 * 10 & 0x1F],
-                validCharacters[id0 >> 5 * 9 & 0x1F],
-                validCharacters[id0 >> 5 * 8 & 0x1F],
+            validCharacters[id0 >> 5 * 11 & 0x1F],
+            validCharacters[id0 >> 5 * 10 & 0x1F],
+            validCharacters[id0 >> 5 * 9 & 0x1F],
+            validCharacters[id0 >> 5 * 8 & 0x1F],
 
-                validCharacters[id0 >> 5 * 7 & 0x1F],
-                validCharacters[id0 >> 5 * 6 & 0x1F],
-                validCharacters[id0 >> 5 * 5 & 0x1F],
-                validCharacters[id0 >> 5 * 4 & 0x1F],
+            validCharacters[id0 >> 5 * 7 & 0x1F],
+            validCharacters[id0 >> 5 * 6 & 0x1F],
+            validCharacters[id0 >> 5 * 5 & 0x1F],
+            validCharacters[id0 >> 5 * 4 & 0x1F],
 
-                validCharacters[id0 >> 5 * 3 & 0x1F],
-                validCharacters[id0 >> 5 * 2 & 0x1F],
-                validCharacters[id0 >> 5 & 0x1F],
-                validCharacters[id0 & 0x1F]
-            });
+            validCharacters[id0 >> 5 * 3 & 0x1F],
+            validCharacters[id0 >> 5 * 2 & 0x1F],
+            validCharacters[id0 >> 5 & 0x1F],
+            validCharacters[id0 & 0x1F]
+        });
     }
 
     public static bool operator ==(LUID left, LUID right)

@@ -5,76 +5,108 @@
 @inject MudBlazor.IDialogService dialogService
 @inject MudBlazor.ISnackbar snackBar
 
-<MudExpansionPanels MultiExpansion="true" DisableBorders="true" Elevation="0">
-    <MudExpansionPanel id="@EditPanelId" Text="@EditPanelText" @bind-IsExpanded="_editPanelExpanded">
-        @if (playerAccount.Id > 0)
+<MudExpansionPanel id="@EditPanelId" Text="@EditPanelText" @bind-IsExpanded="_editPanelExpanded">
+    @if (playerAccount.Id > 0)
+    {
+        <MudNumericField Value="@playerAccount.Id" Label="Id" ReadOnly="true" Margin="Margin.Normal" />
+    }
+    else
+    {
+        <MudText Label="Id" Margin="Margin.Normal">New Item</MudText>
+    }
+    <MudTextField @bind-Value="playerAccount.Code" Label="Code" Margin="Margin.Normal" />
+    <MudNumericField @bind-Value="playerAccount.CurrentDeviceId" Label="CurrentDeviceId" Margin="Margin.Normal" />
+    <MudSelect T="PlayerAccountStatus" @bind-Value="playerAccount.Status" Label="Status" Margin="Margin.Normal">
+        @foreach (PlayerAccountStatus item in Enum.GetValues(typeof(PlayerAccountStatus)))
         {
-            <MudNumericField Value="@playerAccount.Id" Label="Id" ReadOnly="true" Margin="Margin.Normal" />
+            <MudSelectItem Value="@item">@(item.ToString())</MudSelectItem>
         }
-        else
-        {
-            <MudText Label="Id" Margin="Margin.Normal">New Item</MudText>
-        }
-        <MudTextField @bind-Value="playerAccount.Code" Label="Code" Margin="Margin.Normal" />
-        <MudNumericField @bind-Value="playerAccount.CurrentDeviceId" Label="CurrentDeviceId" Margin="Margin.Normal" />
-        <MudSelect @bind-Value="playerAccount.Status" Label="Status" Margin="Margin.Normal">
-            @foreach (PlayerAccountStatus item in Enum.GetValues(typeof(PlayerAccountStatus)))
-            {
-                <MudSelectItem Value="@item">@(item.ToString())</MudSelectItem>
-            }
-        </MudSelect>
-        <MudDatePicker @bind-Date="playerAccount.Since" Label="Since" Margin="Margin.Normal"/>
-        <MudDatePicker @bind-Date="playerAccount.LastLogin" Label="LastLogin" Margin="Margin.Normal" />
-        <MudDatePicker @bind-Date="playerAccount.InactivateDate" Label="InactivateDate" Margin="Margin.Normal" />
-        <MudDatePicker @bind-Date="playerAccount.BanDate" Label="BanDate" Margin="Margin.Normal" />
-        <MudDatePicker @bind-Date="playerAccount.ExpireDate" Label="ExpireDate" Margin="Margin.Normal" />
-        <br />
-        <MudButton Variant="Variant.Filled" Color="Color.Success" OnClick="@(async () => await Save(playerAccount))">
-            @(playerAccount.Id > 0 ? "Save Change" : "Create New")
-        </MudButton>
-        <MudButton Variant="Variant.Filled" OnClick="Clear">Clear</MudButton>
-    </MudExpansionPanel>
-    <MudExpansionPanel Text="@ListPanelText" @bind-IsExpanded="_listPanelExpanded">
-        <MudTable Items="dbContext.PlayerAccounts" Filter="Search" @bind-customer="playerAccount">
-            <ToolBarContent>
-                <MudTextField @bind-Value="_searchString" Placeholder="Search for PlayerAccounts..." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
-            </ToolBarContent>
-            <HeaderContent>
-                <MudTh>Id</MudTh>
-                <MudTh>Code</MudTh>
-                <MudTh>CurrentDeviceId</MudTh>
-                <MudTh>Status</MudTh>
-                <MudTh>Since</MudTh>
-                <MudTh>LastLogin</MudTh>
-                <MudTh>InactivateDate</MudTh>
-                <MudTh>BanDate</MudTh>
-                <MudTh>ExpireDate</MudTh>
-            </HeaderContent>
-            <RowTemplate>
-                <MudTd DataLabel="Id">@context.Id</MudTd>
-                <MudTd DataLabel="Code">@context.Code</MudTd>
-                <MudTd DataLabel="CurrentDeviceId">@context.CurrentDeviceId</MudTd>
-                <MudTd DataLabel="Status">@context.Status</MudTd>
-                <MudTd DataLabel="Since">@context.Since?.ToShortDateString()</MudTd>
-                <MudTd DataLabel="LastLogin">@context.LastLogin?.ToShortDateString()</MudTd>
-                <MudTd DataLabel="InactivateDate">@context.InactivateDate?.ToShortDateString()</MudTd>
-                <MudTd DataLabel="BanDate">@context.BanDate?.ToShortDateString()</MudTd>
-                <MudTd DataLabel="ExpireDate">@context.ExpireDate?.ToShortDateString()</MudTd>
-                <MudTd DataLabel="">
-                    <MudFab @onclick="@(async () => await Edit(@context))" Color="Color.Primary" Icon="@Icons.Material.Filled.Edit" Size="Size.Small" IconSize="Size.Small" />
-                    <MudFab @onclick="@(async () => await Delete(@context))" Color="Color.Secondary" Icon="@Icons.Material.Filled.Delete" Size="Size.Small" IconSize="Size.Small" />
-                </MudTd>
-            </RowTemplate>
-            <PagerContent>
-                <MudTablePager />
-            </PagerContent>
-        </MudTable>
-    </MudExpansionPanel>
-</MudExpansionPanels>
+    </MudSelect>
+    <MudGrid>
+        <MudItem xs="6">
+            <MudDatePicker @bind-Date="playerAccount.Since" Label="Since" Margin="Margin.Normal"/>
+        </MudItem>
+        <MudItem xs="6">
+            <MudTimePicker Text="@playerAccount.Since?.ToShortTimeString()" Label="Since" Margin="Margin.Normal"/>
+        </MudItem>
+    </MudGrid>
+    <MudGrid>
+        <MudItem xs="6">
+            <MudDatePicker @bind-Date="playerAccount.LastLogin" Label="LastLogin" Margin="Margin.Normal" />
+        </MudItem>
+        <MudItem xs="6">
+            <MudTimePicker Text="@playerAccount.LastLogin?.ToShortTimeString()" Label="LastLogin" Margin="Margin.Normal" />
+        </MudItem>
+    </MudGrid>
+    <MudGrid>
+        <MudItem xs="6">
+            <MudDatePicker @bind-Date="playerAccount.InactivateDate" Label="InactivateDate" Margin="Margin.Normal" />
+        </MudItem>
+        <MudItem xs="6">
+            <MudTimePicker Text="@playerAccount.InactivateDate?.ToShortTimeString()" Label="InactivateDate" Margin="Margin.Normal" />
+        </MudItem>
+    </MudGrid>
+    <MudGrid>
+        <MudItem xs="6">
+            <MudDatePicker @bind-Date="playerAccount.BanDate" Label="BanDate" Margin="Margin.Normal" />
+        </MudItem>
+        <MudItem xs="6">
+            <MudTimePicker Text="@playerAccount.BanDate?.ToShortTimeString()" Label="BanDate" Margin="Margin.Normal" />
+        </MudItem>
+    </MudGrid>
+    <MudGrid>
+        <MudItem xs="6">
+            <MudDatePicker @bind-Date="playerAccount.ExpireDate" Label="ExpireDate" Margin="Margin.Normal" />
+        </MudItem>
+        <MudItem xs="6">
+            <MudTimePicker Text="@playerAccount.ExpireDate?.ToShortTimeString()" Label="ExpireDate" Margin="Margin.Normal" />
+        </MudItem>
+    </MudGrid>
+    <br />
+    <MudButton Variant="Variant.Filled" Color="Color.Success" OnClick="@(async () => await Save(playerAccount))">
+        @(playerAccount.Id > 0 ? "Save Change" : "Create New")
+    </MudButton>
+    <MudButton Variant="Variant.Filled" OnClick="Clear">Clear</MudButton>
+</MudExpansionPanel>
+<MudTable Items="dbContext.PlayerAccounts" Filter="Search" @bind-customer="playerAccount">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">@ListPanelText</MudText>
+        <MudSpacer />
+        <MudTextField @bind-Value="_searchString" Placeholder="Search for PlayerAccounts..." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" />
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh>Id</MudTh>
+        <MudTh>Code</MudTh>
+        <MudTh>CurrentDeviceId</MudTh>
+        <MudTh>Status</MudTh>
+        <MudTh>Since</MudTh>
+        <MudTh>LastLogin</MudTh>
+        <MudTh>InactivateDate</MudTh>
+        <MudTh>BanDate</MudTh>
+        <MudTh>ExpireDate</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Id">@context.Id</MudTd>
+        <MudTd DataLabel="Code">@context.Code</MudTd>
+        <MudTd DataLabel="CurrentDeviceId">@context.CurrentDeviceId</MudTd>
+        <MudTd DataLabel="Status">@context.Status</MudTd>
+        <MudTd DataLabel="Since">@context.Since</MudTd>
+        <MudTd DataLabel="LastLogin">@context.LastLogin</MudTd>
+        <MudTd DataLabel="InactivateDate">@context.InactivateDate</MudTd>
+        <MudTd DataLabel="BanDate">@context.BanDate</MudTd>
+        <MudTd DataLabel="ExpireDate">@context.ExpireDate</MudTd>
+        <MudTd DataLabel="">
+            <MudFab @onclick="@(async () => await Edit(@context))" Color="Color.Primary" Icon="@Icons.Material.Filled.Edit" Size="Size.Small" IconSize="Size.Small" />
+            <MudFab @onclick="@(async () => await Delete(@context))" Color="Color.Secondary" Icon="@Icons.Material.Filled.Delete" Size="Size.Small" IconSize="Size.Small" />
+        </MudTd>
+    </RowTemplate>
+    <PagerContent>
+        <MudTablePager />
+    </PagerContent>
+</MudTable>
 
 @code {
     bool _editPanelExpanded = false;
-    bool _listPanelExpanded = true;
     string _searchString = "";
     PlayerAccount playerAccount = new();
 

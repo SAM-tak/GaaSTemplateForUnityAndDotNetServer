@@ -5,67 +5,64 @@
 @inject MudBlazor.IDialogService dialogService
 @inject MudBlazor.ISnackbar snackBar
 
-<MudExpansionPanels MultiExpansion="true" DisableBorders="true" Elevation="0">
-    <MudExpansionPanel id="@EditPanelId" Text="@EditPanelText" @bind-IsExpanded="_editPanelExpanded">
-        @if (playerDevice.Id > 0)
+<MudExpansionPanel id="@EditPanelId" Text="@EditPanelText" @bind-IsExpanded="_editPanelExpanded">
+    @if (playerDevice.Id > 0)
+    {
+        <MudNumericField Value="@playerDevice.Id" Label="Id" ReadOnly="true" Margin="Margin.Normal" />
+    }
+    else
+    {
+        <MudText Label="Id" Margin="Margin.Normal">New Item</MudText>
+    }
+    <MudNumericField @bind-Value="playerDevice.OwnerId" Label="OwnerId" Margin="Margin.Normal" />
+    <MudSelect @bind-Value="playerDevice.DeviceType" Label="DeviceType" Margin="Margin.Normal">
+        @foreach (DeviceType item in Enum.GetValues(typeof(DeviceType)))
         {
-            <MudNumericField Value="@playerDevice.Id" Label="Id" ReadOnly="true" Margin="Margin.Normal" />
+            <MudSelectItem Value="@item">@(item.ToString())</MudSelectItem>
         }
-        else
-        {
-            <MudText Label="Id" Margin="Margin.Normal">New Item</MudText>
-        }
-        <MudNumericField @bind-Value="playerDevice.OwnerId" Label="OwnerId" Margin="Margin.Normal" />
-        <MudSelect @bind-Value="playerDevice.DeviceType" Label="DeviceType" Margin="Margin.Normal">
-            @foreach (DeviceType item in Enum.GetValues(typeof(DeviceType)))
-            {
-                <MudSelectItem Value="@item">@(item.ToString())</MudSelectItem>
-            }
-        </MudSelect>
-        <MudTextField @bind-Value="playerDevice.DeviceId" Label="DeviceId" Margin="Margin.Normal" />
-        <MudDatePicker @bind-Date="playerDevice.Since" Label="Since" Margin="Margin.Normal"/>
-        <MudDatePicker @bind-Date="playerDevice.LastUsed" Label="LastUsed" Margin="Margin.Normal" />
-        <br />
-        <MudButton Variant="Variant.Filled" Color="Color.Success" OnClick="@(async () => await Save(playerDevice))">
-            @(playerDevice.Id > 0 ? "Save Change" : "Create New")
-        </MudButton>
-        <MudButton Variant="Variant.Filled" OnClick="Clear">Clear</MudButton>
-    </MudExpansionPanel>
-    <MudExpansionPanel Text="@ListPanelText" @bind-IsExpanded="_listPanelExpanded">
-        <MudTable Items="dbContext.PlayerDevices" Filter="Search" @bind-customer="playerDevice">
-            <ToolBarContent>
-                <MudTextField @bind-Value="_searchString" Placeholder="Search for PlayerDevices..." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
-            </ToolBarContent>
-            <HeaderContent>
-                <MudTh>Id</MudTh>
-                <MudTh>OwnerId</MudTh>
-                <MudTh>DeviceType</MudTh>
-                <MudTh>DeviceId</MudTh>
-                <MudTh>Since</MudTh>
-                <MudTh>LastUsed</MudTh>
-            </HeaderContent>
-            <RowTemplate>
-                <MudTd DataLabel="Id">@context.Id</MudTd>
-                <MudTd DataLabel="OwnerId">@context.OwnerId</MudTd>
-                <MudTd DataLabel="DeviceType">@context.DeviceType</MudTd>
-                <MudTd DataLabel="DeviceId">@context.DeviceId</MudTd>
-                <MudTd DataLabel="Since">@context.Since?.ToShortDateString()</MudTd>
-                <MudTd DataLabel="LastUsed">@context.LastUsed?.ToShortDateString()</MudTd>
-                <MudTd DataLabel="">
-                    <MudFab @onclick="@(async () => await Edit(@context))" Color="Color.Primary" Icon="@Icons.Material.Filled.Edit" Size="Size.Small" IconSize="Size.Small" />
-                    <MudFab @onclick="@(async () => await Delete(@context))" Color="Color.Secondary" Icon="@Icons.Material.Filled.Delete" Size="Size.Small" IconSize="Size.Small" />
-                </MudTd>
-            </RowTemplate>
-            <PagerContent>
-                <MudTablePager />
-            </PagerContent>
-        </MudTable>
-    </MudExpansionPanel>
-</MudExpansionPanels>
+    </MudSelect>
+    <MudTextField @bind-Value="playerDevice.DeviceId" Label="DeviceId" Margin="Margin.Normal" />
+    <MudDatePicker @bind-Date="playerDevice.Since" Label="Since" Margin="Margin.Normal"/>
+    <MudDatePicker @bind-Date="playerDevice.LastUsed" Label="LastUsed" Margin="Margin.Normal" />
+    <br />
+    <MudButton Variant="Variant.Filled" Color="Color.Success" OnClick="@(async () => await Save(playerDevice))">
+        @(playerDevice.Id > 0 ? "Save Change" : "Create New")
+    </MudButton>
+    <MudButton Variant="Variant.Filled" OnClick="Clear">Clear</MudButton>
+</MudExpansionPanel>
+<MudTable Items="dbContext.PlayerDevices" Filter="Search" @bind-customer="playerDevice">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">@ListPanelText</MudText>
+        <MudSpacer />
+        <MudTextField @bind-Value="_searchString" Placeholder="Search for PlayerDevices..." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh>Id</MudTh>
+        <MudTh>OwnerId</MudTh>
+        <MudTh>DeviceType</MudTh>
+        <MudTh>DeviceId</MudTh>
+        <MudTh>Since</MudTh>
+        <MudTh>LastUsed</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Id">@context.Id</MudTd>
+        <MudTd DataLabel="OwnerId">@context.OwnerId</MudTd>
+        <MudTd DataLabel="DeviceType">@context.DeviceType</MudTd>
+        <MudTd DataLabel="DeviceId">@context.DeviceId</MudTd>
+        <MudTd DataLabel="Since">@context.Since?.ToShortDateString()</MudTd>
+        <MudTd DataLabel="LastUsed">@context.LastUsed?.ToShortDateString()</MudTd>
+        <MudTd DataLabel="">
+            <MudFab @onclick="@(async () => await Edit(@context))" Color="Color.Primary" Icon="@Icons.Material.Filled.Edit" Size="Size.Small" IconSize="Size.Small" />
+            <MudFab @onclick="@(async () => await Delete(@context))" Color="Color.Secondary" Icon="@Icons.Material.Filled.Delete" Size="Size.Small" IconSize="Size.Small" />
+        </MudTd>
+    </RowTemplate>
+    <PagerContent>
+        <MudTablePager />
+    </PagerContent>
+</MudTable>
 
 @code {
     bool _editPanelExpanded = false;
-    bool _listPanelExpanded = true;
     string _searchString = "";
     PlayerDevice playerDevice = new();
 

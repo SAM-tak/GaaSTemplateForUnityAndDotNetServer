@@ -1,0 +1,178 @@
+@page "/tables/lootbox"
+
+@using System.ComponentModel.DataAnnotations
+
+@inject YourGameServer.Data.GameDbContext dbContext
+@inject MudBlazor.IScrollManager scrollManager
+@inject MudBlazor.IDialogService dialogService
+@inject MudBlazor.ISnackbar snackBar
+
+<MudExpansionPanel id="@EditPanelId" Text="@EditPanelText" @bind-IsExpanded="_editPanelExpanded">
+    <EditForm Model="@_newItem" OnValidSubmit="OnValidSubmit">
+        <DataAnnotationsValidator />
+        <MudCard>
+            <MudCardContent>
+                <MudTd>
+                    <MudTextField @bind-Value="_newItem.Name" Label="Name" />
+                </MudTd>
+                <MudTd>
+                    <MudTextField @bind-Value="_newItem.ProductName" Label="ProductName" />
+                </MudTd>
+                <MudTd DataLabel="DisplayName">
+                    <MudTextField @bind-Value="_newItem.DisplayName" Label="DisplayName" />
+                </MudTd>
+                <MudTd DataLabel="Description">
+                    <MudTextField @bind-Value="_newItem.Description" Label="Description" />
+                </MudTd>
+                <MudTd DataLabel="IconAddress">
+                    <MudTextField @bind-Value="_newItem.IconAddress" Label="IconAddress" />
+                </MudTd>
+                <MudTd DataLabel="BannerAddress">
+                    <MudTextField @bind-Value="_newItem.BannerAddress" Label="BannerAddress" />
+                </MudTd>
+            </MudCardContent>
+            <MudCardActions>
+                <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Success">Create New</MudButton>
+                <MudButton Class="ml-2" Variant="Variant.Filled" OnClick="Clear">Clear</MudButton>
+            </MudCardActions>
+        </MudCard>
+    </EditForm>
+</MudExpansionPanel>
+<br />
+<MudTable T="LootBox" Items="dbContext.LootBoxes" Filter="Search" CanCancelEdit="true" RowEditPreview="BackupItem" RowEditCancel="ResetItemToOriginalValues" RowEditCommit="@(async (x) => await ItemHasBeenCommitted(x))">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">@ListPanelText</MudText>
+        <MudSpacer />
+        <MudTextField @bind-Value="_searchString" Placeholder="Search for LootBoxes..." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh>Id</MudTh>
+        <MudTh>Name</MudTh>
+        <MudTh>ProductName</MudTh>
+        <MudTh>DisplayName</MudTh>
+        <MudTh>IconAddress</MudTh>
+        <MudTh>BannerAddress</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Id">@context.Id</MudTd>
+        <MudTd DataLabel="Name">@context.Name</MudTd>
+        <MudTd DataLabel="ProductName">@context.ProductName</MudTd>
+        <MudTd DataLabel="DisplayName">@context.DisplayName</MudTd>
+        <MudTd DataLabel="Description">@context.Description</MudTd>
+        <MudTd DataLabel="IconAddress">@context.IconAddress</MudTd>
+        <MudTd DataLabel="BannerAddress">@context.BannerAddress</MudTd>
+        <MudTd DataLabel="">
+            <MudFab @onclick="@(async () => await Delete(@context))" Color="Color.Primary" Icon="@Icons.Material.Filled.Delete" Size="Size.Small" IconSize="Size.Small" />
+        </MudTd>
+    </RowTemplate>
+    <RowEditingTemplate>
+        <MudTd DataLabel="Id">@context.Id</MudTd>
+        <MudTd DataLabel="Name">
+            <MudTextField @bind-Value="context.Name" Label="Name" />
+        </MudTd>
+        <MudTd DataLabel="ProductName">
+            <MudTextField @bind-Value="context.ProductName" Label="ProductName" />
+        </MudTd>
+        <MudTd DataLabel="DisplayName">
+            <MudTextField @bind-Value="context.DisplayName" Label="DisplayName" />
+        </MudTd>
+        <MudTd DataLabel="Description">
+            <MudTextField @bind-Value="context.Description" Label="Description" />
+        </MudTd>
+        <MudTd DataLabel="IconAddress">
+            <MudTextField @bind-Value="context.IconAddress" Label="IconAddress" />
+        </MudTd>
+        <MudTd DataLabel="BannerAddress">
+            <MudTextField @bind-Value="context.BannerAddress" Label="BannerAddress" />
+        </MudTd>
+    </RowEditingTemplate>
+    <PagerContent>
+        <MudTablePager />
+    </PagerContent>
+</MudTable>
+
+@code {
+    bool _editPanelExpanded = false;
+    string _searchString = "";
+    LootBox _newItem = new();
+
+    LootBox _backup;
+
+    static readonly string EditPanelId =  $"{nameof(LootBox).ToLower()}-edit-panel";
+    static readonly string EditPanelText = $"Add {nameof(LootBox)}";
+    static readonly string ListPanelText = nameof(LootBox);
+
+    private bool Search(LootBox x)
+    {
+        if (string.IsNullOrWhiteSpace(_searchString)) return true;
+
+        if (x.Name.Contains(_searchString, StringComparison.OrdinalIgnoreCase)) return true;
+
+        if (x.DisplayName.Contains(_searchString, StringComparison.OrdinalIgnoreCase)) return true;
+
+        if (x.Description.Contains(_searchString, StringComparison.OrdinalIgnoreCase)) return true;
+
+        if (x.IconAddress.Contains(_searchString, StringComparison.OrdinalIgnoreCase)) return true;
+
+        if (x.BannerAddress.Contains(_searchString, StringComparison.OrdinalIgnoreCase)) return true;
+
+        if ($"{x.Id}".Contains(_searchString)) return true;
+
+        return false;
+    }
+
+    async Task OnValidSubmit(EditContext contex)
+    {
+        dbContext.Add(_newItem);
+        await dbContext.SaveChangesAsync();
+        snackBar.Add($"New {nameof(LootBox)} (id:{_newItem.Id}) Created.", Severity.Success);
+        _newItem = new ();
+    }
+    
+    void Clear()
+    {
+        _newItem = new();
+    }
+
+    void BackupItem(object x)
+    {
+        _backup = ((LootBox)x) with { };
+    }
+
+    async Task ItemHasBeenCommitted(object x)
+    {
+        //AddEditionEvent($"RowEditCommit event: Changes to Element {((Element)element).Name} committed");
+        var record = (LootBox)x;
+        dbContext.Entry(record).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+        await dbContext.SaveChangesAsync();
+        snackBar.Add($"{nameof(LootBox)} (id:{record.Id}) Saved.", Severity.Success);
+    }
+
+    void ResetItemToOriginalValues(object x)
+    {
+        //AddEditionEvent($"RowEditCancel event: Editing of Element {((Element)element).Name} cancelled");
+        ((LootBox)x).CopyFrom(_backup);
+    }
+
+    async Task Save(LootBox x)
+    {
+        dbContext.Entry(x).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+        await dbContext.SaveChangesAsync();
+        snackBar.Add($"{nameof(LootBox)} (id:{x.Id}) Saved.", Severity.Success);
+    }
+
+    async Task Delete(LootBox x)
+    {
+        var parameters = new DialogParameters();
+        parameters.Add("ContentText", $"Do you really want to delete this records? This process cannot be undone.");
+        parameters.Add("ContentSubText", $"{x}");
+        parameters.Add("ButtonText", "Delete");
+        parameters.Add("Color", Color.Error);
+
+        if (!(await dialogService.Show<ConfirmDialog>("Delete", parameters, new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall }).Result).Cancelled) {
+            dbContext.LootBoxes.Remove(x);
+            await dbContext.SaveChangesAsync();
+            snackBar.Add($"{nameof(LootBox)} (id:{x.Id}) Deleted.", Severity.Success);
+        }
+    }
+}

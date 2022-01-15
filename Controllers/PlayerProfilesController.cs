@@ -59,6 +59,8 @@ public class PlayerProfilesController : ControllerBase
             return BadRequest();
         }
 
+        playerProfile.LastUpdate = DateTime.UtcNow;
+
         _context.Entry(playerProfile).State = EntityState.Modified;
 
         try {
@@ -84,6 +86,9 @@ public class PlayerProfilesController : ControllerBase
         if(playerId != playerProfile.OwnerId) {
             return BadRequest();
         }
+        
+        playerProfile.LastUpdate = DateTime.UtcNow;
+
         _context.PlayerProfiles.Add(playerProfile);
         await _context.SaveChangesAsync();
 

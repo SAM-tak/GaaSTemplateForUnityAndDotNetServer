@@ -1,6 +1,7 @@
 <MudDialog>
     <DialogContent>
         <MudText>@ContentText</MudText>
+        <MudText>@ContentSubText</MudText>
     </DialogContent>
     <DialogActions>
         <MudButton OnClick="Cancel">Cancel</MudButton>
@@ -12,6 +13,8 @@
     [CascadingParameter] MudDialogInstance MudDialog { get; set; }
 
     [Parameter] public string ContentText { get; set; }
+
+    [Parameter] public string ContentSubText { get; set; }
 
     [Parameter] public string ButtonText { get; set; }
 

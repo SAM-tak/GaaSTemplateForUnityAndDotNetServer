@@ -1,4 +1,4 @@
-@page "/tables/playerprofile"
+@page "/tables/serviceticket"
 
 @inject YourGameServer.Data.GameDbContext dbContext
 @inject MudBlazor.IScrollManager scrollManager
@@ -11,17 +11,27 @@
         <MudCard>
             <MudCardContent>
                 <MudTd>
-                    <MudNumericField @bind-Value="_newItem.OwnerId" Label="OwnerId" T="ulong" Min="0" />
-                </MudTd>
-                <MudTd>
-                    <MudDatePicker @bind-Date="_newItem.LastUpdate" Label="LastUpdate" />
-                    <MudTimePicker Time="_newItem.LastUpdate?.TimeOfDay" Label="LastUpdate" TimeChanged="(t) => _newItem.LastUpdate = _newItem.LastUpdate?.Date + t" />
-                </MudTd>
-                <MudTd>
                     <MudTextField @bind-Value="_newItem.Name" Label="Name" />
                 </MudTd>
                 <MudTd>
-                    <MudTextField @bind-Value="_newItem.Motto" Label="Motto" />
+                    <MudSelect T="ServiceTicketKind" @bind-Value="_newItem.Kind">
+                        @foreach (ServiceTicketKind item in Enum.GetValues(typeof(ServiceTicketKind)))
+                        {
+                                <MudSelectItem Value="@item">@item.GetDisplayName()</MudSelectItem>
+                        }
+                    </MudSelect>
+                </MudTd>
+                <MudTd>
+                    <MudTextField @bind-Value="_newItem.ProductName" Label="ProductName" />
+                </MudTd>
+                <MudTd>
+                    <MudTextField @bind-Value="_newItem.DisplayName" Label="DisplayName" />
+                </MudTd>
+                <MudTd>
+                    <MudTextField @bind-Value="_newItem.Description" Label="Description" />
+                </MudTd>
+                <MudTd>
+                    <MudNumericField @bind-Value="_newItem.DetailId" Label="DetailId" />
                 </MudTd>
                 <MudTd>
                     <MudNumericField @bind-Value="_newItem.IconBlobId" Label="IconBlobId" />
@@ -35,25 +45,31 @@
     </EditForm>
 </MudExpansionPanel>
 <br />
-<MudTable T="PlayerProfile" Items="dbContext.PlayerProfiles" Filter="Search" CanCancelEdit="true" RowEditPreview="BackupItem" RowEditCancel="ResetItemToOriginalValues"
+<MudTable T="ServiceTicket" Items="dbContext.ServiceTickets" Filter="Search" CanCancelEdit="true" RowEditPreview="BackupItem" RowEditCancel="ResetItemToOriginalValues"
           RowEditCommit="@(async (x) => await ItemHasBeenCommitted(x))">
     <ToolBarContent>
         <MudText Typo="Typo.h6">@ListPanelText</MudText>
         <MudSpacer />
-        <MudTextField @bind-Value="_searchString" Placeholder="Search for PlayerProfiles..." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+        <MudTextField @bind-Value="_searchString" Placeholder="Search for ServiceTickets..." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
     </ToolBarContent>
     <HeaderContent>
         <MudTh>Id</MudTh>
-        <MudTh>OwnerId</MudTh>
         <MudTh>Name</MudTh>
-        <MudTh>Motto</MudTh>
+        <MudTh>Kind</MudTh>
+        <MudTh>ProductName</MudTh>
+        <MudTh>DisplayName</MudTh>
+        <MudTh>Description</MudTh>
+        <MudTh>DetailId</MudTh>
         <MudTh>IconBlobId</MudTh>
     </HeaderContent>
     <RowTemplate>
         <MudTd DataLabel="Id">@context.Id</MudTd>
-        <MudTd DataLabel="OwnerId">@context.OwnerId</MudTd>
         <MudTd DataLabel="Name">@context.Name</MudTd>
-        <MudTd DataLabel="Motto">@context.Motto</MudTd>
+        <MudTd DataLabel="Kind">@context.Kind</MudTd>
+        <MudTd DataLabel="ProductName">@context.ProductName</MudTd>
+        <MudTd DataLabel="DisplayName">@context.DisplayName</MudTd>
+        <MudTd DataLabel="Description">@context.Description</MudTd>
+        <MudTd DataLabel="DetailId">@context.DetailId</MudTd>
         <MudTd DataLabel="IconBlobId">@context.IconBlobId</MudTd>
         <MudTd DataLabel="">
             <MudFab @onclick="@(async () => await Delete(@context))" Color="Color.Primary" Icon="@Icons.Material.Filled.Delete" Size="Size.Small" IconSize="Size.Small" />
@@ -61,18 +77,28 @@
     </RowTemplate>
     <RowEditingTemplate>
         <MudTd DataLabel="Id">@context.Id</MudTd>
-        <MudTd DataLabel="OwnerId">
-            <MudNumericField @bind-Value="context.OwnerId" Label="OwnerId" T="ulong" Min="0" />
-        </MudTd>
-        <MudTd DataLabel="LastUpdate">
-            <MudDatePicker @bind-Date="context.LastUpdate" Label="LastUpdate" />
-            <MudTimePicker Time="context.LastUpdate?.TimeOfDay" Label="LastUpdate" TimeChanged="(t) => context.LastUpdate = context.LastUpdate?.Date + t" />
-        </MudTd>
         <MudTd DataLabel="Name">
             <MudTextField @bind-Value="context.Name" Label="Name" />
         </MudTd>
-        <MudTd DataLabel="Motto">
-            <MudTextField @bind-Value="context.Motto" Label="Motto" />
+        <MudTd DataLabel="Kind">
+            <MudSelect T="ServiceTicketKind" @bind-Value="context.Kind">
+                @foreach (ServiceTicketKind item in Enum.GetValues(typeof(ServiceTicketKind)))
+                {
+                    <MudSelectItem Value="@item">@item.GetDisplayName()</MudSelectItem>
+                }
+            </MudSelect>
+        </MudTd>
+        <MudTd DataLabel="ProductName">
+            <MudTextField @bind-Value="context.ProductName" Label="ProductName" />
+        </MudTd>
+        <MudTd DataLabel="DisplayName">
+            <MudTextField @bind-Value="context.DisplayName" Label="DisplayName" />
+        </MudTd>
+        <MudTd DataLabel="Description">
+            <MudTextField @bind-Value="context.Description" Label="Description" />
+        </MudTd>
+        <MudTd DataLabel="DetailId">
+            <MudNumericField @bind-Value="context.DetailId" Label="DetailId" />
         </MudTd>
         <MudTd DataLabel="IconBlobId">
             <MudNumericField @bind-Value="context.IconBlobId" Label="IconBlobId" />
@@ -86,23 +112,25 @@
 @code {
     bool _editPanelExpanded = false;
     string _searchString = "";
-    PlayerProfile _newItem = new();
+    ServiceTicket _newItem = new();
 
-    PlayerProfile _backup;
+    ServiceTicket _backup;
 
-    static readonly string EditPanelId =  $"{nameof(PlayerProfile).ToLower()}-edit-panel";
-    static readonly string EditPanelText = $"Add {nameof(PlayerProfile)}";
-    static readonly string ListPanelText = nameof(PlayerProfile);
+    static readonly string EditPanelId =  $"{nameof(ServiceTicket).ToLower()}-edit-panel";
+    static readonly string EditPanelText = $"Add {nameof(ServiceTicket)}";
+    static readonly string ListPanelText = nameof(ServiceTicket);
 
-    private bool Search(PlayerProfile x)
+    private bool Search(ServiceTicket x)
     {
         if (string.IsNullOrWhiteSpace(_searchString)) return true;
 
         if (x.Name.Contains(_searchString, StringComparison.OrdinalIgnoreCase)) return true;
 
-        if (x.Motto.Contains(_searchString, StringComparison.OrdinalIgnoreCase)) return true;
+        if (x.DisplayName.Contains(_searchString, StringComparison.OrdinalIgnoreCase)) return true;
 
-        if ($"{x.Id} {x.IconBlobId}".Contains(_searchString)) return true;
+        if (x.Description.Contains(_searchString, StringComparison.OrdinalIgnoreCase)) return true;
+
+        if ($"{x.Id} {x.DetailId} {x.IconBlobId}".Contains(_searchString)) return true;
 
         return false;
     }
@@ -111,7 +139,7 @@
     {
         dbContext.Add(_newItem);
         await dbContext.SaveChangesAsync();
-        snackBar.Add($"New {nameof(PlayerProfile)} (id:{_newItem.Id}) Created.", Severity.Success);
+        snackBar.Add($"New {nameof(ServiceTicket)} (id:{_newItem.Id}) Created.", Severity.Success);
         _newItem = new ();
     }
 
@@ -122,32 +150,32 @@
 
     void BackupItem(object x)
     {
-        _backup = ((PlayerProfile)x) with { };
+        _backup = ((ServiceTicket)x) with { };
     }
 
     async Task ItemHasBeenCommitted(object x)
     {
         //AddEditionEvent($"RowEditCommit event: Changes to Element {((Element)element).Name} committed");
-        var record = (PlayerProfile)x;
+        var record = (ServiceTicket)x;
         dbContext.Entry(record).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
         await dbContext.SaveChangesAsync();
-        snackBar.Add($"{nameof(PlayerProfile)} (id:{record.Id}) Saved.", Severity.Success);
+        snackBar.Add($"{nameof(ServiceTicket)} (id:{record.Id}) Saved.", Severity.Success);
     }
 
     void ResetItemToOriginalValues(object x)
     {
         //AddEditionEvent($"RowEditCancel event: Editing of Element {((Element)element).Name} cancelled");
-        ((PlayerProfile)x).CopyFrom(_backup);
+        ((ServiceTicket)x).CopyFrom(_backup);
     }
 
-    async Task Save(PlayerProfile x)
+    async Task Save(ServiceTicket x)
     {
         dbContext.Entry(x).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
         await dbContext.SaveChangesAsync();
-        snackBar.Add($"{nameof(PlayerProfile)} (id:{x.Id}) Saved.", Severity.Success);
+        snackBar.Add($"{nameof(ServiceTicket)} (id:{x.Id}) Saved.", Severity.Success);
     }
 
-    async Task Delete(PlayerProfile x)
+    async Task Delete(ServiceTicket x)
     {
         var parameters = new DialogParameters();
         parameters.Add("ContentText", $"Do you really want to delete this records? This process cannot be undone.");
@@ -156,9 +184,9 @@
         parameters.Add("Color", Color.Error);
 
         if (!(await dialogService.Show<ConfirmDialog>("Delete", parameters, new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall }).Result).Cancelled) {
-            dbContext.PlayerProfiles.Remove(x);
+            dbContext.ServiceTickets.Remove(x);
             await dbContext.SaveChangesAsync();
-            snackBar.Add($"{nameof(PlayerProfile)} (id:{x.Id}) Deleted.", Severity.Success);
+            snackBar.Add($"{nameof(ServiceTicket)} (id:{x.Id}) Deleted.", Severity.Success);
         }
     }
 }

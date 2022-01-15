@@ -6,31 +6,42 @@
 @inject MudBlazor.ISnackbar snackBar
 
 <MudExpansionPanel id="@EditPanelId" Text="@EditPanelText" @bind-IsExpanded="_editPanelExpanded">
-    @if (playerDevice.Id > 0)
-    {
-        <MudNumericField Value="@playerDevice.Id" Label="Id" ReadOnly="true" Margin="Margin.Normal" />
-    }
-    else
-    {
-        <MudText Label="Id" Margin="Margin.Normal">New Item</MudText>
-    }
-    <MudNumericField @bind-Value="playerDevice.OwnerId" Label="OwnerId" Margin="Margin.Normal" />
-    <MudSelect @bind-Value="playerDevice.DeviceType" Label="DeviceType" Margin="Margin.Normal">
-        @foreach (DeviceType item in Enum.GetValues(typeof(DeviceType)))
-        {
-            <MudSelectItem Value="@item">@(item.ToString())</MudSelectItem>
-        }
-    </MudSelect>
-    <MudTextField @bind-Value="playerDevice.DeviceId" Label="DeviceId" Margin="Margin.Normal" />
-    <MudDatePicker @bind-Date="playerDevice.Since" Label="Since" Margin="Margin.Normal"/>
-    <MudDatePicker @bind-Date="playerDevice.LastUsed" Label="LastUsed" Margin="Margin.Normal" />
-    <br />
-    <MudButton Variant="Variant.Filled" Color="Color.Success" OnClick="@(async () => await Save(playerDevice))">
-        @(playerDevice.Id > 0 ? "Save Change" : "Create New")
-    </MudButton>
-    <MudButton Variant="Variant.Filled" OnClick="Clear">Clear</MudButton>
+    <EditForm Model="@_newItem" OnValidSubmit="OnValidSubmit">
+        <DataAnnotationsValidator />
+        <MudCard>
+            <MudCardContent>
+                <MudTd>
+                    <MudNumericField @bind-Value="_newItem.OwnerId" Label="OwnerId" T="ulong" Min="0" />
+                </MudTd>
+                <MudTd>
+                    <MudSelect @bind-Value="_newItem.DeviceType" Label="DeviceType">
+                        @foreach (DeviceType item in Enum.GetValues(typeof(DeviceType)))
+                        {
+                            <MudSelectItem Value="@item">@(item.GetDisplayName())</MudSelectItem>
+                        }
+                </MudSelect>
+                </MudTd>
+                <MudTd>
+                    <MudTextField @bind-Value="_newItem.DeviceId" Label="DeviceId" />
+                </MudTd>
+                <MudTd>
+                    <MudDatePicker @bind-Date="_newItem.Since" Label="Since"/>
+                    <MudTimePicker Time="_newItem.Since?.TimeOfDay" Label="Since" TimeChanged="(t) => _newItem.Since = _newItem.Since?.Date + t" />
+                </MudTd>
+                <MudTd>
+                    <MudDatePicker @bind-Date="_newItem.LastUsed" Label="LastUsed" />
+                    <MudTimePicker Time="_newItem.LastUsed?.TimeOfDay" Label="LastUsed" TimeChanged="(t) => _newItem.LastUsed = _newItem.LastUsed?.Date + t" />
+                </MudTd>
+            </MudCardContent>
+            <MudCardActions>
+                <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Success">Create New</MudButton>
+                <MudButton Class="ml-2" Variant="Variant.Filled" OnClick="Clear">Clear</MudButton>
+            </MudCardActions>
+        </MudCard>
+    </EditForm>
 </MudExpansionPanel>
-<MudTable Items="dbContext.PlayerDevices" Filter="Search">
+<br />
+<MudTable T="PlayerDevice" Items="dbContext.PlayerDevices" Filter="Search" CanCancelEdit="true" RowEditPreview="BackupItem" RowEditCancel="ResetItemToOriginalValues" RowEditCommit="@(async (x) => await ItemHasBeenCommitted(x))">
     <ToolBarContent>
         <MudText Typo="Typo.h6">@ListPanelText</MudText>
         <MudSpacer />
@@ -52,10 +63,31 @@
         <MudTd DataLabel="Since">@context.Since?.ToShortDateString()</MudTd>
         <MudTd DataLabel="LastUsed">@context.LastUsed?.ToShortDateString()</MudTd>
         <MudTd DataLabel="">
-            <MudFab @onclick="@(async () => await Edit(@context))" Color="Color.Primary" Icon="@Icons.Material.Filled.Edit" Size="Size.Small" IconSize="Size.Small" />
-            <MudFab @onclick="@(async () => await Delete(@context))" Color="Color.Secondary" Icon="@Icons.Material.Filled.Delete" Size="Size.Small" IconSize="Size.Small" />
+            <MudFab @onclick="@(async () => await Delete(@context))" Color="Color.Primary" Icon="@Icons.Material.Filled.Delete" Size="Size.Small" IconSize="Size.Small" />
         </MudTd>
     </RowTemplate>
+    <RowEditingTemplate>
+        <MudTd DataLabel="Id">@context.Id</MudTd>
+        <MudTd DataLabel="OwnerId">
+            <MudNumericField @bind-Value="context.OwnerId" Label="OwnerId" T="ulong" Min="0" />
+        </MudTd>
+        <MudTd DataLabel="DeviceType">
+            <MudSelect @bind-Value="context.DeviceType" Label="DeviceType">
+                @foreach (DeviceType item in Enum.GetValues(typeof(DeviceType)))
+                {
+                    <MudSelectItem Value="@item">@(item.GetDisplayName())</MudSelectItem>
+                }
+            </MudSelect>
+        </MudTd>
+        <MudTd DataLabel="DeviceId">
+            <MudTextField @bind-Value="context.DeviceId" Label="DeviceId" />
+        </MudTd>
+        <MudTd DataLabel="Since">@context.Since</MudTd>
+        <MudTd DataLabel="LastUsed">
+            <MudDatePicker @bind-Date="context.LastUsed" Label="LastUsed" />
+            <MudTimePicker Time="context.LastUsed?.TimeOfDay" Label="LastUsed" />
+        </MudTd>
+    </RowEditingTemplate>
     <PagerContent>
         <MudTablePager />
     </PagerContent>
@@ -64,10 +96,12 @@
 @code {
     bool _editPanelExpanded = false;
     string _searchString = "";
-    PlayerDevice playerDevice = new();
+    PlayerDevice _newItem = new();
+
+    PlayerDevice _backup;
 
     static readonly string EditPanelId =  $"{nameof(PlayerDevice).ToLower()}-edit-panel";
-    static readonly string EditPanelText = $"Add / Edit {nameof(PlayerDevice)}";
+    static readonly string EditPanelText = $"Add {nameof(PlayerDevice)}";
     static readonly string ListPanelText = nameof(PlayerDevice);
 
     private bool Search(PlayerDevice x)
@@ -81,44 +115,58 @@
         return false;
     }
 
+    async Task OnValidSubmit(EditContext contex)
+    {
+        dbContext.Add(_newItem);
+        await dbContext.SaveChangesAsync();
+        snackBar.Add($"New {nameof(PlayerDevice)} (id:{_newItem.Id}) Created.", Severity.Success);
+        _newItem = new ();
+    }
+
     void Clear()
     {
-        playerDevice = new();
+        _newItem = new();
     }
 
-    async Task Edit(PlayerDevice playerDevice)
+    void BackupItem(object x)
     {
-        this.playerDevice = playerDevice;
-        _editPanelExpanded = true;
-        await scrollManager.ScrollToTopAsync(EditPanelId, ScrollBehavior.Smooth);
+        _backup = ((PlayerDevice)x) with {};
     }
 
-    async Task Create(PlayerDevice playerDevice)
+    async Task ItemHasBeenCommitted(object x)
     {
-        dbContext.Add(playerDevice);
+        //AddEditionEvent($"RowEditCommit event: Changes to Element {((Element)element).Name} committed");
+        var record = (PlayerDevice)x;
+        dbContext.Entry(record).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
         await dbContext.SaveChangesAsync();
-        playerDevice = new PlayerDevice();
-        snackBar.Add($"New {nameof(PlayerDevice)} (id:{playerDevice.Id}) Created.", Severity.Success);
+        snackBar.Add($"{nameof(PlayerDevice)} (id:{record.Id}) Saved.", Severity.Success);
     }
 
-    async Task Save(PlayerDevice playerDevice)
+    void ResetItemToOriginalValues(object x)
     {
-        dbContext.Entry(playerDevice).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
-        await dbContext.SaveChangesAsync();
-        snackBar.Add($"{nameof(PlayerDevice)} (id:{playerDevice.Id}) Saved.", Severity.Success);
+        //AddEditionEvent($"RowEditCancel event: Editing of Element {((Element)element).Name} cancelled");
+        ((PlayerDevice)x).CopyFrom(_backup);
     }
 
-    async Task Delete(PlayerDevice playerDevice)
+    async Task Save(PlayerDevice x)
+    {
+        dbContext.Entry(x).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+        await dbContext.SaveChangesAsync();
+        snackBar.Add($"{nameof(PlayerDevice)} (id:{x.Id}) Saved.", Severity.Success);
+    }
+
+    async Task Delete(PlayerDevice x)
     {
         var parameters = new DialogParameters();
-        parameters.Add("ContentText", $"Do you really want to delete this records? This process cannot be undone.\n{playerDevice}");
+        parameters.Add("ContentText", $"Do you really want to delete this records? This process cannot be undone.");
+        parameters.Add("ContentSubText", $"{x}");
         parameters.Add("ButtonText", "Delete");
         parameters.Add("Color", Color.Error);
 
         if (!(await dialogService.Show<ConfirmDialog>("Delete", parameters, new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall }).Result).Cancelled) {
-            dbContext.PlayerDevices.Remove(playerDevice);
+            dbContext.PlayerDevices.Remove(x);
             await dbContext.SaveChangesAsync();
-            snackBar.Add($"{nameof(PlayerDevice)} (id:{playerDevice.Id}) Deleted.", Severity.Success);
+            snackBar.Add($"{nameof(PlayerDevice)} (id:{x.Id}) Deleted.", Severity.Success);
         }
     }
 }

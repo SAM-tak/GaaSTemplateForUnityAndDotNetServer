@@ -37,6 +37,8 @@ public class PlayerAccountsController : ControllerBase
         }
 #if DEBUG
         return await _context.PlayerAccounts.Skip(s ?? 0).Take(c ?? 1).Select(i => i.MakeMasked()).ToListAsync();
+#else
+        return NoContent();
 #endif
     }
 

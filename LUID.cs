@@ -8,7 +8,7 @@ public struct LUID : IEquatable<LUID>
     public ulong id0;
     public ushort id1;
 
-    private static readonly char[] validCharacters = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789".ToCharArray(); // length = 32
+    private static readonly char[] _validCharacters = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789".ToCharArray(); // length = 32
     public const int StringPresentationLength = 16;
     // 0-31 = 5bit * 16 = 80bit  元は64bit幅のIDだから、80bit確保できれば十分だと思う
 
@@ -66,8 +66,8 @@ public struct LUID : IEquatable<LUID>
         var ret = new LUID();
         var state = 0;
         foreach(var c in source) {
-            if(validCharacters.Contains(c)) {
-                var i = Array.IndexOf(validCharacters, c);
+            if(_validCharacters.Contains(c)) {
+                var i = Array.IndexOf(_validCharacters, c);
                 if(state < 3) {
                     ret.id1 |= (ushort)(i << 5 * (2 - state) + 1);
                 }
@@ -110,25 +110,25 @@ public struct LUID : IEquatable<LUID>
     {
         var mid = (id1 & 0x1) << 4 | (int)(id0 >> 5 * 12) & 0x1F;
         return new string(new char[] {
-            validCharacters[id1 >> 5 * 2 + 1],
-            validCharacters[id1 >> 5 + 1 & 0x1F],
-            validCharacters[id1 >> 1 & 0x1F],
-            validCharacters[mid],
+            _validCharacters[id1 >> 5 * 2 + 1],
+            _validCharacters[id1 >> 5 + 1 & 0x1F],
+            _validCharacters[id1 >> 1 & 0x1F],
+            _validCharacters[mid],
 
-            validCharacters[id0 >> 5 * 11 & 0x1F],
-            validCharacters[id0 >> 5 * 10 & 0x1F],
-            validCharacters[id0 >> 5 * 9 & 0x1F],
-            validCharacters[id0 >> 5 * 8 & 0x1F],
+            _validCharacters[id0 >> 5 * 11 & 0x1F],
+            _validCharacters[id0 >> 5 * 10 & 0x1F],
+            _validCharacters[id0 >> 5 * 9 & 0x1F],
+            _validCharacters[id0 >> 5 * 8 & 0x1F],
 
-            validCharacters[id0 >> 5 * 7 & 0x1F],
-            validCharacters[id0 >> 5 * 6 & 0x1F],
-            validCharacters[id0 >> 5 * 5 & 0x1F],
-            validCharacters[id0 >> 5 * 4 & 0x1F],
+            _validCharacters[id0 >> 5 * 7 & 0x1F],
+            _validCharacters[id0 >> 5 * 6 & 0x1F],
+            _validCharacters[id0 >> 5 * 5 & 0x1F],
+            _validCharacters[id0 >> 5 * 4 & 0x1F],
 
-            validCharacters[id0 >> 5 * 3 & 0x1F],
-            validCharacters[id0 >> 5 * 2 & 0x1F],
-            validCharacters[id0 >> 5 & 0x1F],
-            validCharacters[id0 & 0x1F]
+            _validCharacters[id0 >> 5 * 3 & 0x1F],
+            _validCharacters[id0 >> 5 * 2 & 0x1F],
+            _validCharacters[id0 >> 5 & 0x1F],
+            _validCharacters[id0 & 0x1F]
         });
     }
 

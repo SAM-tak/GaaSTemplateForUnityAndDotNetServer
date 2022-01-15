@@ -9,7 +9,7 @@
         <MudButton Class="pl-4 ml-8" Variant="Variant.Filled" Color="Color.Primary" Disabled="@buttonDisabled" @onclick="Execute">Execute</MudButton>
         <MudButton Class="pl-4 ml-8" Variant="Variant.Filled" Color="Color.Secondary" Disabled="@buttonDisabled" @onclick="DeleteAll">Delete All</MudButton>
     </MudGrid>
-    <MudOverlay Visible="buttonDisabled" DarkBackground="true" Absolute="true">
+    <MudOverlay Visible="buttonDisabled" DarkBackground="true">
         <MudProgressCircular Color="Color.Secondary" Indeterminate="true" />
     </MudOverlay>
 </MudPaper>
@@ -20,6 +20,7 @@
     private bool buttonDisabled;
 
     string latestLUID;
+
     private async Task Execute()
     {
         buttonDisabled = true;

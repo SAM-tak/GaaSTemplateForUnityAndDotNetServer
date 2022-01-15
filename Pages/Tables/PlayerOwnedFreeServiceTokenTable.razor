@@ -1,0 +1,205 @@
+@page "/tables/playerownedfreeservicetoken"
+
+@inject YourGameServer.Data.GameDbContext dbContext
+@inject MudBlazor.IScrollManager scrollManager
+@inject MudBlazor.IDialogService dialogService
+@inject MudBlazor.ISnackbar snackBar
+
+<MudExpansionPanel id="@EditPanelId" Text="@EditPanelText" @bind-IsExpanded="_editPanelExpanded">
+    <EditForm Model="@_newItem" OnValidSubmit="OnValidSubmit">
+        <DataAnnotationsValidator />
+        <MudCard>
+            <MudCardContent>
+                <MudTd>
+                    <MudNumericField @bind-Value="_newItem.OwnerId" Label="OwnerId" T="ulong" Min="0" />
+                </MudTd>
+                <MudTd>
+                    <MudSelect T="ConsumableOrigin" @bind-Value="_newItem.Origin">
+                        @foreach (ConsumableOrigin item in Enum.GetValues(typeof(ConsumableOrigin)))
+                        {
+                            <MudSelectItem Value="@item">@item.GetDisplayName()</MudSelectItem>
+                        }
+                    </MudSelect>
+                </MudTd>
+                <MudTd>
+                    <MudSelect T="ConsumableStatus" @bind-Value="_newItem.Status">
+                        @foreach (ConsumableStatus item in Enum.GetValues(typeof(ConsumableStatus)))
+                        {
+                            <MudSelectItem Value="@item">@item.GetDisplayName()</MudSelectItem>
+                        }
+                    </MudSelect>
+                </MudTd>
+                <MudTd>
+                    <MudDatePicker @bind-Date="_newItem.Period" Label="Period" />
+                    <MudTimePicker Time="_newItem.Period?.TimeOfDay" Label="Period" TimeChanged="(t) => _newItem.Period = _newItem.Period?.Date + t" />
+                </MudTd>
+                <MudTd>
+                    <MudDatePicker @bind-Date="_newItem.UsedDate" Label="UsedDate" />
+                    <MudTimePicker Time="_newItem.UsedDate?.TimeOfDay" Label="UsedDate" TimeChanged="(t) => _newItem.UsedDate = _newItem.UsedDate?.Date + t" />
+                </MudTd>
+                <MudTd>
+                    <MudDatePicker @bind-Date="_newItem.InvalidateDate" Label="InvalidateDate" />
+                    <MudTimePicker Time="_newItem.InvalidateDate?.TimeOfDay" Label="InvalidateDate" TimeChanged="(t) => _newItem.InvalidateDate = _newItem.InvalidateDate?.Date + t" />
+                </MudTd>
+                <MudTd>
+                    <MudDatePicker @bind-Date="_newItem.ExpireDate" Label="ExpireDate" />
+                    <MudTimePicker Time="_newItem.ExpireDate?.TimeOfDay" Label="ExpireDate" TimeChanged="(t) => _newItem.ExpireDate = _newItem.ExpireDate?.Date + t" />
+                </MudTd>
+            </MudCardContent>
+            <MudCardActions>
+                <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Success">Create New</MudButton>
+                <MudButton Class="ml-2" Variant="Variant.Filled" OnClick="Clear">Clear</MudButton>
+            </MudCardActions>
+        </MudCard>
+    </EditForm>
+</MudExpansionPanel>
+<br />
+<MudTable T="PlayerOwnedFreeServiceToken" Items="dbContext.PlayerOwnedFreeServiceTokens" Filter="Search" CanCancelEdit="true" RowEditPreview="BackupItem" RowEditCancel="ResetItemToOriginalValues"
+          RowEditCommit="@(async (x) => await ItemHasBeenCommitted(x))">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">@ListPanelText</MudText>
+        <MudSpacer />
+        <MudTextField @bind-Value="_searchString" Placeholder="Search for PlayerProfiles..." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh>Id</MudTh>
+        <MudTh>OwnerId</MudTh>
+        <MudTh>Origin</MudTh>
+        <MudTh>Status</MudTh>
+        <MudTh>Period</MudTh>
+        <MudTh>UsedDate</MudTh>
+        <MudTh>InvalidateDate</MudTh>
+        <MudTh>ExpireDate</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Id">@context.Id</MudTd>
+        <MudTd DataLabel="OwnerId">@context.OwnerId</MudTd>
+        <MudTd DataLabel="Origin">@context.Origin</MudTd>
+        <MudTd DataLabel="Status">@context.Status</MudTd>
+        <MudTd DataLabel="Period">@context.Period</MudTd>
+        <MudTd DataLabel="UsedDate">@context.UsedDate</MudTd>
+        <MudTd DataLabel="InvalidateDate">@context.InvalidateDate</MudTd>
+        <MudTd DataLabel="ExpireDate">@context.ExpireDate</MudTd>
+        <MudTd DataLabel="">
+            <MudFab @onclick="@(async () => await Delete(@context))" Color="Color.Primary" Icon="@Icons.Material.Filled.Delete" Size="Size.Small" IconSize="Size.Small" />
+        </MudTd>
+    </RowTemplate>
+    <RowEditingTemplate>
+        <MudTd DataLabel="Id">@context.Id</MudTd>
+        <MudTd DataLabel="OwnerId">
+            <MudNumericField @bind-Value="context.OwnerId" Label="OwnerId" T="ulong" Min="0" />
+        </MudTd>
+        <MudTd DataLabel="Origin">
+            <MudSelect T="ConsumableOrigin" @bind-Value="context.Origin">
+                @foreach (ConsumableOrigin item in Enum.GetValues(typeof(ConsumableOrigin)))
+                {
+                    <MudSelectItem Value="@item">@item.GetDisplayName()</MudSelectItem>
+                }
+            </MudSelect>
+        </MudTd>
+        <MudTd DataLabel="Status">
+            <MudSelect T="ConsumableStatus" @bind-Value="context.Status">
+                @foreach (ConsumableStatus item in Enum.GetValues(typeof(ConsumableStatus)))
+                {
+                    <MudSelectItem Value="@item">@item.GetDisplayName()</MudSelectItem>
+                }
+            </MudSelect>
+        </MudTd>
+        <MudTd DataLabel="Period">
+            <MudDatePicker @bind-Date="context.Period" Label="Period" />
+            <MudTimePicker Time="context.Period?.TimeOfDay" TimeChanged="(t) => context.Period = context.Period?.Date + t" />
+        </MudTd>
+        <MudTd DataLabel="UsedDate">
+            <MudDatePicker @bind-Date="context.UsedDate" Label="UsedDate" />
+            <MudTimePicker Time="context.UsedDate?.TimeOfDay" TimeChanged="(t) => context.UsedDate = context.UsedDate?.Date + t" />
+        </MudTd>
+        <MudTd DataLabel="InvalidateDate">
+            <MudDatePicker @bind-Date="context.InvalidateDate" Label="InvalidateDate" />
+            <MudTimePicker Time="context.InvalidateDate?.TimeOfDay" TimeChanged="(t) => context.InvalidateDate = context.InvalidateDate?.Date + t" />
+        </MudTd>
+        <MudTd DataLabel="ExpireDate">
+            <MudDatePicker @bind-Date="context.ExpireDate" Label="ExpireDate" />
+            <MudTimePicker Time="context.ExpireDate?.TimeOfDay" TimeChanged="(t) => context.ExpireDate = context.ExpireDate?.Date + t" />
+        </MudTd>
+    </RowEditingTemplate>
+    <PagerContent>
+        <MudTablePager />
+    </PagerContent>
+</MudTable>
+
+@code {
+    bool _editPanelExpanded = false;
+    string _searchString = "";
+    PlayerOwnedFreeServiceToken _newItem = new();
+
+    PlayerOwnedFreeServiceToken _backup;
+
+    static readonly string EditPanelId =  $"{nameof(PlayerOwnedFreeServiceToken).ToLower()}-edit-panel";
+    static readonly string EditPanelText = $"Add {nameof(PlayerOwnedFreeServiceToken)}";
+    static readonly string ListPanelText = nameof(PlayerOwnedFreeServiceToken);
+
+    private bool Search(PlayerOwnedFreeServiceToken x)
+    {
+        if (string.IsNullOrWhiteSpace(_searchString)) return true;
+
+        if ($"{x.Id} {x.Origin} {x.Status} {x.Period} {x.UsedDate} {x.InvalidateDate} {x.ExpireDate}".Contains(_searchString)) return true;
+
+        return false;
+    }
+
+    async Task OnValidSubmit(EditContext contex)
+    {
+        dbContext.Add(_newItem);
+        await dbContext.SaveChangesAsync();
+        snackBar.Add($"New {nameof(PlayerOwnedFreeServiceToken)} (id:{_newItem.Id}) Created.", Severity.Success);
+        _newItem = new ();
+    }
+
+    void Clear()
+    {
+        _newItem = new();
+
+    }
+
+    void BackupItem(object x)
+    {
+        _backup = ((PlayerOwnedFreeServiceToken)x) with { };
+    }
+
+    async Task ItemHasBeenCommitted(object x)
+    {
+        //AddEditionEvent($"RowEditCommit event: Changes to Element {((Element)element).Name} committed");
+        var record = (PlayerOwnedFreeServiceToken)x;
+        dbContext.Entry(record).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+        await dbContext.SaveChangesAsync();
+        snackBar.Add($"{nameof(PlayerProfile)} (id:{record.Id}) Saved.", Severity.Success);
+    }
+
+    void ResetItemToOriginalValues(object x)
+    {
+        //AddEditionEvent($"RowEditCancel event: Editing of Element {((Element)element).Name} cancelled");
+        ((PlayerOwnedFreeServiceToken)x).CopyFrom(_backup);
+    }
+
+    async Task Save(PlayerOwnedFreeServiceToken x)
+    {
+        dbContext.Entry(x).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+        await dbContext.SaveChangesAsync();
+        snackBar.Add($"{nameof(PlayerOwnedFreeServiceToken)} (id:{x.Id}) Saved.", Severity.Success);
+    }
+
+    async Task Delete(PlayerOwnedFreeServiceToken x)
+    {
+        var parameters = new DialogParameters();
+        parameters.Add("ContentText", $"Do you really want to delete this records? This process cannot be undone.");
+        parameters.Add("ContentSubText", $"{x}");
+        parameters.Add("ButtonText", "Delete");
+        parameters.Add("Color", Color.Error);
+
+        if (!(await dialogService.Show<ConfirmDialog>("Delete", parameters, new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall }).Result).Cancelled) {
+            dbContext.PlayerOwnedFreeServiceTokens.Remove(x);
+            await dbContext.SaveChangesAsync();
+            snackBar.Add($"{nameof(PlayerOwnedFreeServiceToken)} (id:{x.Id}) Deleted.", Severity.Success);
+        }
+    }
+}

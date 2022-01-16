@@ -1,3 +1,4 @@
+#nullable disable
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -6,6 +7,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using MessagePack;
 using Microsoft.EntityFrameworkCore;
 #if UNITY_5_3_OR_NEWER
+#nullable disable
 using Newtonsoft.Json;
 #else
 using System.Text.Json.Serialization;

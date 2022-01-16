@@ -20,6 +20,8 @@ builder.Services.AddApiVersioning(options => {
 });
 
 builder.AddJwtTokenGenarator();
+builder.Services.AddGrpc();
+builder.Services.AddMagicOnion();
 
 // https://stackoverflow.com/questions/4804086/is-there-any-connection-string-parser-in-c
 
@@ -47,7 +49,11 @@ builder.Services.AddAuthentication(options => {
     options.ClientSecret = googleAuthNSection["ClientSecret"];
     options.SaveTokens = true;
 })
-.AddJwtBearer(options => options.TokenValidationParameters = JwtTokenGenarator.TokenValidationParameters)
+.AddJwtBearer(options => {
+    if(JwtTokenGenarator.TokenValidationParameters is not null) {
+        options.TokenValidationParameters = JwtTokenGenarator.TokenValidationParameters;
+    }
+})
 //.AddMicrosoftIdentityWebApp(builder.Configuration)
 ;
 //builder.Services.AddAuthentication().AddScheme<AuthenticationSchemeOptions, ApiAuthHandler>("Api", null);
@@ -67,14 +73,14 @@ builder.Services.AddControllers(options => {
 })
 //.AddMicrosoftIdentityUI() // 今のところ役に立ってない
 ;
-builder.Services.AddRazorPages();
-builder.Services.AddServerSideBlazor();
-builder.Services.AddMudServices();
 if(builder.Environment.IsDevelopment()) {
     // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
     builder.Services.AddEndpointsApiExplorer();
     builder.Services.AddSwaggerGen();
 }
+builder.Services.AddRazorPages();
+builder.Services.AddServerSideBlazor();
+builder.Services.AddMudServices();
 
 var app = builder.Build();
 
@@ -84,6 +90,8 @@ app.UseJwtTokenGenarator();
 if(app.Environment.IsDevelopment()) {
     app.UseSwagger();
     app.UseSwaggerUI();
+    var methodHandlers = app.Services.GetService<MagicOnion.Server.MagicOnionServiceDefinition>()?.MethodHandlers;
+    if(methodHandlers is not null) app.MapMagicOnionSwagger("rpcswagger", methodHandlers, "/_/");
 }
 else {
     app.UseExceptionHandler("/Error");
@@ -97,6 +105,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapDefaultControllerRoute();
 app.MapBlazorHub();
+app.MapMagicOnionService();
 app.MapFallbackToPage("/_Host");
 
 app.Run();

@@ -45,7 +45,7 @@ public struct LUID : IEquatable<LUID>
         return result;
     }
 
-    public static async Task<string> NewLUIDStringAsync(Func<string, Task<bool>> isUnique)
+    public static async Task<string> NewLUIDStringAsync(Func<string, Task<bool>>? isUnique)
     {
         string result;
         do {
@@ -96,7 +96,7 @@ public struct LUID : IEquatable<LUID>
         return id0 == other.id0 && id1 == other.id1;
     }
 
-    public override bool Equals(object obj)
+    public override bool Equals(object? obj)
     {
         return obj is LUID luid && Equals(luid);
     }

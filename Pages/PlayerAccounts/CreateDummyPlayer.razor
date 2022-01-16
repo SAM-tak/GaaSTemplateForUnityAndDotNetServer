@@ -19,7 +19,7 @@
 
     private bool buttonDisabled;
 
-    string latestLUID;
+    string latestLUID = string.Empty;
 
     private async Task Execute()
     {
@@ -42,7 +42,7 @@
         for(int i = 0; i < Count; ++i) {
             latestLUID = await LUID.NewLUIDStringAsync(null);
             //Console.WriteLine($"New LUID {luid.id1} {luid.id0} {latestLUID}");
-            var playerAccount = await SignInController.CreateAccountAsync(context, new AccountCreationRequest {
+            var playerAccount = await SignUpController.CreateAccountAsync(context, new AccountCreationRequest {
                 DeviceType = (DeviceType)Random.Shared.Next(2),
                 DeviceId = Guid.NewGuid().ToString("N")
             });

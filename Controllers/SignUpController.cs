@@ -10,23 +10,29 @@ namespace YourGameServer.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class SignInController : ControllerBase
+public class SignUpController : ControllerBase
 {
     readonly GameDbContext _context;
     readonly JwtTokenGenarator _jwt;
 
-    public SignInController(GameDbContext context, JwtTokenGenarator jwt)
+    public SignUpController(GameDbContext context, JwtTokenGenarator jwt)
     {
         _context = context;
         _jwt = jwt;
     }
 
+    /// <summary>
+    /// Sign Up (Create New Account)
+    /// </summary>
+    /// <param name="signup"></param>
+    /// <returns></returns>
     [AllowAnonymous]
     [HttpPost]
-    public async Task<ActionResult<AccountCreationResult>> SignUp([FromBody] AccountCreationRequest signin)
+    public async Task<ActionResult<AccountCreationResult>> SignUp([FromBody] AccountCreationRequest signup)
     {
-        if(!string.IsNullOrWhiteSpace(signin.DeviceId)) {
-            var playerAccount = await CreateAccountAsync(_context, signin);
+        Console.WriteLine("SignUp");
+        if(!string.IsNullOrWhiteSpace(signup.DeviceId)) {
+            var playerAccount = await CreateAccountAsync(_context, signup);
             await _context.AddAsync(playerAccount);
             playerAccount.CurrentDeviceId = playerAccount.DeviceList[0].Id;
             await _context.SaveChangesAsync();

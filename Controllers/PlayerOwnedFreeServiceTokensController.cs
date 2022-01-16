@@ -23,7 +23,7 @@ namespace YourGameServer.Controllers
 
         // GET: api/PlayerOwnedFreeServiceTokens
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<PlayerOwnedFreeServiceToken>>> GetPlayerOwnedFreeServiceToken()
+        public async Task<ActionResult<IEnumerable<PlayerOwnedFreeServiceToken>>?> GetPlayerOwnedFreeServiceToken()
         {
             return await _context.PlayerOwnedFreeServiceTokens.ToListAsync();
         }
@@ -33,7 +33,7 @@ namespace YourGameServer.Controllers
         public async Task<ActionResult<PlayerOwnedFreeServiceToken>> GetPlayerOwnedFreeServiceToken(ulong id)
         {
             var playerOwnedFreeServiceToken = await _context.PlayerOwnedFreeServiceTokens.FindAsync(id);
-
+ 
             if (playerOwnedFreeServiceToken == null)
             {
                 return NotFound();

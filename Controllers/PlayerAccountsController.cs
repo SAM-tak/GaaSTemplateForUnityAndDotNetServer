@@ -18,7 +18,14 @@ public class PlayerAccountsController : ControllerBase
         _context = context;
     }
 
-    // GET: api/PlayerAccounts?id=111&id=112&id=113
+    /// <summary>
+    /// GET: api/PlayerAccounts?id=111&amp;id=112&amp;id=113
+    /// </summary>
+    /// <param name="playerId"></param>
+    /// <param name="id"></param>
+    /// <param name="s"></param>
+    /// <param name="c"></param>
+    /// <returns></returns>
     [HttpGet]
     public async Task<ActionResult<IEnumerable<MaskedPlayerAccount>>> GetPlayerAccounts([FromHeader] ulong playerId, [FromQuery] ulong[] id
 #if DEBUG
@@ -42,7 +49,12 @@ public class PlayerAccountsController : ControllerBase
 #endif
     }
 
-    // GET: api/PlayerAccounts/5
+    /// <summary>
+    /// GET: api/PlayerAccounts/5
+    /// </summary>
+    /// <param name="playerId"></param>
+    /// <param name="id"></param>
+    /// <returns></returns>
     [HttpGet("{id}")]
     public async Task<ActionResult<PlayerAccount>> GetPlayerAccount([FromHeader] ulong playerId, ulong id)
     {
@@ -59,8 +71,14 @@ public class PlayerAccountsController : ControllerBase
         return playerAccount;
     }
 
-    // PUT: api/PlayerAccounts/5
-    // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+    /// <summary>
+    /// PUT: api/PlayerAccounts/5
+    /// To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+    /// </summary>
+    /// <param name="playerId"></param>
+    /// <param name="id"></param>
+    /// <param name="playerAccount"></param>
+    /// <returns></returns>
     [HttpPut("{id}")]
     public async Task<IActionResult> PutPlayerAccount([FromHeader] ulong playerId, ulong id, PlayerAccount playerAccount)
     {
@@ -99,7 +117,12 @@ public class PlayerAccountsController : ControllerBase
     //     return CreatedAtAction("GetPlayerAccount", new { id = playerAccount.Id }, playerAccount);
     // }
 
-    // DELETE: api/PlayerAccounts/5
+    /// <summary>
+    /// DELETE: api/PlayerAccounts/5
+    /// </summary>
+    /// <param name="playerId"></param>
+    /// <param name="id"></param>
+    /// <returns></returns>
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeletePlayerAccount([FromHeader] ulong playerId, ulong id)
     {

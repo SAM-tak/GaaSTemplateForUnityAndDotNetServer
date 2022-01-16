@@ -1,9 +1,10 @@
+#nullable disable
 using System.ComponentModel.DataAnnotations.Schema;
 using MessagePack;
+using YourGameServer.Models;
 
-namespace YourGameServer.Models // Unity cannot accpect 'namespace YourProjectName.Models;' yet
+namespace YourGameServer.Interface // Unity cannot accpect 'namespace YourProjectName.Models;' yet
 {
-    [NotMapped]
     [MessagePackObject]
     public record TokenRequest
     {
@@ -17,7 +18,6 @@ namespace YourGameServer.Models // Unity cannot accpect 'namespace YourProjectNa
         public string NewDeviceId { get; init; } // Unity's SystemInfo.deviceUniqueIdentifier
     }
 
-    [NotMapped]
     [MessagePackObject]
     public record TokenRequestResult
     {

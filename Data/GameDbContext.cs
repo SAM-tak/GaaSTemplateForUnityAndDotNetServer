@@ -1,3 +1,4 @@
+#nullable disable
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using YourGameServer.Models;
@@ -10,21 +11,21 @@ public class GameDbContext : DbContext
     {
     }
 
-    public DbSet<PlayerAccount> PlayerAccounts { get; set; }
+    public DbSet<PlayerAccount> PlayerAccounts { get; init; }
 
-    public DbSet<PlayerProfile> PlayerProfiles { get; set; }
+    public DbSet<PlayerProfile> PlayerProfiles { get; init; }
 
-    public DbSet<PlayerDevice> PlayerDevices { get; set; }
+    public DbSet<PlayerDevice> PlayerDevices { get; init; }
 
-    public DbSet<PlayerOwnedFreeServiceToken> PlayerOwnedFreeServiceTokens { get; set; }
+    public DbSet<PlayerOwnedFreeServiceToken> PlayerOwnedFreeServiceTokens { get; init; }
 
-    public DbSet<PlayerOwnedPaidServiceToken> PlayerOwnedPaidServiceTokens { get; set; }
+    public DbSet<PlayerOwnedPaidServiceToken> PlayerOwnedPaidServiceTokens { get; init; }
 
-    public DbSet<PlayerOwnedServiceTicket> PlayerOwnedServiceTickets { get; set; }
+    public DbSet<PlayerOwnedServiceTicket> PlayerOwnedServiceTickets { get; init; }
 
-    public DbSet<ServiceToken> ServiceTokens { get; set; }
+    public DbSet<ServiceToken> ServiceTokens { get; init; }
 
-    public DbSet<ServiceTicket> ServiceTickets { get; set; }
+    public DbSet<ServiceTicket> ServiceTickets { get; init; }
 
-    public DbSet<LootBox> LootBoxes { get; set; }
+    public DbSet<LootBox> LootBoxes { get; init; }
 }

@@ -9,47 +9,47 @@ namespace YourGameServer.Extensions;
 
 public static class TextHelper
 {
-    public static string LabelFor<T>(Expression<Func<T, object>> propertyExpression)
+    public static string LabelFor<T>(Expression<Func<T, object?>> propertyExpression)
     {
         var memberInfo = GetPropertyInformation(propertyExpression.Body);
-        if(memberInfo == null) {
+        if(memberInfo is null) {
             throw new ArgumentException("No property reference expression was found.", nameof(propertyExpression));
         }
 
         var attr = memberInfo.GetAttribute<DisplayAttribute>(false);
-        if(attr == null) {
+        if(attr is null) {
             return memberInfo.Name;
         }
 
-        return attr.Name;
+        return attr.Name ?? memberInfo.Name;
     }
 
-    public static string DescriptionFor<T>(Expression<Func<T, object>> propertyExpression)
+    public static string DescriptionFor<T>(Expression<Func<T, object?>> propertyExpression)
     {
         var memberInfo = GetPropertyInformation(propertyExpression.Body);
-        if(memberInfo == null) {
+        if(memberInfo is null) {
             throw new ArgumentException("No property reference expression was found.", nameof(propertyExpression));
         }
 
         var attr = memberInfo.GetAttribute<DisplayAttribute>(false);
-        if(attr == null) {
+        if(attr is null) {
             return memberInfo.Name;
         }
 
-        return attr.Description;
+        return attr.Description ?? memberInfo.Name;
     }
 
-    public static MemberInfo GetPropertyInformation(Expression propertyExpression)
+    public static MemberInfo? GetPropertyInformation(Expression propertyExpression)
     {
-        Debug.Assert(propertyExpression != null, "propertyExpression != null");
+        Debug.Assert(propertyExpression is not null, "propertyExpression is not null");
         var memberExpr = propertyExpression as MemberExpression;
-        if(memberExpr == null) {
+        if(memberExpr is null) {
             if(propertyExpression is UnaryExpression unaryExpr && unaryExpr.NodeType == ExpressionType.Convert) {
                 memberExpr = unaryExpr.Operand as MemberExpression;
             }
         }
 
-        if(memberExpr != null && memberExpr.Member.MemberType == MemberTypes.Property) {
+        if(memberExpr is not null && memberExpr.Member.MemberType == MemberTypes.Property) {
             return memberExpr.Member;
         }
 

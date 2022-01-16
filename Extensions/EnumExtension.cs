@@ -10,17 +10,19 @@ static class EnumExtension
 {
     public static string GetDisplayName(this Enum enumValue)
     {
-        return enumValue.GetType().GetMember(enumValue.ToString())
+        var enumString = enumValue.ToString();
+        return enumValue.GetType()?.GetMember(enumString)
                     .First()
                     .GetCustomAttribute<DisplayAttribute>()
-                    .Name;
+                    ?.Name ?? enumString;
     }
 
     public static string GetDescription(this Enum enumValue)
     {
-        return enumValue.GetType().GetMember(enumValue.ToString())
+        var enumString = enumValue.ToString();
+        return enumValue.GetType()?.GetMember(enumString)
                     .First()
                     .GetCustomAttribute<DisplayAttribute>()
-                    .Description;
+                    ?.Description ?? enumString;
     }
 }

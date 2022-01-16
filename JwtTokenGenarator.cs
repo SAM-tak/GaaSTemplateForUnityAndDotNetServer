@@ -16,12 +16,12 @@ namespace YourGameServer;
 
 public class JwtTokenGenarator
 {
-    public static TokenValidationParameters TokenValidationParameters { get; private set; }
+    public static TokenValidationParameters? TokenValidationParameters { get; private set; }
 
     public int ExpireMinutes { get; }
 
     SigningCredentials SigningCredentials { get; set; }
-    internal IServiceProvider _serviceProvider;
+    internal IServiceProvider? _serviceProvider;
 
     public JwtTokenGenarator(IConfiguration config, IWebHostEnvironment environment)
     {
@@ -43,14 +43,14 @@ public class JwtTokenGenarator
                     var serviceScopeFactory = _serviceProvider.GetRequiredService<IServiceScopeFactory>();
                     using var scope = serviceScopeFactory.CreateScope();
                     var httpContextAccessor = scope.ServiceProvider.GetService<IHttpContextAccessor>();
-                    var playerIdString = httpContextAccessor.HttpContext.Request.Headers["PlayerId"];
-                    var deviceIdString = httpContextAccessor.HttpContext.Request.Headers["DeviceId"];
+                    var playerIdString = httpContextAccessor?.HttpContext?.Request.Headers["PlayerId"];
+                    var deviceIdString = httpContextAccessor?.HttpContext?.Request.Headers["DeviceId"];
                     if(!string.IsNullOrEmpty(playerIdString) && !string.IsNullOrEmpty(deviceIdString)
                     && audiences.Any(i => i == $"{validationParameters.ValidAudience}/{playerIdString}/{deviceIdString}")) {
                         var playerId = ulong.Parse(playerIdString);
                         var deviceId = ulong.Parse(deviceIdString);
                         var context = scope.ServiceProvider.GetService<GameDbContext>();
-                        var playerAccount = context.PlayerAccounts.Find(playerId);
+                        var playerAccount = context?.PlayerAccounts.Find(playerId);
                         if (playerAccount != null)
                         {
                             return playerAccount.CurrentDeviceId == deviceId;
@@ -72,8 +72,8 @@ public class JwtTokenGenarator
     public string CreateToken(ulong playerId, ulong deviceId)
     {
         var token = new JwtSecurityToken(
-            issuer: TokenValidationParameters.ValidIssuer,
-            audience: $"{TokenValidationParameters.ValidAudience}/{playerId}/{deviceId}",
+            issuer: TokenValidationParameters?.ValidIssuer,
+            audience: $"{TokenValidationParameters?.ValidAudience}/{playerId}/{deviceId}",
             expires: ExpireMinutes > 0 ? DateTime.Now.AddMinutes(ExpireMinutes) : null,
             signingCredentials: SigningCredentials
         );
@@ -95,7 +95,8 @@ internal static class ApplicationBuilderJwtTokenGenaratorExtention
 {
     public static IApplicationBuilder UseJwtTokenGenarator(this IApplicationBuilder app)
     {
-        app.ApplicationServices.GetService<JwtTokenGenarator>()._serviceProvider = app.ApplicationServices;
+        var jwtTokenGenarator = app.ApplicationServices.GetService<JwtTokenGenarator>();
+        if(jwtTokenGenarator != null) jwtTokenGenarator._serviceProvider = app.ApplicationServices;
         return app;
     }
 }

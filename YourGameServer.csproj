@@ -4,13 +4,16 @@
     <TargetFramework>net6.0</TargetFramework>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>$(NoWarn);1591</NoWarn>
-    <Nullable>disable</Nullable>
+    <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>b682ec76-59ef-485d-8611-cd02c9fea2c0</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Bogus" Version="34.0.1" />
+    <PackageReference Include="Grpc.AspNetCore" Version="2.41.0" />
+    <PackageReference Include="MagicOnion.Server" Version="4.3.1" />
+    <PackageReference Include="MagicOnion.Server.HttpGateway" Version="4.3.1" />
     <PackageReference Include="MessagePack" Version="2.3.85" />
     <PackageReference Include="MessagePack.AspNetCoreMvcFormatter" Version="2.3.85" />
     <PackageReference Include="MessagePack.UnityShims" Version="2.3.85" />

@@ -50,8 +50,8 @@
     <Columns>
         <Column T="PlayerDevice" Field="Id">
             <EditTemplate>
-                <MudFab @onclick="@(async () => await Delete(@context))" Color="Color.Primary" Icon="@Icons.Material.Filled.Delete" Size="Size.Small" IconSize="Size.Small" />
                 @context.Id
+                <MudFab @onclick="@(async () => await Delete(@context))" Color="Color.Primary" Icon="@Icons.Material.Filled.Delete" Size="Size.Small" IconSize="Size.Small" />
             </EditTemplate>
         </Column>
         <Column T="PlayerDevice" Field="OwnerId" />

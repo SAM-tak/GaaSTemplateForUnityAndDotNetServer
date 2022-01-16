@@ -1,7 +1,5 @@
 @page "/tables/lootbox"
 
-@using System.ComponentModel.DataAnnotations
-
 @inject YourGameServer.Data.GameDbContext dbContext
 @inject MudBlazor.IScrollManager scrollManager
 @inject MudBlazor.IDialogService dialogService
@@ -48,8 +46,8 @@
     <Columns>
         <Column T="LootBox" Field="Id">
             <EditTemplate>
-                <MudFab @onclick="@(async () => await Delete(@context))" Color="Color.Primary" Icon="@Icons.Material.Filled.Delete" Size="Size.Small" IconSize="Size.Small" />
                 @context.Id
+                <MudFab @onclick="@(async () => await Delete(@context))" Color="Color.Primary" Icon="@Icons.Material.Filled.Delete" Size="Size.Small" IconSize="Size.Small" />
             </EditTemplate>
         </Column>
         <Column T="LootBox" Field="Name" />

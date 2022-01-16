@@ -20,7 +20,7 @@ public class PlayerAccountsController : ControllerBase
 
     // GET: api/PlayerAccounts?id=111&id=112&id=113
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<PlayerAccount.Masked>>> GetPlayerAccounts([FromHeader] ulong playerId, [FromQuery] ulong[] id
+    public async Task<ActionResult<IEnumerable<MaskedPlayerAccount>>> GetPlayerAccounts([FromHeader] ulong playerId, [FromQuery] ulong[] id
 #if DEBUG
         , [FromQuery] int? s, [FromQuery] int? c
 #endif

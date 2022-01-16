@@ -20,7 +20,7 @@ static class EnumExtension
     {
         return enumValue.GetType().GetMember(enumValue.ToString())
                     .First()
-                    .GetCustomAttribute<DescriptionAttribute>()
+                    .GetCustomAttribute<DisplayAttribute>()
                     .Description;
     }
 }

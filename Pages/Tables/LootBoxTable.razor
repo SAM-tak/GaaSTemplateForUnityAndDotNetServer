@@ -13,22 +13,22 @@
         <MudCard>
             <MudCardContent>
                 <MudTd>
-                    <MudTextField @bind-Value="_newItem.Name" Label="Name" />
+                    <MudTextField @bind-Value="_newItem.Name" Label="@(TextHelper.LabelFor<LootBox>(i => i.Name))" />
                 </MudTd>
                 <MudTd>
-                    <MudTextField @bind-Value="_newItem.ProductName" Label="ProductName" />
+                    <MudTextField @bind-Value="_newItem.ProductName" Label="@(TextHelper.LabelFor<LootBox>(i => i.ProductName))" />
                 </MudTd>
                 <MudTd DataLabel="DisplayName">
-                    <MudTextField @bind-Value="_newItem.DisplayName" Label="DisplayName" />
+                    <MudTextField @bind-Value="_newItem.DisplayName" Label="@(TextHelper.LabelFor<LootBox>(i => i.DisplayName))" />
                 </MudTd>
                 <MudTd DataLabel="Description">
-                    <MudTextField @bind-Value="_newItem.Description" Label="Description" />
+                    <MudTextField @bind-Value="_newItem.Description" Label="@(TextHelper.LabelFor<LootBox>(i => i.Description))" />
                 </MudTd>
                 <MudTd DataLabel="IconAddress">
-                    <MudTextField @bind-Value="_newItem.IconAddress" Label="IconAddress" />
+                    <MudTextField @bind-Value="_newItem.IconAddress" Label="@(TextHelper.LabelFor<LootBox>(i => i.IconAddress))" />
                 </MudTd>
                 <MudTd DataLabel="BannerAddress">
-                    <MudTextField @bind-Value="_newItem.BannerAddress" Label="BannerAddress" />
+                    <MudTextField @bind-Value="_newItem.BannerAddress" Label="@(TextHelper.LabelFor<LootBox>(i => i.BannerAddress))" />
                 </MudTd>
             </MudCardContent>
             <MudCardActions>
@@ -46,12 +46,12 @@
         <MudTextField @bind-Value="_searchString" Placeholder="Search for LootBoxes..." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
     </ToolBarContent>
     <HeaderContent>
-        <MudTh>Id</MudTh>
-        <MudTh>Name</MudTh>
-        <MudTh>ProductName</MudTh>
-        <MudTh>DisplayName</MudTh>
-        <MudTh>IconAddress</MudTh>
-        <MudTh>BannerAddress</MudTh>
+        <MudTh>@(TextHelper.LabelFor<LootBox>(i => i.Id))</MudTh>
+        <MudTh>@(TextHelper.LabelFor<LootBox>(i => i.Name))</MudTh>
+        <MudTh>@(TextHelper.LabelFor<LootBox>(i => i.ProductName))</MudTh>
+        <MudTh>@(TextHelper.LabelFor<LootBox>(i => i.DisplayName))</MudTh>
+        <MudTh>@(TextHelper.LabelFor<LootBox>(i => i.IconAddress))</MudTh>
+        <MudTh>@(TextHelper.LabelFor<LootBox>(i => i.BannerAddress))</MudTh>
     </HeaderContent>
     <RowTemplate>
         <MudTd DataLabel="Id">@context.Id</MudTd>
@@ -68,22 +68,22 @@
     <RowEditingTemplate>
         <MudTd DataLabel="Id">@context.Id</MudTd>
         <MudTd DataLabel="Name">
-            <MudTextField @bind-Value="context.Name" Label="Name" />
+            <MudTextField @bind-Value="context.Name" />
         </MudTd>
         <MudTd DataLabel="ProductName">
-            <MudTextField @bind-Value="context.ProductName" Label="ProductName" />
+            <MudTextField @bind-Value="context.ProductName" />
         </MudTd>
         <MudTd DataLabel="DisplayName">
-            <MudTextField @bind-Value="context.DisplayName" Label="DisplayName" />
+            <MudTextField @bind-Value="context.DisplayName" />
         </MudTd>
         <MudTd DataLabel="Description">
-            <MudTextField @bind-Value="context.Description" Label="Description" />
+            <MudTextField @bind-Value="context.Description" />
         </MudTd>
         <MudTd DataLabel="IconAddress">
-            <MudTextField @bind-Value="context.IconAddress" Label="IconAddress" />
+            <MudTextField @bind-Value="context.IconAddress" />
         </MudTd>
         <MudTd DataLabel="BannerAddress">
-            <MudTextField @bind-Value="context.BannerAddress" Label="BannerAddress" />
+            <MudTextField @bind-Value="context.BannerAddress" />
         </MudTd>
     </RowEditingTemplate>
     <PagerContent>

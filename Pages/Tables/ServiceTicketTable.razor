@@ -11,7 +11,7 @@
         <MudCard>
             <MudCardContent>
                 <MudTd>
-                    <MudTextField @bind-Value="_newItem.Name" Label="Name" />
+                    <MudTextField @bind-Value="_newItem.Name" Label="@(TextHelper.LabelFor<ServiceTicket>(i => i.Name))" />
                 </MudTd>
                 <MudTd>
                     <MudSelect T="ServiceTicketKind" @bind-Value="_newItem.Kind">
@@ -22,19 +22,19 @@
                     </MudSelect>
                 </MudTd>
                 <MudTd>
-                    <MudTextField @bind-Value="_newItem.ProductName" Label="ProductName" />
+                    <MudTextField @bind-Value="_newItem.ProductName" Label="@(TextHelper.LabelFor<ServiceTicket>(i => i.ProductName))" />
                 </MudTd>
                 <MudTd>
-                    <MudTextField @bind-Value="_newItem.DisplayName" Label="DisplayName" />
+                    <MudTextField @bind-Value="_newItem.DisplayName" Label="@(TextHelper.LabelFor<ServiceTicket>(i => i.DisplayName))" />
                 </MudTd>
                 <MudTd>
-                    <MudTextField @bind-Value="_newItem.Description" Label="Description" />
+                    <MudTextField @bind-Value="_newItem.Description" Label="@(TextHelper.LabelFor<ServiceTicket>(i => i.Description))" />
                 </MudTd>
                 <MudTd>
-                    <MudNumericField @bind-Value="_newItem.DetailId" Label="DetailId" />
+                    <MudNumericField @bind-Value="_newItem.DetailId" Label="@(TextHelper.LabelFor<ServiceTicket>(i => i.DetailId))" />
                 </MudTd>
                 <MudTd>
-                    <MudNumericField @bind-Value="_newItem.IconBlobId" Label="IconBlobId" />
+                    <MudNumericField @bind-Value="_newItem.IconBlobId" Label="@(TextHelper.LabelFor<ServiceTicket>(i => i.IconBlobId))" />
                 </MudTd>
             </MudCardContent>
             <MudCardActions>
@@ -53,14 +53,14 @@
         <MudTextField @bind-Value="_searchString" Placeholder="Search for ServiceTickets..." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
     </ToolBarContent>
     <HeaderContent>
-        <MudTh>Id</MudTh>
-        <MudTh>Name</MudTh>
-        <MudTh>Kind</MudTh>
-        <MudTh>ProductName</MudTh>
-        <MudTh>DisplayName</MudTh>
-        <MudTh>Description</MudTh>
-        <MudTh>DetailId</MudTh>
-        <MudTh>IconBlobId</MudTh>
+        <MudTh>@(TextHelper.LabelFor<ServiceTicket>(i => i.Id))</MudTh>
+        <MudTh>@(TextHelper.LabelFor<ServiceTicket>(i => i.Name))</MudTh>
+        <MudTh>@(TextHelper.LabelFor<ServiceTicket>(i => i.Kind))</MudTh>
+        <MudTh>@(TextHelper.LabelFor<ServiceTicket>(i => i.ProductName))</MudTh>
+        <MudTh>@(TextHelper.LabelFor<ServiceTicket>(i => i.DisplayName))</MudTh>
+        <MudTh>@(TextHelper.LabelFor<ServiceTicket>(i => i.Description))</MudTh>
+        <MudTh>@(TextHelper.LabelFor<ServiceTicket>(i => i.DetailId))</MudTh>
+        <MudTh>@(TextHelper.LabelFor<ServiceTicket>(i => i.IconBlobId))</MudTh>
     </HeaderContent>
     <RowTemplate>
         <MudTd DataLabel="Id">@context.Id</MudTd>
@@ -78,7 +78,7 @@
     <RowEditingTemplate>
         <MudTd DataLabel="Id">@context.Id</MudTd>
         <MudTd DataLabel="Name">
-            <MudTextField @bind-Value="context.Name" Label="Name" />
+            <MudTextField @bind-Value="context.Name" />
         </MudTd>
         <MudTd DataLabel="Kind">
             <MudSelect T="ServiceTicketKind" @bind-Value="context.Kind">
@@ -89,19 +89,19 @@
             </MudSelect>
         </MudTd>
         <MudTd DataLabel="ProductName">
-            <MudTextField @bind-Value="context.ProductName" Label="ProductName" />
+            <MudTextField @bind-Value="context.ProductName" />
         </MudTd>
         <MudTd DataLabel="DisplayName">
-            <MudTextField @bind-Value="context.DisplayName" Label="DisplayName" />
+            <MudTextField @bind-Value="context.DisplayName" />
         </MudTd>
         <MudTd DataLabel="Description">
-            <MudTextField @bind-Value="context.Description" Label="Description" />
+            <MudTextField @bind-Value="context.Description" />
         </MudTd>
         <MudTd DataLabel="DetailId">
-            <MudNumericField @bind-Value="context.DetailId" Label="DetailId" />
+            <MudNumericField @bind-Value="context.DetailId" />
         </MudTd>
         <MudTd DataLabel="IconBlobId">
-            <MudNumericField @bind-Value="context.IconBlobId" Label="IconBlobId" />
+            <MudNumericField @bind-Value="context.IconBlobId"  />
         </MudTd>
     </RowEditingTemplate>
     <PagerContent>

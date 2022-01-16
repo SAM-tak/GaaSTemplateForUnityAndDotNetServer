@@ -11,20 +11,20 @@
         <MudCard>
             <MudCardContent>
                 <MudTd>
-                    <MudNumericField @bind-Value="_newItem.OwnerId" Label="OwnerId" T="ulong" Min="0" />
+                    <MudNumericField @bind-Value="_newItem.OwnerId" Label="@(TextHelper.LabelFor<PlayerProfile>(i => i.OwnerId))" T="ulong" Min="0" />
                 </MudTd>
                 <MudTd>
-                    <MudDatePicker @bind-Date="_newItem.LastUpdate" Label="LastUpdate" />
+                    <MudDatePicker @bind-Date="_newItem.LastUpdate" Label="@(TextHelper.LabelFor<PlayerProfile>(i => i.LastUpdate))" />
                     <MudTimePicker Time="_newItem.LastUpdate?.TimeOfDay" Label="LastUpdate" TimeChanged="(t) => _newItem.LastUpdate = _newItem.LastUpdate?.Date + t" />
                 </MudTd>
                 <MudTd>
-                    <MudTextField @bind-Value="_newItem.Name" Label="Name" />
+                    <MudTextField @bind-Value="_newItem.Name" Label="@(TextHelper.LabelFor<PlayerProfile>(i => i.Name))" />
                 </MudTd>
                 <MudTd>
-                    <MudTextField @bind-Value="_newItem.Motto" Label="Motto" />
+                    <MudTextField @bind-Value="_newItem.Motto" Label="@(TextHelper.LabelFor<PlayerProfile>(i => i.Motto))" />
                 </MudTd>
                 <MudTd>
-                    <MudNumericField @bind-Value="_newItem.IconBlobId" Label="IconBlobId" />
+                    <MudNumericField @bind-Value="_newItem.IconBlobId" Label="@(TextHelper.LabelFor<PlayerProfile>(i => i.IconBlobId))" />
                 </MudTd>
             </MudCardContent>
             <MudCardActions>
@@ -43,11 +43,11 @@
         <MudTextField @bind-Value="_searchString" Placeholder="Search for PlayerProfiles..." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
     </ToolBarContent>
     <HeaderContent>
-        <MudTh>Id</MudTh>
-        <MudTh>OwnerId</MudTh>
-        <MudTh>Name</MudTh>
-        <MudTh>Motto</MudTh>
-        <MudTh>IconBlobId</MudTh>
+        <MudTh>@(TextHelper.LabelFor<PlayerProfile>(i => i.Id))</MudTh>
+        <MudTh>@(TextHelper.LabelFor<PlayerProfile>(i => i.OwnerId))</MudTh>
+        <MudTh>@(TextHelper.LabelFor<PlayerProfile>(i => i.Name))</MudTh>
+        <MudTh>@(TextHelper.LabelFor<PlayerProfile>(i => i.Motto))</MudTh>
+        <MudTh>@(TextHelper.LabelFor<PlayerProfile>(i => i.IconBlobId))</MudTh>
     </HeaderContent>
     <RowTemplate>
         <MudTd DataLabel="Id">@context.Id</MudTd>
@@ -62,20 +62,20 @@
     <RowEditingTemplate>
         <MudTd DataLabel="Id">@context.Id</MudTd>
         <MudTd DataLabel="OwnerId">
-            <MudNumericField @bind-Value="context.OwnerId" Label="OwnerId" T="ulong" Min="0" />
+            <MudNumericField @bind-Value="context.OwnerId" T="ulong" Min="0" />
         </MudTd>
         <MudTd DataLabel="LastUpdate">
-            <MudDatePicker @bind-Date="context.LastUpdate" Label="LastUpdate" />
-            <MudTimePicker Time="context.LastUpdate?.TimeOfDay" Label="LastUpdate" TimeChanged="(t) => context.LastUpdate = context.LastUpdate?.Date + t" />
+            <MudDatePicker @bind-Date="context.LastUpdate" />
+            <MudTimePicker Time="context.LastUpdate?.TimeOfDay" TimeChanged="(t) => context.LastUpdate = context.LastUpdate?.Date + t" />
         </MudTd>
         <MudTd DataLabel="Name">
-            <MudTextField @bind-Value="context.Name" Label="Name" />
+            <MudTextField @bind-Value="context.Name" />
         </MudTd>
         <MudTd DataLabel="Motto">
-            <MudTextField @bind-Value="context.Motto" Label="Motto" />
+            <MudTextField @bind-Value="context.Motto" />
         </MudTd>
         <MudTd DataLabel="IconBlobId">
-            <MudNumericField @bind-Value="context.IconBlobId" Label="IconBlobId" />
+            <MudNumericField @bind-Value="context.IconBlobId" />
         </MudTd>
     </RowEditingTemplate>
     <PagerContent>

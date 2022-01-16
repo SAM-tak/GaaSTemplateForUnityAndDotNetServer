@@ -11,7 +11,7 @@
         <MudCard>
             <MudCardContent>
                 <MudTd>
-                    <MudNumericField @bind-Value="_newItem.OwnerId" Label="OwnerId" T="ulong" Min="0" />
+                    <MudNumericField @bind-Value="_newItem.OwnerId" Label="@(TextHelper.LabelFor<PlayerOwnedFreeServiceToken>(i => i.OwnerId))" T="ulong" Min="0" />
                 </MudTd>
                 <MudTd>
                     <MudSelect T="ConsumableOrigin" @bind-Value="_newItem.Origin">
@@ -30,20 +30,20 @@
                     </MudSelect>
                 </MudTd>
                 <MudTd>
-                    <MudDatePicker @bind-Date="_newItem.Period" Label="Period" />
-                    <MudTimePicker Time="_newItem.Period?.TimeOfDay" Label="Period" TimeChanged="(t) => _newItem.Period = _newItem.Period?.Date + t" />
+                    <MudDatePicker @bind-Date="_newItem.Period" Label="@(TextHelper.LabelFor<PlayerOwnedFreeServiceToken>(i => i.Period))" />
+                    <MudTimePicker Time="_newItem.Period?.TimeOfDay"TimeChanged="(t) => _newItem.Period = _newItem.Period?.Date + t" />
                 </MudTd>
                 <MudTd>
-                    <MudDatePicker @bind-Date="_newItem.UsedDate" Label="UsedDate" />
-                    <MudTimePicker Time="_newItem.UsedDate?.TimeOfDay" Label="UsedDate" TimeChanged="(t) => _newItem.UsedDate = _newItem.UsedDate?.Date + t" />
+                    <MudDatePicker @bind-Date="_newItem.UsedDate" Label="@(TextHelper.LabelFor<PlayerOwnedFreeServiceToken>(i => i.UsedDate))" />
+                    <MudTimePicker Time="_newItem.UsedDate?.TimeOfDay"TimeChanged="(t) => _newItem.UsedDate = _newItem.UsedDate?.Date + t" />
                 </MudTd>
                 <MudTd>
-                    <MudDatePicker @bind-Date="_newItem.InvalidateDate" Label="InvalidateDate" />
-                    <MudTimePicker Time="_newItem.InvalidateDate?.TimeOfDay" Label="InvalidateDate" TimeChanged="(t) => _newItem.InvalidateDate = _newItem.InvalidateDate?.Date + t" />
+                    <MudDatePicker @bind-Date="_newItem.InvalidateDate" Label="@(TextHelper.LabelFor<PlayerOwnedFreeServiceToken>(i => i.InvalidateDate))" />
+                    <MudTimePicker Time="_newItem.InvalidateDate?.TimeOfDay" TimeChanged="(t) => _newItem.InvalidateDate = _newItem.InvalidateDate?.Date + t" />
                 </MudTd>
                 <MudTd>
-                    <MudDatePicker @bind-Date="_newItem.ExpireDate" Label="ExpireDate" />
-                    <MudTimePicker Time="_newItem.ExpireDate?.TimeOfDay" Label="ExpireDate" TimeChanged="(t) => _newItem.ExpireDate = _newItem.ExpireDate?.Date + t" />
+                    <MudDatePicker @bind-Date="_newItem.ExpireDate" Label="@(TextHelper.LabelFor<PlayerOwnedFreeServiceToken>(i => i.ExpireDate))" />
+                    <MudTimePicker Time="_newItem.ExpireDate?.TimeOfDay" TimeChanged="(t) => _newItem.ExpireDate = _newItem.ExpireDate?.Date + t" />
                 </MudTd>
             </MudCardContent>
             <MudCardActions>
@@ -62,14 +62,14 @@
         <MudTextField @bind-Value="_searchString" Placeholder="Search for PlayerProfiles..." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
     </ToolBarContent>
     <HeaderContent>
-        <MudTh>Id</MudTh>
-        <MudTh>OwnerId</MudTh>
-        <MudTh>Origin</MudTh>
-        <MudTh>Status</MudTh>
-        <MudTh>Period</MudTh>
-        <MudTh>UsedDate</MudTh>
-        <MudTh>InvalidateDate</MudTh>
-        <MudTh>ExpireDate</MudTh>
+        <MudTh>@(TextHelper.LabelFor<PlayerOwnedFreeServiceToken>(i => i.Id))</MudTh>
+        <MudTh>@(TextHelper.LabelFor<PlayerOwnedFreeServiceToken>(i => i.OwnerId))</MudTh>
+        <MudTh>@(TextHelper.LabelFor<PlayerOwnedFreeServiceToken>(i => i.Origin))</MudTh>
+        <MudTh>@(TextHelper.LabelFor<PlayerOwnedFreeServiceToken>(i => i.Status))</MudTh>
+        <MudTh>@(TextHelper.LabelFor<PlayerOwnedFreeServiceToken>(i => i.Period))</MudTh>
+        <MudTh>@(TextHelper.LabelFor<PlayerOwnedFreeServiceToken>(i => i.UsedDate))</MudTh>
+        <MudTh>@(TextHelper.LabelFor<PlayerOwnedFreeServiceToken>(i => i.InvalidateDate))</MudTh>
+        <MudTh>@(TextHelper.LabelFor<PlayerOwnedFreeServiceToken>(i => i.ExpireDate))</MudTh>
     </HeaderContent>
     <RowTemplate>
         <MudTd DataLabel="Id">@context.Id</MudTd>
@@ -87,7 +87,7 @@
     <RowEditingTemplate>
         <MudTd DataLabel="Id">@context.Id</MudTd>
         <MudTd DataLabel="OwnerId">
-            <MudNumericField @bind-Value="context.OwnerId" Label="OwnerId" T="ulong" Min="0" />
+            <MudNumericField @bind-Value="context.OwnerId" T="ulong" Min="0" />
         </MudTd>
         <MudTd DataLabel="Origin">
             <MudSelect T="ConsumableOrigin" @bind-Value="context.Origin">
@@ -106,19 +106,19 @@
             </MudSelect>
         </MudTd>
         <MudTd DataLabel="Period">
-            <MudDatePicker @bind-Date="context.Period" Label="Period" />
+            <MudDatePicker @bind-Date="context.Period" />
             <MudTimePicker Time="context.Period?.TimeOfDay" TimeChanged="(t) => context.Period = context.Period?.Date + t" />
         </MudTd>
         <MudTd DataLabel="UsedDate">
-            <MudDatePicker @bind-Date="context.UsedDate" Label="UsedDate" />
+            <MudDatePicker @bind-Date="context.UsedDate" />
             <MudTimePicker Time="context.UsedDate?.TimeOfDay" TimeChanged="(t) => context.UsedDate = context.UsedDate?.Date + t" />
         </MudTd>
         <MudTd DataLabel="InvalidateDate">
-            <MudDatePicker @bind-Date="context.InvalidateDate" Label="InvalidateDate" />
+            <MudDatePicker @bind-Date="context.InvalidateDate" />
             <MudTimePicker Time="context.InvalidateDate?.TimeOfDay" TimeChanged="(t) => context.InvalidateDate = context.InvalidateDate?.Date + t" />
         </MudTd>
         <MudTd DataLabel="ExpireDate">
-            <MudDatePicker @bind-Date="context.ExpireDate" Label="ExpireDate" />
+            <MudDatePicker @bind-Date="context.ExpireDate" />
             <MudTimePicker Time="context.ExpireDate?.TimeOfDay" TimeChanged="(t) => context.ExpireDate = context.ExpireDate?.Date + t" />
         </MudTd>
     </RowEditingTemplate>

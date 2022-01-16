@@ -11,10 +11,10 @@
         <MudCard>
             <MudCardContent>
                 <MudTd>
-                    <MudNumericField @bind-Value="_newItem.OwnerId" Label="OwnerId" T="ulong" Min="0" />
+                    <MudNumericField @bind-Value="_newItem.OwnerId" Label="@(TextHelper.LabelFor<PlayerDevice>(i => i.OwnerId))" T="ulong" Min="0" />
                 </MudTd>
                 <MudTd>
-                    <MudSelect @bind-Value="_newItem.DeviceType" Label="DeviceType">
+                    <MudSelect @bind-Value="_newItem.DeviceType" Label="@(TextHelper.LabelFor<PlayerDevice>(i => i.DeviceType))">
                         @foreach (DeviceType item in Enum.GetValues(typeof(DeviceType)))
                         {
                             <MudSelectItem Value="@item">@(item.GetDisplayName())</MudSelectItem>
@@ -22,15 +22,15 @@
                 </MudSelect>
                 </MudTd>
                 <MudTd>
-                    <MudTextField @bind-Value="_newItem.DeviceId" Label="DeviceId" />
+                    <MudTextField @bind-Value="_newItem.DeviceId" Label="@(TextHelper.LabelFor<PlayerDevice>(i => i.DeviceId))" />
                 </MudTd>
                 <MudTd>
-                    <MudDatePicker @bind-Date="_newItem.Since" Label="Since"/>
-                    <MudTimePicker Time="_newItem.Since?.TimeOfDay" Label="Since" TimeChanged="(t) => _newItem.Since = _newItem.Since?.Date + t" />
+                    <MudDatePicker @bind-Date="_newItem.Since" Label="@(TextHelper.LabelFor<PlayerDevice>(i => i.Since))"/>
+                    <MudTimePicker Time="_newItem.Since?.TimeOfDay"TimeChanged="(t) => _newItem.Since = _newItem.Since?.Date + t" />
                 </MudTd>
                 <MudTd>
-                    <MudDatePicker @bind-Date="_newItem.LastUsed" Label="LastUsed" />
-                    <MudTimePicker Time="_newItem.LastUsed?.TimeOfDay" Label="LastUsed" TimeChanged="(t) => _newItem.LastUsed = _newItem.LastUsed?.Date + t" />
+                    <MudDatePicker @bind-Date="_newItem.LastUsed" Label="@(TextHelper.LabelFor<PlayerDevice>(i => i.LastUsed))" />
+                    <MudTimePicker Time="_newItem.LastUsed?.TimeOfDay" TimeChanged="(t) => _newItem.LastUsed = _newItem.LastUsed?.Date + t" />
                 </MudTd>
             </MudCardContent>
             <MudCardActions>
@@ -48,12 +48,12 @@
         <MudTextField @bind-Value="_searchString" Placeholder="Search for PlayerDevices..." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
     </ToolBarContent>
     <HeaderContent>
-        <MudTh>Id</MudTh>
-        <MudTh>OwnerId</MudTh>
-        <MudTh>DeviceType</MudTh>
-        <MudTh>DeviceId</MudTh>
-        <MudTh>Since</MudTh>
-        <MudTh>LastUsed</MudTh>
+        <MudTh>@(TextHelper.LabelFor<PlayerDevice>(i => i.Id))</MudTh>
+        <MudTh>@(TextHelper.LabelFor<PlayerDevice>(i => i.OwnerId))</MudTh>
+        <MudTh>@(TextHelper.LabelFor<PlayerDevice>(i => i.DeviceType))</MudTh>
+        <MudTh>@(TextHelper.LabelFor<PlayerDevice>(i => i.DeviceId))</MudTh>
+        <MudTh>@(TextHelper.LabelFor<PlayerDevice>(i => i.Since))</MudTh>
+        <MudTh>@(TextHelper.LabelFor<PlayerDevice>(i => i.LastUsed))</MudTh>
     </HeaderContent>
     <RowTemplate>
         <MudTd DataLabel="Id">@context.Id</MudTd>
@@ -69,10 +69,10 @@
     <RowEditingTemplate>
         <MudTd DataLabel="Id">@context.Id</MudTd>
         <MudTd DataLabel="OwnerId">
-            <MudNumericField @bind-Value="context.OwnerId" Label="OwnerId" T="ulong" Min="0" />
+            <MudNumericField @bind-Value="context.OwnerId" T="ulong" Min="0" />
         </MudTd>
         <MudTd DataLabel="DeviceType">
-            <MudSelect @bind-Value="context.DeviceType" Label="DeviceType">
+            <MudSelect @bind-Value="context.DeviceType">
                 @foreach (DeviceType item in Enum.GetValues(typeof(DeviceType)))
                 {
                     <MudSelectItem Value="@item">@(item.GetDisplayName())</MudSelectItem>
@@ -80,12 +80,12 @@
             </MudSelect>
         </MudTd>
         <MudTd DataLabel="DeviceId">
-            <MudTextField @bind-Value="context.DeviceId" Label="DeviceId" />
+            <MudTextField @bind-Value="context.DeviceId" />
         </MudTd>
         <MudTd DataLabel="Since">@context.Since</MudTd>
         <MudTd DataLabel="LastUsed">
-            <MudDatePicker @bind-Date="context.LastUsed" Label="LastUsed" />
-            <MudTimePicker Time="context.LastUsed?.TimeOfDay" Label="LastUsed" />
+            <MudDatePicker @bind-Date="context.LastUsed" />
+            <MudTimePicker Time="context.LastUsed?.TimeOfDay" />
         </MudTd>
     </RowEditingTemplate>
     <PagerContent>

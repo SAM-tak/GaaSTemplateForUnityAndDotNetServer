@@ -24,68 +24,40 @@
     </EditForm>
 </MudExpansionPanel>
 <br />
-<MudTable T="ServiceToken" Items="dbContext.ServiceTokens" Filter="Search" CanCancelEdit
-           ="true" RowEditPreview="BackupItem" RowEditCancel="ResetItemToOriginalValues"
-          RowEditCommit="@(async (x) => await ItemHasBeenCommitted(x))">
+<MudDataGrid Items="dbContext.ServiceTokens" Sortable="true" Filterable="true" QuickFilter="QuickFilter" ReadOnly="false" EditMode="@DataGridEditMode.Inline">
     <ToolBarContent>
         <MudText Typo="Typo.h6">@ListPanelText</MudText>
         <MudSpacer />
         <MudTextField @bind-Value="_searchString" Placeholder="Search for ServiceTokens..." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
     </ToolBarContent>
-    <HeaderContent>
-        <MudTh>@(TextHelper.LabelFor<ServiceToken>(i => i.Id))</MudTh>
-        <MudTh>@(TextHelper.LabelFor<ServiceToken>(i => i.Name))</MudTh>
-        <MudTh>@(TextHelper.LabelFor<ServiceToken>(i => i.ProductName))</MudTh>
-        <MudTh>@(TextHelper.LabelFor<ServiceToken>(i => i.DisplayName))</MudTh>
-        <MudTh>@(TextHelper.LabelFor<ServiceToken>(i => i.Description))</MudTh>
-        <MudTh>@(TextHelper.LabelFor<ServiceToken>(i => i.IconBlobId))</MudTh>
-    </HeaderContent>
-    <RowTemplate>
-        <MudTd DataLabel="Id">@context.Id</MudTd>
-        <MudTd DataLabel="Name">@context.Name</MudTd>
-        <MudTd DataLabel="ProductName">@context.ProductName</MudTd>
-        <MudTd DataLabel="DisplayName">@context.DisplayName</MudTd>
-        <MudTd DataLabel="Description">@context.Description</MudTd>
-        <MudTd DataLabel="IconBlobId">@context.IconBlobId</MudTd>
-        <MudTd DataLabel="">
-            <MudFab @onclick="@(async () => await Delete(@context))" Color="Color.Primary" Icon="@Icons.Material.Filled.Delete" Size="Size.Small" IconSize="Size.Small" />
-        </MudTd>
-    </RowTemplate>
-    <RowEditingTemplate>
-        <MudTd DataLabel="Id">@context.Id</MudTd>
-        <MudTd DataLabel="Name">
-            <MudTextField @bind-Value="context.Name" />
-        </MudTd>
-        <MudTd DataLabel="ProductName">
-            <MudTextField @bind-Value="context.ProductName" />
-        </MudTd>
-        <MudTd DataLabel="DisplayName">
-            <MudTextField @bind-Value="context.DisplayName" />
-        </MudTd>
-        <MudTd DataLabel="Description">
-            <MudTextField @bind-Value="context.Description" />
-        </MudTd>
-        <MudTd DataLabel="IconBlobId">
-            <MudNumericField @bind-Value="context.IconBlobId" />
-        </MudTd>
-    </RowEditingTemplate>
+    <Columns>
+        <Column T="ServiceToken" Field="Id">
+            <EditTemplate>
+                <MudFab @onclick="@(async () => await Delete(@context))" Color="Color.Primary" Icon="@Icons.Material.Filled.Delete" Size="Size.Small" IconSize="Size.Small" />
+                @context.Id
+            </EditTemplate>
+        </Column>
+        <Column T="ServiceToken" Field="Name" />
+        <Column T="ServiceToken" Field="ProductName" />
+        <Column T="ServiceToken" Field="DisplayName" />
+        <Column T="ServiceToken" Field="Description" />
+        <Column T="ServiceToken" Field="IconBlobId" />
+    </Columns>
     <PagerContent>
-        <MudTablePager />
+        <MudDataGridPager T="ServiceToken" />
     </PagerContent>
-</MudTable>
+</MudDataGrid>
 
 @code {
     bool _editPanelExpanded = false;
     string _searchString = "";
     ServiceToken _newItem = new();
 
-    ServiceToken _backup;
-
     static readonly string EditPanelId =  $"{nameof(ServiceToken).ToLower()}-edit-panel";
     static readonly string EditPanelText = $"Add {nameof(ServiceToken)}";
     static readonly string ListPanelText = nameof(ServiceToken);
 
-    private bool Search(ServiceToken x)
+    private bool QuickFilter(ServiceToken x)
     {
         if (string.IsNullOrWhiteSpace(_searchString)) return true;
 
@@ -111,33 +83,6 @@
     void Clear()
     {
         _newItem = new();
-    }
-
-    void BackupItem(object x)
-    {
-        _backup = ((ServiceToken)x) with { };
-    }
-
-    async Task ItemHasBeenCommitted(object x)
-    {
-        //AddEditionEvent($"RowEditCommit event: Changes to Element {((Element)element).Name} committed");
-        var record = (ServiceToken)x;
-        dbContext.Entry(record).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
-        await dbContext.SaveChangesAsync();
-        snackBar.Add($"{nameof(ServiceToken)} (id:{record.Id}) Saved.", Severity.Success);
-    }
-
-    void ResetItemToOriginalValues(object x)
-    {
-        //AddEditionEvent($"RowEditCancel event: Editing of Element {((Element)element).Name} cancelled");
-        ((ServiceToken)x).CopyFrom(_backup);
-    }
-
-    async Task Save(ServiceToken x)
-    {
-        dbContext.Entry(x).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
-        await dbContext.SaveChangesAsync();
-        snackBar.Add($"{nameof(ServiceToken)} (id:{x.Id}) Saved.", Severity.Success);
     }
 
     async Task Delete(ServiceToken x)

@@ -35,66 +35,45 @@
     </EditForm>
 </MudExpansionPanel>
 <br />
-<MudTable T="PlayerProfile" Items="dbContext.PlayerProfiles" Filter="Search" CanCancelEdit="true" RowEditPreview="BackupItem" RowEditCancel="ResetItemToOriginalValues"
-          RowEditCommit="@(async (x) => await ItemHasBeenCommitted(x))">
+<MudDataGrid Items="dbContext.PlayerProfiles" Sortable="true" Filterable="true" QuickFilter="QuickFilter" ReadOnly="false" EditMode="@DataGridEditMode.Inline">
     <ToolBarContent>
         <MudText Typo="Typo.h6">@ListPanelText</MudText>
         <MudSpacer />
         <MudTextField @bind-Value="_searchString" Placeholder="Search for PlayerProfiles..." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
     </ToolBarContent>
-    <HeaderContent>
-        <MudTh>@(TextHelper.LabelFor<PlayerProfile>(i => i.Id))</MudTh>
-        <MudTh>@(TextHelper.LabelFor<PlayerProfile>(i => i.OwnerId))</MudTh>
-        <MudTh>@(TextHelper.LabelFor<PlayerProfile>(i => i.Name))</MudTh>
-        <MudTh>@(TextHelper.LabelFor<PlayerProfile>(i => i.Motto))</MudTh>
-        <MudTh>@(TextHelper.LabelFor<PlayerProfile>(i => i.IconBlobId))</MudTh>
-    </HeaderContent>
-    <RowTemplate>
-        <MudTd DataLabel="Id">@context.Id</MudTd>
-        <MudTd DataLabel="OwnerId">@context.OwnerId</MudTd>
-        <MudTd DataLabel="Name">@context.Name</MudTd>
-        <MudTd DataLabel="Motto">@context.Motto</MudTd>
-        <MudTd DataLabel="IconBlobId">@context.IconBlobId</MudTd>
-        <MudTd DataLabel="">
-            <MudFab @onclick="@(async () => await Delete(@context))" Color="Color.Primary" Icon="@Icons.Material.Filled.Delete" Size="Size.Small" IconSize="Size.Small" />
-        </MudTd>
-    </RowTemplate>
-    <RowEditingTemplate>
-        <MudTd DataLabel="Id">@context.Id</MudTd>
-        <MudTd DataLabel="OwnerId">
-            <MudNumericField @bind-Value="context.OwnerId" T="ulong" Min="0" />
-        </MudTd>
-        <MudTd DataLabel="LastUpdate">
-            <MudDatePicker @bind-Date="context.LastUpdate" />
-            <MudTimePicker Time="context.LastUpdate?.TimeOfDay" TimeChanged="(t) => context.LastUpdate = context.LastUpdate?.Date + t" />
-        </MudTd>
-        <MudTd DataLabel="Name">
-            <MudTextField @bind-Value="context.Name" />
-        </MudTd>
-        <MudTd DataLabel="Motto">
-            <MudTextField @bind-Value="context.Motto" />
-        </MudTd>
-        <MudTd DataLabel="IconBlobId">
-            <MudNumericField @bind-Value="context.IconBlobId" />
-        </MudTd>
-    </RowEditingTemplate>
+    <Columns>
+        <Column T="PlayerProfile" Field="Id">
+            <EditTemplate>
+                <MudFab @onclick="@(async () => await Delete(@context))" Color="Color.Primary" Icon="@Icons.Material.Filled.Delete" Size="Size.Small" IconSize="Size.Small" />
+                @context.Id
+            </EditTemplate>
+        </Column>
+        <Column T="PlayerProfile" Field="OwnerId" />
+        <Column T="PlayerProfile" Field="LastUpdate">
+            <EditTemplate>
+                <MudDatePicker @bind-Date="context.LastUpdate" />
+                <MudTimePicker Time="context.LastUpdate?.TimeOfDay" TimeChanged="(t) => context.LastUpdate = context.LastUpdate?.Date + t" />
+            </EditTemplate>
+        </Column>
+        <Column T="PlayerProfile" Field="Name" />
+        <Column T="PlayerProfile" Field="Motto" />
+        <Column T="PlayerProfile" Field="IconBlobId" />
+    </Columns>
     <PagerContent>
-        <MudTablePager />
+        <MudDataGridPager T="PlayerProfile" />
     </PagerContent>
-</MudTable>
+</MudDataGrid>
 
 @code {
     bool _editPanelExpanded = false;
     string _searchString = "";
     PlayerProfile _newItem = new();
 
-    PlayerProfile _backup;
-
     static readonly string EditPanelId =  $"{nameof(PlayerProfile).ToLower()}-edit-panel";
     static readonly string EditPanelText = $"Add {nameof(PlayerProfile)}";
     static readonly string ListPanelText = nameof(PlayerProfile);
 
-    private bool Search(PlayerProfile x)
+    private bool QuickFilter(PlayerProfile x)
     {
         if (string.IsNullOrWhiteSpace(_searchString)) return true;
 
@@ -118,33 +97,6 @@
     void Clear()
     {
         _newItem = new();
-    }
-
-    void BackupItem(object x)
-    {
-        _backup = ((PlayerProfile)x) with { };
-    }
-
-    async Task ItemHasBeenCommitted(object x)
-    {
-        //AddEditionEvent($"RowEditCommit event: Changes to Element {((Element)element).Name} committed");
-        var record = (PlayerProfile)x;
-        dbContext.Entry(record).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
-        await dbContext.SaveChangesAsync();
-        snackBar.Add($"{nameof(PlayerProfile)} (id:{record.Id}) Saved.", Severity.Success);
-    }
-
-    void ResetItemToOriginalValues(object x)
-    {
-        //AddEditionEvent($"RowEditCancel event: Editing of Element {((Element)element).Name} cancelled");
-        ((PlayerProfile)x).CopyFrom(_backup);
-    }
-
-    async Task Save(PlayerProfile x)
-    {
-        dbContext.Entry(x).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
-        await dbContext.SaveChangesAsync();
-        snackBar.Add($"{nameof(PlayerProfile)} (id:{x.Id}) Saved.", Severity.Success);
     }
 
     async Task Delete(PlayerProfile x)

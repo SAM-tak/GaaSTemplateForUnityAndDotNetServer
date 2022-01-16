@@ -1,7 +1,6 @@
 @page "/tables/playeraccount"
 
 @inject YourGameServer.Data.GameDbContext dbContext
-@inject MudBlazor.IScrollManager scrollManager
 @inject MudBlazor.IDialogService dialogService
 @inject MudBlazor.ISnackbar snackBar
 
@@ -20,7 +19,7 @@
                     <MudSelect T="PlayerAccountKind" @bind-Value="_newItem.Kind" Label="@(TextHelper.LabelFor<PlayerAccount>(i => i.Kind))">
                         @foreach (PlayerAccountKind item in Enum.GetValues(typeof(PlayerAccountKind)))
                         {
-                                <MudSelectItem Value="@item">@item.GetDisplayName()</MudSelectItem>
+                            <MudSelectItem Value="@item">@item.GetDisplayName()</MudSelectItem>
                         }
                     </MudSelect>
                 </MudTd>
@@ -28,7 +27,7 @@
                     <MudSelect T="PlayerAccountStatus" @bind-Value="_newItem.Status" Label="@(TextHelper.LabelFor<PlayerAccount>(i => i.Status))">
                         @foreach (PlayerAccountStatus item in Enum.GetValues(typeof(PlayerAccountStatus)))
                         {
-                                <MudSelectItem Value="@item">@item.GetDisplayName()</MudSelectItem>
+                            <MudSelectItem Value="@item">@item.GetDisplayName()</MudSelectItem>
                         }
                     </MudSelect>
                 </MudTd>
@@ -61,103 +60,88 @@
     </EditForm>
 </MudExpansionPanel>
 <br />
-<MudTable T="PlayerAccount" Items="dbContext.PlayerAccounts" Filter="Search" Hover="true" CanCancelEdit="true" CommitEditTooltip="Commit Edit" RowEditPreview="BackupItem" RowEditCancel="ResetItemToOriginalValues"
-          RowEditCommit="@(async (x) => await ItemHasBeenCommitted(x))">
+<MudDataGrid Items="dbContext.PlayerAccounts" Sortable="true" Filterable="true" QuickFilter="QuickFilter" ReadOnly="false" EditMode="@DataGridEditMode.Inline">
     <ToolBarContent>
         <MudText Typo="Typo.h6">@ListPanelText</MudText>
         <MudSpacer />
         <MudTextField @bind-Value="_searchString" Placeholder="@PlaceholderText" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" />
     </ToolBarContent>
-    <HeaderContent>
-        <MudTh>@(TextHelper.LabelFor<PlayerAccount>(i => i.Id))</MudTh>
-        <MudTh>@(TextHelper.LabelFor<PlayerAccount>(i => i.Code))</MudTh>
-        <MudTh>@(TextHelper.LabelFor<PlayerAccount>(i => i.CurrentDeviceId))</MudTh>
-        <MudTh>@(TextHelper.LabelFor<PlayerAccount>(i => i.Kind))</MudTh>
-        <MudTh>@(TextHelper.LabelFor<PlayerAccount>(i => i.Status))</MudTh>
-        <MudTh>@(TextHelper.LabelFor<PlayerAccount>(i => i.Since))</MudTh>
-        <MudTh>@(TextHelper.LabelFor<PlayerAccount>(i => i.LastLogin))</MudTh>
-        <MudTh>@(TextHelper.LabelFor<PlayerAccount>(i => i.InactivateDate))</MudTh>
-        <MudTh>@(TextHelper.LabelFor<PlayerAccount>(i => i.BanDate))</MudTh>
-        <MudTh>@(TextHelper.LabelFor<PlayerAccount>(i => i.ExpireDate))</MudTh>
-    </HeaderContent>
-    <RowTemplate>
-        <MudTd DataLabel="Id">@context.Id</MudTd>
-        <MudTd DataLabel="Code">@context.Code</MudTd>
-        <MudTd DataLabel="CurrentDeviceId">@context.CurrentDeviceId</MudTd>
-        <MudTd DataLabel="Kind">@context.Kind</MudTd>
-        <MudTd DataLabel="Status">@context.Status</MudTd>
-        <MudTd DataLabel="Since">@context.Since</MudTd>
-        <MudTd DataLabel="LastLogin">@context.LastLogin</MudTd>
-        <MudTd DataLabel="InactivateDate">@context.InactivateDate</MudTd>
-        <MudTd DataLabel="BanDate">@context.BanDate</MudTd>
-        <MudTd DataLabel="ExpireDate">@context.ExpireDate</MudTd>
-        <MudTd DataLabel="">
-            <MudFab @onclick="@(async () => await Delete(@context))" Color="Color.Primary" Icon="@Icons.Material.Filled.Delete" Size="Size.Small" IconSize="Size.Small" />
-        </MudTd>
-    </RowTemplate>
-    <RowEditingTemplate>
-        <MudTd DataLabel="Id">@context.Id</MudTd>
-        <MudTd DataLabel="Code">
-            <MudTextField @bind-Value="@context.Code" />
-        </MudTd>
-        <MudTd DataLabel="CurrentDeviceId">
-            <MudNumericField @bind-Value="@context.CurrentDeviceId" T="ulong" Min="0" />
-        </MudTd>
-        <MudTd DataLabel="Kind">
-            <MudSelect T="PlayerAccountKind" @bind-Value="context.Kind">
-                @foreach (PlayerAccountKind item in Enum.GetValues(typeof(PlayerAccountKind)))
-                {
-                    <MudSelectItem Value="@item">@item.GetDisplayName()</MudSelectItem>
-                }
-            </MudSelect>
-        </MudTd>
-        <MudTd DataLabel="Status">
-            <MudSelect T="PlayerAccountStatus" @bind-Value="context.Status">
-                @foreach (PlayerAccountStatus item in Enum.GetValues(typeof(PlayerAccountStatus)))
-                {
-                    <MudSelectItem Value="@item">@item.GetDisplayName()</MudSelectItem>
-                }
-            </MudSelect>
-        </MudTd>
-        <MudTd DataLabel="Since">
-            <MudDatePicker @bind-Date="context.Since" />
-            <MudTimePicker Time="context.Since?.TimeOfDay" TimeChanged="(t) => context.Since = context.Since?.Date + t" />
-        </MudTd>
-        <MudTd DataLabel="LastLogin">
-            <MudDatePicker @bind-Date="context.LastLogin" />
-            <MudTimePicker Time="context.LastLogin?.TimeOfDay" TimeChanged="(t) => context.LastLogin = context.LastLogin?.Date + t" />
-        </MudTd>
-        <MudTd DataLabel="InactivateDate">
-            <MudDatePicker @bind-Date="context.InactivateDate" />
-            <MudTimePicker Time="context.InactivateDate?.TimeOfDay" TimeChanged="(t) => context.InactivateDate = context.InactivateDate?.Date + t" />
-        </MudTd>
-        <MudTd DataLabel="BanDate">
-            <MudDatePicker @bind-Date="context.BanDate" />
-            <MudTimePicker Time="context.BanDate?.TimeOfDay" TimeChanged="(t) => context.BanDate = context.BanDate?.Date + t" />
-        </MudTd>
-        <MudTd DataLabel="ExpireDate">
-            <MudDatePicker @bind-Date="context.ExpireDate" />
-            <MudTimePicker Time="context.ExpireDate?.TimeOfDay" TimeChanged="(t) => context.ExpireDate = context.ExpireDate?.Date + t" />
-        </MudTd>
-    </RowEditingTemplate>
+    <Columns>
+        <Column T="PlayerAccount" Field="Id">
+            <EditTemplate>
+                <MudFab @onclick="@(async () => await Delete(@context))" Color="Color.Primary" Icon="@Icons.Material.Filled.Delete" Size="Size.Small" IconSize="Size.Small" />
+                @context.Id
+            </EditTemplate>
+        </Column>
+        <Column T="PlayerAccount" Field="Code" />
+        <Column T="PlayerAccount" Field="CurrentDeviceId" />
+        <Column T="PlayerAccount" Field="Kind">
+            <EditTemplate>
+                <MudSelect T="PlayerAccountKind" @bind-Value="context.Kind">
+                    @foreach (PlayerAccountKind item in Enum.GetValues(typeof(PlayerAccountKind)))
+                    {
+                        <MudSelectItem Value="@item">@item.GetDisplayName()</MudSelectItem>
+                    }
+                </MudSelect>
+            </EditTemplate>
+        </Column>
+        <Column T="PlayerAccount" Field="Status">
+            <EditTemplate>
+                <MudSelect T="PlayerAccountStatus" @bind-Value="context.Status">
+                    @foreach (PlayerAccountStatus item in Enum.GetValues(typeof(PlayerAccountStatus)))
+                    {
+                        <MudSelectItem Value="@item">@item.GetDisplayName()</MudSelectItem>
+                    }
+                </MudSelect>
+            </EditTemplate>
+        </Column>
+        <Column T="PlayerAccount" Field="Since">
+            <EditTemplate>
+                <MudDatePicker @bind-Date="context.Since" />
+                <MudTimePicker Time="context.Since?.TimeOfDay" TimeChanged="(t) => context.Since = context.Since?.Date + t" />
+            </EditTemplate>
+        </Column>
+        <Column T="PlayerAccount" Field="LastLogin">
+            <EditTemplate>
+                <MudDatePicker @bind-Date="context.LastLogin" />
+                <MudTimePicker Time="context.LastLogin?.TimeOfDay" TimeChanged="(t) => context.LastLogin = context.LastLogin?.Date + t" />
+            </EditTemplate>
+        </Column>
+        <Column T="PlayerAccount" Field="InactivateDate">
+            <EditTemplate>
+                <MudDatePicker @bind-Date="context.InactivateDate" />
+                <MudTimePicker Time="context.InactivateDate?.TimeOfDay" TimeChanged="(t) => context.InactivateDate = context.InactivateDate?.Date + t" />
+            </EditTemplate>
+        </Column>
+        <Column T="PlayerAccount" Field="BanDate">
+            <EditTemplate>
+                <MudDatePicker @bind-Date="context.BanDate" />
+                <MudTimePicker Time="context.BanDate?.TimeOfDay" TimeChanged="(t) => context.BanDate = context.Since?.Date + t" />
+            </EditTemplate>
+        </Column>
+        <Column T="PlayerAccount" Field="ExpireDate">
+            <EditTemplate>
+                <MudDatePicker @bind-Date="context.ExpireDate" />
+                <MudTimePicker Time="context.ExpireDate?.TimeOfDay" TimeChanged="(t) => context.ExpireDate = context.ExpireDate?.Date + t" />
+            </EditTemplate>
+        </Column>
+    </Columns>
     <PagerContent>
-        <MudTablePager />
+        <MudDataGridPager T="PlayerAccount" />
     </PagerContent>
-</MudTable>
+</MudDataGrid>
 
 @code {
     bool _editPanelExpanded = false;
     string _searchString = "";
     PlayerAccount _newItem = new();
 
-    PlayerAccount _backup;
-
     static readonly string EditPanelId =  $"{nameof(PlayerAccount).ToLower()}-edit-panel";
     static readonly string EditPanelText = $"Add {nameof(PlayerAccount)}";
     static readonly string ListPanelText = nameof(PlayerAccount);
     static readonly string PlaceholderText = $"Search for {nameof(PlayerAccount)}...";
 
-    private bool Search(PlayerAccount x)
+    bool QuickFilter(PlayerAccount x)
     {
         if (string.IsNullOrWhiteSpace(_searchString)) return true;
 
@@ -167,7 +151,7 @@
 
         return false;
     }
-    
+
     async Task OnValidSubmit(EditContext contex)
     {
         dbContext.Add(_newItem);
@@ -179,33 +163,6 @@
     void Clear()
     {
         _newItem = new ();
-    }
-
-    void BackupItem(object x)
-    {
-        _backup = ((PlayerAccount)x) with {};
-    }
-
-    async Task ItemHasBeenCommitted(object x)
-    {
-        //AddEditionEvent($"RowEditCommit event: Changes to Element {((PlayerAccount)element).Name} committed");
-        var record = (PlayerAccount)x;
-        dbContext.Entry(record).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
-        await dbContext.SaveChangesAsync();
-        snackBar.Add($"{nameof(PlayerAccount)} (id:{record.Id}) Saved.", Severity.Success);
-    }
-
-    void ResetItemToOriginalValues(object x)
-    {
-        //AddEditionEvent($"RowEditCancel event: Editing of Element {((PlayerAccount)element).Id} cancelled");
-        ((PlayerAccount)x).CopyFrom(_backup);
-    }
-
-    async Task Save(PlayerAccount x)
-    {
-        dbContext.Entry(x).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
-        await dbContext.SaveChangesAsync();
-        snackBar.Add($"{nameof(PlayerAccount)} (id:{x.Id}) Saved.", Severity.Success);
     }
 
     async Task Delete(PlayerAccount x)

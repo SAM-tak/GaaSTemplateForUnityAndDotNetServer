@@ -41,70 +41,59 @@
     </EditForm>
 </MudExpansionPanel>
 <br />
-<MudTable T="PlayerDevice" Items="dbContext.PlayerDevices" Filter="Search" CanCancelEdit="true" RowEditPreview="BackupItem" RowEditCancel="ResetItemToOriginalValues" RowEditCommit="@(async (x) => await ItemHasBeenCommitted(x))">
+<MudDataGrid Items="dbContext.PlayerDevices" Sortable="true" Filterable="true" QuickFilter="QuickFilter" ReadOnly="false" EditMode="@DataGridEditMode.Inline">
     <ToolBarContent>
         <MudText Typo="Typo.h6">@ListPanelText</MudText>
         <MudSpacer />
         <MudTextField @bind-Value="_searchString" Placeholder="Search for PlayerDevices..." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
     </ToolBarContent>
-    <HeaderContent>
-        <MudTh>@(TextHelper.LabelFor<PlayerDevice>(i => i.Id))</MudTh>
-        <MudTh>@(TextHelper.LabelFor<PlayerDevice>(i => i.OwnerId))</MudTh>
-        <MudTh>@(TextHelper.LabelFor<PlayerDevice>(i => i.DeviceType))</MudTh>
-        <MudTh>@(TextHelper.LabelFor<PlayerDevice>(i => i.DeviceId))</MudTh>
-        <MudTh>@(TextHelper.LabelFor<PlayerDevice>(i => i.Since))</MudTh>
-        <MudTh>@(TextHelper.LabelFor<PlayerDevice>(i => i.LastUsed))</MudTh>
-    </HeaderContent>
-    <RowTemplate>
-        <MudTd DataLabel="Id">@context.Id</MudTd>
-        <MudTd DataLabel="OwnerId">@context.OwnerId</MudTd>
-        <MudTd DataLabel="DeviceType">@context.DeviceType</MudTd>
-        <MudTd DataLabel="DeviceId">@context.DeviceId</MudTd>
-        <MudTd DataLabel="Since">@context.Since?.ToShortDateString()</MudTd>
-        <MudTd DataLabel="LastUsed">@context.LastUsed?.ToShortDateString()</MudTd>
-        <MudTd DataLabel="">
-            <MudFab @onclick="@(async () => await Delete(@context))" Color="Color.Primary" Icon="@Icons.Material.Filled.Delete" Size="Size.Small" IconSize="Size.Small" />
-        </MudTd>
-    </RowTemplate>
-    <RowEditingTemplate>
-        <MudTd DataLabel="Id">@context.Id</MudTd>
-        <MudTd DataLabel="OwnerId">
-            <MudNumericField @bind-Value="context.OwnerId" T="ulong" Min="0" />
-        </MudTd>
-        <MudTd DataLabel="DeviceType">
-            <MudSelect @bind-Value="context.DeviceType">
-                @foreach (DeviceType item in Enum.GetValues(typeof(DeviceType)))
-                {
-                    <MudSelectItem Value="@item">@(item.GetDisplayName())</MudSelectItem>
-                }
-            </MudSelect>
-        </MudTd>
-        <MudTd DataLabel="DeviceId">
-            <MudTextField @bind-Value="context.DeviceId" />
-        </MudTd>
-        <MudTd DataLabel="Since">@context.Since</MudTd>
-        <MudTd DataLabel="LastUsed">
-            <MudDatePicker @bind-Date="context.LastUsed" />
-            <MudTimePicker Time="context.LastUsed?.TimeOfDay" />
-        </MudTd>
-    </RowEditingTemplate>
+    <Columns>
+        <Column T="PlayerDevice" Field="Id">
+            <EditTemplate>
+                <MudFab @onclick="@(async () => await Delete(@context))" Color="Color.Primary" Icon="@Icons.Material.Filled.Delete" Size="Size.Small" IconSize="Size.Small" />
+                @context.Id
+            </EditTemplate>
+        </Column>
+        <Column T="PlayerDevice" Field="OwnerId" />
+        <Column T="PlayerDevice" Field="DeviceType">
+            <EditTemplate>
+                <MudSelect @bind-Value="context.DeviceType">
+                    @foreach (DeviceType item in Enum.GetValues(typeof(DeviceType)))
+                    {
+                        <MudSelectItem Value="@item">@(item.GetDisplayName())</MudSelectItem>
+                    }
+                </MudSelect>
+            </EditTemplate>
+        </Column>
+        <Column T="PlayerDevice" Field="DeviceId" />
+        <Column T="PlayerDevice" Field="Since">
+            <EditTemplate>
+                <MudDatePicker @bind-Date="context.Since" />
+                <MudTimePicker Time="context.Since?.TimeOfDay" />
+            </EditTemplate>
+        </Column>
+        <Column T="PlayerDevice" Field="LastUsed">
+            <EditTemplate>
+                <MudDatePicker @bind-Date="context.LastUsed" />
+                <MudTimePicker Time="context.LastUsed?.TimeOfDay" />
+            </EditTemplate>
+        </Column>
+    </Columns>
     <PagerContent>
-        <MudTablePager />
+        <MudDataGridPager T="PlayerDevice" />
     </PagerContent>
-</MudTable>
+</MudDataGrid>
 
 @code {
     bool _editPanelExpanded = false;
     string _searchString = "";
     PlayerDevice _newItem = new();
 
-    PlayerDevice _backup;
-
     static readonly string EditPanelId =  $"{nameof(PlayerDevice).ToLower()}-edit-panel";
     static readonly string EditPanelText = $"Add {nameof(PlayerDevice)}";
     static readonly string ListPanelText = nameof(PlayerDevice);
 
-    private bool Search(PlayerDevice x)
+    private bool QuickFilter(PlayerDevice x)
     {
         if (string.IsNullOrWhiteSpace(_searchString)) return true;
 
@@ -126,33 +115,6 @@
     void Clear()
     {
         _newItem = new();
-    }
-
-    void BackupItem(object x)
-    {
-        _backup = ((PlayerDevice)x) with {};
-    }
-
-    async Task ItemHasBeenCommitted(object x)
-    {
-        //AddEditionEvent($"RowEditCommit event: Changes to Element {((Element)element).Name} committed");
-        var record = (PlayerDevice)x;
-        dbContext.Entry(record).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
-        await dbContext.SaveChangesAsync();
-        snackBar.Add($"{nameof(PlayerDevice)} (id:{record.Id}) Saved.", Severity.Success);
-    }
-
-    void ResetItemToOriginalValues(object x)
-    {
-        //AddEditionEvent($"RowEditCancel event: Editing of Element {((Element)element).Name} cancelled");
-        ((PlayerDevice)x).CopyFrom(_backup);
-    }
-
-    async Task Save(PlayerDevice x)
-    {
-        dbContext.Entry(x).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
-        await dbContext.SaveChangesAsync();
-        snackBar.Add($"{nameof(PlayerDevice)} (id:{x.Id}) Saved.", Severity.Success);
     }
 
     async Task Delete(PlayerDevice x)

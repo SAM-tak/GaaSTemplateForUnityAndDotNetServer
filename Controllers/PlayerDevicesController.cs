@@ -10,8 +10,8 @@ using YourGameServer.Models;
 namespace YourGameServer.Controllers;
 
 [Route("api/[controller]")]
-[ApiController]
 [ApiAuth]
+[ApiController]
 public class PlayerDevicesController : ControllerBase
 {
     private readonly GameDbContext _context;

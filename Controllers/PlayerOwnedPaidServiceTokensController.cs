@@ -11,6 +11,7 @@ using YourGameServer.Models;
 namespace YourGameServer.Controllers
 {
     [Route("api/[controller]")]
+    [ApiAuth]
     [ApiController]
     public class PlayerOwnedPaidServiceTokensController : ControllerBase
     {

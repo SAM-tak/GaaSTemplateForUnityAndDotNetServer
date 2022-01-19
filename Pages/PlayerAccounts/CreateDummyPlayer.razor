@@ -1,3 +1,6 @@
+@using YourGameServer.Interface
+@using YourGameServer.Services
+
 @inject NavigationManager navigationManager
 @inject GameDbContext context
 
@@ -42,7 +45,7 @@
         for(int i = 0; i < Count; ++i) {
             latestLUID = await LUID.NewLUIDStringAsync(null);
             //Console.WriteLine($"New LUID {luid.id1} {luid.id0} {latestLUID}");
-            var playerAccount = await SignUpController.CreateAccountAsync(context, new AccountCreationRequest {
+            var playerAccount = await AccountService.CreateAccountAsync(context, new SignInRequest {
                 DeviceType = (DeviceType)Random.Shared.Next(2),
                 DeviceId = Guid.NewGuid().ToString("N")
             });
@@ -51,8 +54,6 @@
 
             playerAccount.Profile.Name = faker.Name.FullName();
             playerAccount.Profile.Motto = faker.Lorem.Sentence(8);
-
-            context.Add(playerAccount);
         }
         await context.SaveChangesAsync();
         buttonDisabled = false;

@@ -19,9 +19,7 @@ builder.Services.AddApiVersioning(options => {
     options.DefaultApiVersion = new ApiVersion(1, 0);
 });
 
-builder.AddJwtTokenGenarator();
-builder.Services.AddGrpc();
-builder.Services.AddMagicOnion();
+builder.AddJwtTokenGenerator();
 
 // https://stackoverflow.com/questions/4804086/is-there-any-connection-string-parser-in-c
 
@@ -49,11 +47,7 @@ builder.Services.AddAuthentication(options => {
     options.ClientSecret = googleAuthNSection["ClientSecret"];
     options.SaveTokens = true;
 })
-.AddJwtBearer(options => {
-    if(JwtTokenGenarator.TokenValidationParameters is not null) {
-        options.TokenValidationParameters = JwtTokenGenarator.TokenValidationParameters;
-    }
-})
+.AddJwtBearerWithTokenGenerator()
 //.AddMicrosoftIdentityWebApp(builder.Configuration)
 ;
 //builder.Services.AddAuthentication().AddScheme<AuthenticationSchemeOptions, ApiAuthHandler>("Api", null);
@@ -82,9 +76,14 @@ builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddMudServices();
 
+builder.Services.AddGrpc();
+builder.Services.AddMagicOnion(option => {
+    option.SerializerOptions = option.SerializerOptions.WithCompression(MessagePackCompression.Lz4BlockArray);
+});
+
 var app = builder.Build();
 
-app.UseJwtTokenGenarator();
+app.UseJwtTokenGenerator();
 
 // Configure the HTTP request pipeline.
 if(app.Environment.IsDevelopment()) {
@@ -97,15 +96,15 @@ else {
     app.UseExceptionHandler("/Error");
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
+    app.UseHttpsRedirection();
 }
-app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapDefaultControllerRoute();
 app.MapBlazorHub();
-app.MapMagicOnionService();
+app.MapMagicOnionService().AllowAnonymous();
 app.MapFallbackToPage("/_Host");
 
 app.Run();

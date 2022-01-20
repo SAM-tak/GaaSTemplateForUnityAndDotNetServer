@@ -19,8 +19,6 @@ builder.Services.AddApiVersioning(options => {
     options.DefaultApiVersion = new ApiVersion(1, 0);
 });
 
-builder.AddJwtTokenGenerator();
-
 // https://stackoverflow.com/questions/4804086/is-there-any-connection-string-parser-in-c
 
 var connectionString = builder.Configuration.GetConnectionString(builder.Configuration["GameDbConnectionStringKey"]);
@@ -47,7 +45,7 @@ builder.Services.AddAuthentication(options => {
     options.ClientSecret = googleAuthNSection["ClientSecret"];
     options.SaveTokens = true;
 })
-.AddJwtBearerWithTokenGenerator()
+.AddJwtTokenGenerator(builder)
 //.AddMicrosoftIdentityWebApp(builder.Configuration)
 ;
 //builder.Services.AddAuthentication().AddScheme<AuthenticationSchemeOptions, ApiAuthHandler>("Api", null);

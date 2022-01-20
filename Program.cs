@@ -31,23 +31,25 @@ else {
     builder.Services.AddDbContext<GameDbContext>(options => options.UseMySql(connectionString, new MySqlServerVersion(new Version(10, 6, 5))));
 }
 // Add services to the container.
-builder.Services.AddAuthentication(options => {
+var authentication = builder.Services.AddAuthentication(options => {
     if(builder.Environment.IsDevelopment()) {
         options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
         options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
     }
-})
-.AddCookie() // this is neccesary
-.AddCookie("OpenIdConnect")
-.AddGoogle(options => {
-    IConfigurationSection googleAuthNSection = builder.Configuration.GetSection("Authentication:Google");
-    options.ClientId = googleAuthNSection["ClientId"];
-    options.ClientSecret = googleAuthNSection["ClientSecret"];
-    options.SaveTokens = true;
-})
-.AddJwtAuthorizer(builder)
-//.AddMicrosoftIdentityWebApp(builder.Configuration)
-;
+});
+if(builder.Environment.IsDevelopment()) {
+    authentication.AddCookie(); // this is neccesary
+    authentication.AddCookie("OpenIdConnect");
+    authentication.AddGoogle(options => {
+        IConfigurationSection googleAuthNSection = builder.Configuration.GetSection("Authentication:Google");
+        options.ClientId = googleAuthNSection["ClientId"];
+        options.ClientSecret = googleAuthNSection["ClientSecret"];
+        options.SaveTokens = true;
+    });
+}
+authentication.AddJwtAuthorizer(builder);
+//authentication.AddMicrosoftIdentityWebApp(builder.Configuration);
+
 //builder.Services.AddAuthentication().AddScheme<AuthenticationSchemeOptions, ApiAuthHandler>("Api", null);
 builder.Services.AddAuthorization(options => {
     options.FallbackPolicy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();

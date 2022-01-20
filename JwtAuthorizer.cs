@@ -64,15 +64,15 @@ internal static class JwtAuthorizerExtentions
 {
     public static AuthenticationBuilder AddJwtAuthorizer(this AuthenticationBuilder builder, WebApplicationBuilder webAppBuilder)
     {
-        var jwtTokenGenarator = new JwtAuthorizer(webAppBuilder);
-        builder.Services.AddSingleton(i => jwtTokenGenarator);
-        return builder.AddJwtBearer(options => options.TokenValidationParameters = jwtTokenGenarator.TokenValidationParameters);
+        var jwtAuthorizer = new JwtAuthorizer(webAppBuilder);
+        builder.Services.AddSingleton(i => jwtAuthorizer);
+        return builder.AddJwtBearer(options => options.TokenValidationParameters = jwtAuthorizer.TokenValidationParameters);
     }
 
     public static IApplicationBuilder UseJwtAuthorizer(this IApplicationBuilder app)
     {
-        var jwtTokenGenarator = app.ApplicationServices.GetService<JwtAuthorizer>();
-        if(jwtTokenGenarator is not null) jwtTokenGenarator.TokenValidationParameters.AudienceValidator = (audiences, securityToken, validationParameters) => {
+        var jwtAuthorizer = app.ApplicationServices.GetService<JwtAuthorizer>();
+        if(jwtAuthorizer is not null) jwtAuthorizer.TokenValidationParameters.AudienceValidator = (audiences, securityToken, validationParameters) => {
             var candidate = audiences.Select(i => i.Split('/')).FirstOrDefault(i => i.Length == 3 && i[0] == validationParameters.ValidAudience);
             if(candidate is null) return false;
             var playerIdString = candidate[1];

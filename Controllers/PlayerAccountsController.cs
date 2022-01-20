@@ -103,19 +103,22 @@ public class PlayerAccountsController : ControllerBase
         return NoContent();
     }
 
-    // POST: api/PlayerAccounts
-    // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-    // [HttpPost]
-    // public async Task<ActionResult<PlayerAccount>> PostPlayerAccount(PlayerAccount playerAccount)
-    // {
-    //     var playerId = await LUID.NewLUIDStringAsync(async (i) => ! await _context.PlayerAccounts.AnyAsync(x => x.Luid == i));
-    //     _context.PlayerAccounts.Add(playerAccount with {
-    //         Luid = playerId
-    //     });
-    //     await _context.SaveChangesAsync();
-
-    //     return CreatedAtAction("GetPlayerAccount", new { id = playerAccount.Id }, playerAccount);
-    // }
+    /// <summary>
+    /// POST: api/PlayerAccounts
+    /// To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+    /// </summary>
+    /// <param name="playerId"></param>
+    /// <param name="playerAccount"></param>
+    /// <returns>BadRequest or Forbid</returns>
+    [HttpPost]
+    public async Task<ActionResult<PlayerAccount>> PostPlayerAccount([FromHeader] ulong playerId, PlayerAccount playerAccount)
+    {
+        if(playerAccount.Id != playerId) {
+            return BadRequest();
+        }
+        await Task.CompletedTask;
+        return Forbid();
+    }
 
     /// <summary>
     /// DELETE: api/PlayerAccounts/5

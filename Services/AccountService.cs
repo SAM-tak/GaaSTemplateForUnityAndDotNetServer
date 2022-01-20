@@ -19,10 +19,10 @@ namespace YourGameServer.Services;
 public class AccountService : ServiceBase<IAccountService>, IAccountService
 {
     readonly GameDbContext _context;
-    readonly JwtTokenGenarator _jwt;
+    readonly JwtAuthorizer _jwt;
     readonly IHttpContextAccessor _httpContextAccessor;
 
-    public AccountService(GameDbContext context, JwtTokenGenarator jwt, IHttpContextAccessor httpContextAccessor)
+    public AccountService(GameDbContext context, JwtAuthorizer jwt, IHttpContextAccessor httpContextAccessor)
     {
         _context = context;
         _jwt = jwt;

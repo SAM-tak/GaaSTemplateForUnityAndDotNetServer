@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Authentication;
 
 namespace YourGameServer;
 
-public class JwtTokenGenarator
+public class JwtAuthorizer
 {
     public TokenValidationParameters TokenValidationParameters { get; init; }
 
@@ -15,7 +15,7 @@ public class JwtTokenGenarator
 
     SigningCredentials SigningCredentials { get; init; }
 
-    public JwtTokenGenarator(WebApplicationBuilder builder)
+    public JwtAuthorizer(WebApplicationBuilder builder)
     {
         var jwtConfig = builder.Configuration.GetSection("Jwt");
         ExpireMinutes = jwtConfig.GetValue<int>("ExpireMinutes");
@@ -60,18 +60,18 @@ public class JwtTokenGenarator
     }
 }
 
-internal static class JwtTokenGenaratorExtentions
+internal static class JwtAuthorizerExtentions
 {
-    public static AuthenticationBuilder AddJwtTokenGenerator(this AuthenticationBuilder builder, WebApplicationBuilder webAppBuilder)
+    public static AuthenticationBuilder AddJwtAuthorizer(this AuthenticationBuilder builder, WebApplicationBuilder webAppBuilder)
     {
-        var jwtTokenGenarator = new JwtTokenGenarator(webAppBuilder);
+        var jwtTokenGenarator = new JwtAuthorizer(webAppBuilder);
         builder.Services.AddSingleton(i => jwtTokenGenarator);
         return builder.AddJwtBearer(options => options.TokenValidationParameters = jwtTokenGenarator.TokenValidationParameters);
     }
 
-    public static IApplicationBuilder UseJwtTokenGenerator(this IApplicationBuilder app)
+    public static IApplicationBuilder UseJwtAuthorizer(this IApplicationBuilder app)
     {
-        var jwtTokenGenarator = app.ApplicationServices.GetService<JwtTokenGenarator>();
+        var jwtTokenGenarator = app.ApplicationServices.GetService<JwtAuthorizer>();
         if(jwtTokenGenarator is not null) jwtTokenGenarator.TokenValidationParameters.AudienceValidator = (audiences, securityToken, validationParameters) => {
             var candidate = audiences.Select(i => i.Split('/')).FirstOrDefault(i => i.Length == 3 && i[0] == validationParameters.ValidAudience);
             if(candidate is null) return false;

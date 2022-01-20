@@ -45,7 +45,7 @@ builder.Services.AddAuthentication(options => {
     options.ClientSecret = googleAuthNSection["ClientSecret"];
     options.SaveTokens = true;
 })
-.AddJwtTokenGenerator(builder)
+.AddJwtAuthorizer(builder)
 //.AddMicrosoftIdentityWebApp(builder.Configuration)
 ;
 //builder.Services.AddAuthentication().AddScheme<AuthenticationSchemeOptions, ApiAuthHandler>("Api", null);
@@ -81,8 +81,6 @@ builder.Services.AddMagicOnion(option => {
 
 var app = builder.Build();
 
-app.UseJwtTokenGenerator();
-
 // Configure the HTTP request pipeline.
 if(app.Environment.IsDevelopment()) {
     app.UseSwagger();
@@ -100,6 +98,7 @@ app.UseStaticFiles();
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseJwtAuthorizer();
 app.MapDefaultControllerRoute();
 app.MapBlazorHub();
 app.MapMagicOnionService().AllowAnonymous();

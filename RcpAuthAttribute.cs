@@ -6,10 +6,10 @@ namespace YourGameServer;
 
 internal class RpcAuthAttribute : MagicOnionFilterAttribute
 {
-    readonly JwtTokenGenarator _jwt;
+    readonly JwtAuthorizer _jwt;
     readonly IHttpContextAccessor _httpContextAccessor;
 
-    public RpcAuthAttribute(JwtTokenGenarator jwt, IHttpContextAccessor httpContextAccessor)
+    public RpcAuthAttribute(JwtAuthorizer jwt, IHttpContextAccessor httpContextAccessor)
     {
         _jwt = jwt;
         _httpContextAccessor = httpContextAccessor;

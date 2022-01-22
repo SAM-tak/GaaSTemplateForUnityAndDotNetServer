@@ -1,14 +1,15 @@
 using System.Data.Common;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using MessagePack;
-using MessagePack.AspNetCoreMvcFormatter;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using MessagePack;
+using MessagePack.AspNetCoreMvcFormatter;
+using MudBlazor.Services;
+using MagicOnion.Server;
 using YourGameServer;
 using YourGameServer.Data;
-using MudBlazor.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -87,8 +88,11 @@ var app = builder.Build();
 if(app.Environment.IsDevelopment()) {
     app.UseSwagger();
     app.UseSwaggerUI();
-    var methodHandlers = app.Services.GetService<MagicOnion.Server.MagicOnionServiceDefinition>()?.MethodHandlers;
-    if(methodHandlers is not null) app.MapMagicOnionSwagger("rpcswagger", methodHandlers, "/_/");
+    var methodHandlers = app.Services.GetService<MagicOnionServiceDefinition>()?.MethodHandlers;
+    // var url = builder.Configuration.GetSection("Kestrel:Endpoints:Grpc")?.GetValue<string>("Url");
+    // Console.WriteLine($"Kestrel:Endpoints:Grpc = {url}");
+    // app.MapMagicOnionHttpGateway("rpcswagger", methodHandlers!, GrpcChannel.ForAddress("https://localhost/rpc"));
+    app.MapMagicOnionSwagger("rpcswagger", methodHandlers!, "/_/");
 }
 else {
     app.UseExceptionHandler("/Error");
@@ -103,6 +107,7 @@ app.UseAuthorization();
 app.UseJwtAuthorizer();
 app.MapDefaultControllerRoute();
 app.MapBlazorHub();
+//app.UseGrpcWeb();
 app.MapMagicOnionService().AllowAnonymous();
 app.MapFallbackToPage("/_Host");
 

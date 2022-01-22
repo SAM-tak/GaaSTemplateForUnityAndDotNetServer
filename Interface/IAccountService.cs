@@ -7,9 +7,24 @@ namespace YourGameServer.Interface
     // The interface is shared between server and client.
     public interface IAccountService : IService<IAccountService>
     {
-        // The return type must be `UnaryResult<T>`.
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
         UnaryResult<LogInRequestResult> LogIn(LogInRequest param);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="signup"></param>
+        /// <returns></returns>
         UnaryResult<SignInRequestResult> SignUp(SignInRequest signup);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         UnaryResult<RenewTokenRequestResult> RenewToken();
     }
 }

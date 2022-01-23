@@ -56,10 +56,10 @@ public class LogInController : ControllerBase
                 playerDevice.LastUsed = playerAccount.LastLogin = utcNow;
                 playerAccount.CurrentDeviceId = playerDevice.Id;
                 await _context.SaveChangesAsync();
-                return Ok(new LogInRequestResult {
+                return new LogInRequestResult {
                     Token = _jwt.CreateToken(playerAccount.Id, playerDevice.Id, out var period),
                     Period = period
-                });
+                };
             }
         }
         return BadRequest();

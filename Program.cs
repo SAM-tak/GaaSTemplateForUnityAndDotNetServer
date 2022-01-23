@@ -21,7 +21,6 @@ builder.Services.AddApiVersioning(options => {
 });
 
 // https://stackoverflow.com/questions/4804086/is-there-any-connection-string-parser-in-c
-
 var connectionString = builder.Configuration.GetConnectionString(builder.Configuration["GameDbConnectionStringKey"]);
 var dbcsb = new DbConnectionStringBuilder() { ConnectionString = connectionString };
 if(dbcsb.ContainsKey("Data Source") && Path.GetExtension(dbcsb["Data Source"].ToString()) == ".db") {
@@ -84,8 +83,18 @@ builder.Services.AddMagicOnion(option => {
 
 var app = builder.Build();
 
+app.UseStaticFiles();
+app.UseRouting();
+app.UseAuthentication();
+app.UseAuthorization();
+app.UseJwtAuthorizer();
+app.MapDefaultControllerRoute();
+app.MapMagicOnionService().AllowAnonymous();
 // Configure the HTTP request pipeline.
 if(app.Environment.IsDevelopment()) {
+    app.MapBlazorHub();
+    app.UseGrpcWeb();
+    app.MapFallbackToPage("/_Host");
     app.UseSwagger();
     app.UseSwaggerUI();
     var methodHandlers = app.Services.GetService<MagicOnionServiceDefinition>()?.MethodHandlers;
@@ -100,15 +109,5 @@ else {
     app.UseHsts();
     app.UseHttpsRedirection();
 }
-app.UseStaticFiles();
-app.UseRouting();
-app.UseAuthentication();
-app.UseAuthorization();
-app.UseJwtAuthorizer();
-app.MapDefaultControllerRoute();
-app.MapBlazorHub();
-//app.UseGrpcWeb();
-app.MapMagicOnionService().AllowAnonymous();
-app.MapFallbackToPage("/_Host");
 
 app.Run();

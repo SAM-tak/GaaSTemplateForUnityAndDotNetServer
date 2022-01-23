@@ -1,13 +1,9 @@
 #nullable disable
-using System;
-using System.ComponentModel;
 using Grpc.Core;
 using MagicOnion;
 using MagicOnion.Server;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+using MessagePack;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 using YourGameServer.Data;
 using YourGameServer.Interface;
 using YourGameServer.Models;
@@ -38,10 +34,14 @@ public class AccountService : ServiceBase<IAccountService>, IAccountService
     {
         Console.WriteLine("Login");
         var playerAccount = await _context.PlayerAccounts.Include(i => i.DeviceList).FirstOrDefaultAsync(i => i.Id == param.Id);
-        if(playerAccount != null) {
+        if(playerAccount is not null) {
             var playerDevice = playerAccount.DeviceList.FirstOrDefault(i => i.DeviceType == param.DeviceType && i.DeviceId == param.DeviceId);
-            if(playerDevice != null) {
+            if(playerDevice is not null) {
                 var utcNow = DateTime.UtcNow;
+                if (playerAccount.CurrentDeviceId != playerDevice.Id && playerDevice.LastUsed.HasValue && utcNow > _jwt.ExpireDate(playerDevice.LastUsed.Value)) {
+                    // It will deny that last token not expired yet and login with other device.
+                    throw new ReturnStatusException(StatusCode.AlreadyExists, "already logged in with other device. try later.");
+                }
                 if(!string.IsNullOrEmpty(param.NewDeviceId) && param.NewDeviceId != param.DeviceId) {
                     playerDevice = new PlayerDevice {
                         OwnerId = playerAccount.Id,
@@ -57,12 +57,12 @@ public class AccountService : ServiceBase<IAccountService>, IAccountService
                 playerAccount.CurrentDeviceId = playerDevice.Id;
                 await _context.SaveChangesAsync();
                 return new LogInRequestResult {
-                    DeviceId = playerDevice.Id,
-                    Token = _jwt.CreateToken(playerAccount.Id, playerDevice.Id)
+                    Token = _jwt.CreateToken(playerAccount.Id, playerDevice.Id, out var period),
+                    Period = period
                 };
             }
         }
-        return null;
+        throw new ReturnStatusException(StatusCode.NotFound, "correspond account was not found.");
     }
 
     /// <summary>
@@ -72,11 +72,50 @@ public class AccountService : ServiceBase<IAccountService>, IAccountService
     [FromTypeFilter(typeof(RpcAuthAttribute))]
     public async UnaryResult<RenewTokenRequestResult> RenewToken()
     {
-        await Task.CompletedTask;
         Console.WriteLine("RenewToken");
         ulong playerId = ulong.Parse(_httpContextAccessor.HttpContext.Request.Headers["playerid"]);
         ulong deviceId = ulong.Parse(_httpContextAccessor.HttpContext.Request.Headers["deviceid"]);
-        return new RenewTokenRequestResult { Token = _jwt.CreateToken(playerId, deviceId) };
+        var playerAccount = await _context.PlayerAccounts.Include(i => i.DeviceList).FirstOrDefaultAsync(i => i.Id == playerId);
+        if(playerAccount is not null) {
+            var playerDevice = playerAccount.DeviceList.FirstOrDefault(i => i.Id == deviceId);
+            if(playerDevice is not null) {
+                if(playerAccount.CurrentDeviceId != deviceId) {
+                    throw new ReturnStatusException(StatusCode.FailedPrecondition, "You are not logged in with current device.");
+                }
+                playerDevice.LastUsed = DateTime.UtcNow;
+                await _context.SaveChangesAsync();
+                return new RenewTokenRequestResult {
+                    Token = _jwt.CreateToken(playerId, deviceId, out var period),
+                    Period = period
+                };
+            }
+        }
+        throw new ReturnStatusException(StatusCode.NotFound, "correspond account was not found.");
+    }
+
+    /// <summary>
+    /// Log out
+    /// </summary>
+    /// <returns>None</returns>
+    [FromTypeFilter(typeof(RpcAuthAttribute))]
+    public async UnaryResult<Nil> LogOut()
+    {
+        Console.WriteLine("LogOut");
+        ulong playerId = ulong.Parse(_httpContextAccessor.HttpContext.Request.Headers["playerid"]);
+        ulong deviceId = ulong.Parse(_httpContextAccessor.HttpContext.Request.Headers["deviceid"]);
+        var playerAccount = await _context.PlayerAccounts.Include(i => i.DeviceList).FirstOrDefaultAsync(i => i.Id == playerId);
+        if(playerAccount is not null) {
+            var playerDevice = playerAccount.DeviceList.FirstOrDefault(i => i.Id == deviceId);
+            if(playerDevice is not null) {
+                if(playerAccount.CurrentDeviceId != deviceId) {
+                    throw new ReturnStatusException(StatusCode.FailedPrecondition, "You are not logged in with current device.");
+                }
+                playerAccount.CurrentDeviceId = 0;
+                await _context.SaveChangesAsync();
+                return new Nil();
+            }
+        }
+        throw new ReturnStatusException(StatusCode.NotFound, "correspond account was not found.");
     }
 
     /// <summary>
@@ -91,11 +130,11 @@ public class AccountService : ServiceBase<IAccountService>, IAccountService
             var playerAccount = await CreateAccountAsync(_context, signup);
             return new SignInRequestResult {
                 Id = playerAccount.Id,
-                DeviceId = playerAccount.CurrentDeviceId,
-                Token = _jwt.CreateToken(playerAccount.Id, playerAccount.CurrentDeviceId)
+                Token = _jwt.CreateToken(playerAccount.Id, playerAccount.CurrentDeviceId, out var period),
+                Period = period
             };
         }
-        return null;
+        throw new ReturnStatusException(StatusCode.InvalidArgument, "Device Identifier is invalid.");
     }
 
     public static async Task<PlayerAccount> CreateAccountAsync(GameDbContext context, SignInRequest accountCreationModel)

@@ -2,7 +2,6 @@ using System.Text;
 using System.Security;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.IdentityModel.Tokens;
-using YourGameServer.Data;
 using Microsoft.AspNetCore.Authentication;
 
 namespace YourGameServer;
@@ -34,17 +33,26 @@ public class JwtAuthorizer
     }
 
     /// <summary>
+    /// return period
+    /// </summary>
+    /// <param name="baseTime">base time</param>
+    /// <returns>expire date</returns>
+    public DateTime ExpireDate(DateTime baseTime) => baseTime.AddMinutes(ExpireMinutes) + TokenValidationParameters.ClockSkew;
+
+    /// <summary>
     /// Create SecurityToken By Symmetry Key
     /// </summary>
     /// <param name="playerId">Player Account Table index id</param>
     /// <param name="deviceId">Device Id</param>
+    /// <param name="period">expire date</param>
     /// <returns>Token string</returns>
-    public string CreateToken(ulong playerId, ulong deviceId)
+    public string CreateToken(ulong playerId, ulong deviceId, out DateTime period)
     {
+        period = ExpireMinutes > 0 ? DateTime.UtcNow.AddMinutes(ExpireMinutes) : DateTime.MaxValue;
         return new JwtSecurityTokenHandler().WriteToken(new JwtSecurityToken(
             issuer: TokenValidationParameters?.ValidIssuer,
             audience: $"{TokenValidationParameters?.ValidAudience}/{playerId}/{deviceId}",
-            expires: ExpireMinutes > 0 ? DateTime.Now.AddMinutes(ExpireMinutes) : null,
+            expires: ExpireMinutes > 0 ? period : null,
             signingCredentials: SigningCredentials
         ));
     }
@@ -77,7 +85,7 @@ internal static class JwtAuthorizerExtentions
             if(candidate is null) return false;
             var playerIdString = candidate[1];
             var deviceIdString = candidate[2];
-            if(!string.IsNullOrEmpty(playerIdString) && !string.IsNullOrEmpty(deviceIdString)) {
+            if(!string.IsNullOrEmpty(playerIdString) && !string.IsNullOrEmpty(deviceIdString) && ulong.TryParse(playerIdString, out _) && ulong.TryParse(deviceIdString, out _)) {
                 var serviceScopeFactory = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>();
                 using var scope = serviceScopeFactory.CreateScope();
                 var httpContextAccessor = scope.ServiceProvider.GetService<IHttpContextAccessor>();
@@ -87,11 +95,7 @@ internal static class JwtAuthorizerExtentions
                 if(headers.ContainsKey("DeviceId")) headers.Remove("DeviceId");
                 headers.Add("PlayerId", playerIdString);
                 headers.Add("DeviceId", deviceIdString);
-                var playerId = ulong.Parse(playerIdString);
-                var deviceId = ulong.Parse(deviceIdString);
-                var context = scope.ServiceProvider.GetService<GameDbContext>();
-                var currentDeviceId = context?.PlayerAccounts.Where(i => i.Id == playerId).Select(i => i.CurrentDeviceId).FirstOrDefault();
-                return currentDeviceId != null && currentDeviceId == deviceId;
+                return true;
             }
             return false;
         };

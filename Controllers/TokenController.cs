@@ -24,7 +24,7 @@ public class LogInController : ControllerBase
     }
 
     /// <summary>
-    /// Log in (get new token)
+    /// Log in
     /// </summary>
     /// <param name="login"></param>
     /// <returns></returns>

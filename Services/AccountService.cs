@@ -38,7 +38,7 @@ public class AccountService : ServiceBase<IAccountService>, IAccountService
             var playerDevice = playerAccount.DeviceList.FirstOrDefault(i => i.DeviceType == param.DeviceType && i.DeviceId == param.DeviceId);
             if(playerDevice is not null) {
                 var utcNow = DateTime.UtcNow;
-                if (playerAccount.CurrentDeviceId != playerDevice.Id && playerDevice.LastUsed.HasValue && utcNow > _jwt.ExpireDate(playerDevice.LastUsed.Value)) {
+                if (playerAccount.CurrentDeviceId > 0 && playerAccount.CurrentDeviceId != playerDevice.Id && utcNow > _jwt.ExpireDate(playerDevice.LastUsed.Value)) {
                     // It will deny that last token not expired yet and login with other device.
                     throw new ReturnStatusException(StatusCode.AlreadyExists, "already logged in with other device. try later.");
                 }

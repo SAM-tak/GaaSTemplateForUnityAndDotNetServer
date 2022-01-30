@@ -17,9 +17,9 @@ public struct LUID : IEquatable<LUID>
     /// </summary>
     /// <param name="isUnique"></param>
     /// <returns></returns>
-    public static LUID NewLUID(Func<LUID, bool> isUnique)
+    public static LUID NewLUID(Func<LUID, bool>? isUnique = null)
     {
-        LUID result = new();
+        var result = new LUID();
         do {
             // RandomNumberGenerator.GetInt32(int.MinValue, int.MaxValue) returns weird value
             var tmp = RandomNumberGenerator.GetInt32(0x1FFFF + 1);
@@ -33,7 +33,7 @@ public struct LUID : IEquatable<LUID>
 
     public static async Task<LUID> NewLUIDAsync(Func<LUID, Task<bool>> isUnique)
     {
-        LUID result = new();
+        var result = new LUID();
         do {
             // RandomNumberGenerator.GetInt32(int.MinValue, int.MaxValue) returns weird value
             var tmp = RandomNumberGenerator.GetInt32(0x1FFFF + 1);

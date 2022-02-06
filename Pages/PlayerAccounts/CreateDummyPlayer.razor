@@ -45,13 +45,11 @@
         for(int i = 0; i < Count; ++i) {
             latestLUID = await LUID.NewLUIDStringAsync(null);
             //Console.WriteLine($"New LUID {luid.id1} {luid.id0} {latestLUID}");
+            var faker = fakers[Random.Shared.Next(fakers.Length)];
             var playerAccount = await AccountService.CreateAccountAsync(context, new SignInRequest {
                 DeviceType = (DeviceType)Random.Shared.Next(2),
-                DeviceId = Guid.NewGuid().ToString("N")
+                DeviceId = faker.System.AndroidId()
             });
-
-            var faker = fakers[Random.Shared.Next(fakers.Length)];
-
             playerAccount.Profile.Name = faker.Name.FullName();
             playerAccount.Profile.Motto = faker.Lorem.Sentence(8);
         }

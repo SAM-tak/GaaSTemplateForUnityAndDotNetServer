@@ -139,7 +139,7 @@ public class AccountService : ServiceBase<IAccountService>, IAccountService
 
     public static async Task<PlayerAccount> CreateAccountAsync(GameDbContext context, SignInRequest accountCreationModel)
     {
-        var code = await LUID.NewLUIDStringAsync(async (i) => !await context.PlayerAccounts.AnyAsync(x => x.Code == i));
+        var code = await PlayerCode.NewStringAsync(async (i) => !await context.PlayerAccounts.AnyAsync(x => x.Code == i));
         var curDateTime = DateTime.UtcNow;
         var playerAccount = new PlayerAccount {
             Code = code,

@@ -70,7 +70,9 @@
         <Column T="PlayerAccount" Field="Id">
             <EditTemplate>
                 @context.Id
-                <MudFab @onclick="@(async () => await Delete(@context))" Color="Color.Primary" Icon="@Icons.Material.Filled.Delete" Size="Size.Small" IconSize="Size.Small" />
+                <MudTooltip Text="Delete">
+                    <MudIconButton @onclick="@(async () => await Delete(@context))" Color="Color.Primary" Icon="@Icons.Material.Filled.Delete" />
+                </MudTooltip>
             </EditTemplate>
         </Column>
         <Column T="PlayerAccount" Field="Code" />

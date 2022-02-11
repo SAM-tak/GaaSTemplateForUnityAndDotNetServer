@@ -3,7 +3,7 @@ using System.Security.Cryptography;
 namespace YourGameServer;
 
 [Serializable]
-public struct LUID : IEquatable<LUID>
+public struct PlayerCode : IEquatable<PlayerCode>
 {
     public ulong id0;
     public ushort id1;
@@ -17,9 +17,9 @@ public struct LUID : IEquatable<LUID>
     /// </summary>
     /// <param name="isUnique"></param>
     /// <returns></returns>
-    public static LUID NewLUID(Func<LUID, bool>? isUnique = null)
+    public static PlayerCode New(Func<PlayerCode, bool>? isUnique = null)
     {
-        var result = new LUID();
+        var result = new PlayerCode();
         do {
             // RandomNumberGenerator.GetInt32(int.MinValue, int.MaxValue) returns weird value
             var tmp = RandomNumberGenerator.GetInt32(0x1FFFF + 1);
@@ -31,9 +31,9 @@ public struct LUID : IEquatable<LUID>
         return result;
     }
 
-    public static async Task<LUID> NewLUIDAsync(Func<LUID, Task<bool>> isUnique)
+    public static async Task<PlayerCode> NewAsync(Func<PlayerCode, Task<bool>> isUnique)
     {
-        var result = new LUID();
+        var result = new PlayerCode();
         do {
             // RandomNumberGenerator.GetInt32(int.MinValue, int.MaxValue) returns weird value
             var tmp = RandomNumberGenerator.GetInt32(0x1FFFF + 1);
@@ -45,13 +45,13 @@ public struct LUID : IEquatable<LUID>
         return result;
     }
 
-    public static async Task<string> NewLUIDStringAsync(Func<string, Task<bool>>? isUnique)
+    public static async Task<string> NewStringAsync(Func<string, Task<bool>>? isUnique)
     {
         string result;
         do {
             // RandomNumberGenerator.GetInt32(int.MinValue, int.MaxValue) returns weird value
             var tmp = RandomNumberGenerator.GetInt32(0x1FFFF + 1);
-            result = new LUID {
+            result = new PlayerCode {
                 id0 = (ulong)((long)(tmp & 0xF) << 60
                 | (long)RandomNumberGenerator.GetInt32(0x3FFFFFFF + 1) << 30
                 | (long)RandomNumberGenerator.GetInt32(0x3FFFFFFF + 1)),
@@ -61,9 +61,9 @@ public struct LUID : IEquatable<LUID>
         return result;
     }
 
-    public static LUID FromString(string source)
+    public static PlayerCode FromString(string source)
     {
-        var ret = new LUID();
+        var ret = new PlayerCode();
         var state = 0;
         foreach(var c in source) {
             if(_validCharacters.Contains(c)) {
@@ -91,14 +91,14 @@ public struct LUID : IEquatable<LUID>
         return ret;
     }
 
-    public bool Equals(LUID other)
+    public bool Equals(PlayerCode other)
     {
         return id0 == other.id0 && id1 == other.id1;
     }
 
     public override bool Equals(object? obj)
     {
-        return obj is LUID luid && Equals(luid);
+        return obj is PlayerCode luid && Equals(luid);
     }
 
     public override int GetHashCode()
@@ -132,12 +132,12 @@ public struct LUID : IEquatable<LUID>
         });
     }
 
-    public static bool operator ==(LUID left, LUID right)
+    public static bool operator ==(PlayerCode left, PlayerCode right)
     {
         return left.Equals(right);
     }
 
-    public static bool operator !=(LUID left, LUID right)
+    public static bool operator !=(PlayerCode left, PlayerCode right)
     {
         return !(left == right);
     }

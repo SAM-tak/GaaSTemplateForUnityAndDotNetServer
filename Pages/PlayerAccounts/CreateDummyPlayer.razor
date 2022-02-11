@@ -6,7 +6,7 @@
 
 <MudPaper Class="pa-4 mr-16">
     <MudText Typo="Typo.h6" GutterBottom="true">Create Dummy Players</MudText>
-    <MudText>Latest LUID: @latestLUID</MudText>
+    <MudText>Latest Code: @latestCode</MudText>
     <MudGrid Class="pa-8">
         <MudNumericField Label="Count" Variant="Variant.Text" Min="1" Max="9999" @bind-Value="Count" />
         <MudButton Class="pl-4 ml-8" Variant="Variant.Filled" Color="Color.Primary" Disabled="@buttonDisabled" @onclick="Execute">Execute</MudButton>
@@ -22,7 +22,7 @@
 
     private bool buttonDisabled;
 
-    string latestLUID = string.Empty;
+    string latestCode = string.Empty;
 
     private async Task Execute()
     {
@@ -43,8 +43,7 @@
         };
 
         for(int i = 0; i < Count; ++i) {
-            latestLUID = await LUID.NewLUIDStringAsync(null);
-            //Console.WriteLine($"New LUID {luid.id1} {luid.id0} {latestLUID}");
+            latestCode = await PlayerCode.NewStringAsync(null);
             var faker = fakers[Random.Shared.Next(fakers.Length)];
             var playerAccount = await AccountService.CreateAccountAsync(context, new SignInRequest {
                 DeviceType = (DeviceType)Random.Shared.Next(2),

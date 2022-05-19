@@ -1,5 +1,6 @@
 #nullable disable
 using System; // Unity needs this
+using System.Collections;
 using System.Collections.Generic; // Unity needs this
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -20,8 +21,8 @@ namespace YourGameServer.Models // Unity cannot accpect 'namespace YourProjectNa
         Guest,
         [Display(Name = "Special Guest")]
         SpecialGuest,
-        [Display(Name = "Comunity Manager")]
-        ComunityManager,
+        [Display(Name = "Community Manager")]
+        CommunityManager,
         [Display(Name = "Staff")]
         Staff,
     }

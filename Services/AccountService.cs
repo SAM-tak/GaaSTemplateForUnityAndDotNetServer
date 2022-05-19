@@ -139,10 +139,8 @@ public class AccountService : ServiceBase<IAccountService>, IAccountService
 
     public static async Task<PlayerAccount> CreateAccountAsync(GameDbContext context, SignInRequest accountCreationModel)
     {
-        var code = await PlayerCode.NewStringAsync(async (i) => !await context.PlayerAccounts.AnyAsync(x => x.Code == i));
         var curDateTime = DateTime.UtcNow;
         var playerAccount = new PlayerAccount {
-            Code = code,
             DeviceList = new() {
                 new () {
                     DeviceType = accountCreationModel.DeviceType,
@@ -159,6 +157,7 @@ public class AccountService : ServiceBase<IAccountService>, IAccountService
         };
         await context.AddAsync(playerAccount);
         await context.SaveChangesAsync();
+        playerAccount.Code = PlayerCode.NewString(playerAccount.Id);
         playerAccount.CurrentDeviceId = playerAccount.DeviceList.First().Id;
         await context.SaveChangesAsync();
         return playerAccount;

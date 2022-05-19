@@ -27,5 +27,16 @@
     </div>
     <script src="_framework/blazor.server.js"></script>
     <script src="_content/MudBlazor/MudBlazor.min.js"></script>
+
+    <script type="text/javascript">
+        function jumpToBottom(id) {
+            let div = document.getElementById(id);
+            if(div) div.scrollTop = div.scrollHeight;
+            else {
+                document.body.scrollTop = document.body.scrollHeight;
+                document.documentElement.scrollTop = document.documentElement.scrollHeight;
+            }
+        }
+    </script>
 </body>
 </html>

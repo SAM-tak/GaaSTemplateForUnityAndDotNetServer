@@ -1,3 +1,5 @@
+@page "/cheats/createdummyplayers"
+
 @using YourGameServer.Interface
 @using YourGameServer.Services
 
@@ -43,7 +45,6 @@
         };
 
         for(int i = 0; i < Count; ++i) {
-            latestCode = await PlayerCode.NewStringAsync(null);
             var faker = fakers[Random.Shared.Next(fakers.Length)];
             var playerAccount = await AccountService.CreateAccountAsync(context, new SignInRequest {
                 DeviceType = (DeviceType)Random.Shared.Next(2),
@@ -51,6 +52,7 @@
             });
             playerAccount.Profile.Name = faker.Name.FullName();
             playerAccount.Profile.Motto = faker.Lorem.Sentence(8);
+            latestCode = playerAccount.Code;
         }
         await context.SaveChangesAsync();
         buttonDisabled = false;

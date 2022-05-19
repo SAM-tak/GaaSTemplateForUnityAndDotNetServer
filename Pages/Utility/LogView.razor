@@ -1,0 +1,87 @@
+@page "/utility/logview"
+
+@using Microsoft.JSInterop
+@inject ILogger<LogView> _logger
+@inject IJSRuntime JS
+@implements IDisposable
+
+@foreach(var i in logLines)
+{
+    <MudText>@i</MudText>
+}
+
+@code {
+    [Parameter]
+    public string? Id { get; set; }
+
+    [Parameter]
+    public long MaxLength { get; set; } = 1024000;
+
+    Timer? timer;
+
+    protected override void OnInitialized()
+    {
+        timer = new Timer((_) => InvokeAsync(async() => await UpdateLogLines()), null, 0, 1000);
+    }
+
+    public void Dispose() => timer?.Dispose();
+
+    List<string> logLines = new(1024);
+    long lastLength = 0;
+
+    private async Task UpdateLogLines()
+    {
+        var target = (NLog.Targets.Target)NLog.LogManager.Configuration.FindTargetByName("logfile");
+        // Targets can be wrapped multiple times (in my case I had a filter),
+        // so the following snippet is a more generic approach to unwrapping that works for multiple levels and
+        // doesn't make assumptions about target names.
+        while(target is not null && target is NLog.Targets.Wrappers.WrapperTargetBase) {
+            target = (target as NLog.Targets.Wrappers.WrapperTargetBase)?.WrappedTarget;
+        }
+        var fileTarget = target as NLog.Targets.FileTarget;
+        if(fileTarget is not null) {
+            // Need to set timestamp here if filename uses date. 
+            // For example - filename="${basedir}/logs/${shortdate}/trace.log"
+            var logEventInfo = new NLog.LogEventInfo { TimeStamp = DateTime.Now };
+            string fileName = fileTarget.FileName.Render(logEventInfo);
+            if(File.Exists(fileName)) {
+                using(var reader = new StreamReader(fileName)) {
+                    bool needsRead = false;
+                    if(lastLength < reader.BaseStream.Length) {
+                        reader.BaseStream.Seek(Math.Max(lastLength - reader.BaseStream.Length, -MaxLength), SeekOrigin.End);
+                        needsRead = true;
+                    }
+                    else if(lastLength > reader.BaseStream.Length) {
+                        if(reader.BaseStream.Length > MaxLength) {
+                            reader.BaseStream.Seek(-MaxLength, SeekOrigin.End);
+                        }
+                        needsRead = true;
+                    }
+                    if(needsRead) {
+                        bool added = false;
+                        bool first = true;
+                        string? firstLine = null;
+                        for(var line = await reader.ReadLineAsync(); line != null; line = await reader.ReadLineAsync()) {
+                            if(first) firstLine = line;
+                            else {
+                                firstLine = null;
+                                logLines.Add(line);
+                                added = true;
+                            }
+                            first = false;
+                        }
+                        if(firstLine is not null) {
+                            logLines.Add(firstLine);
+                            added = true;
+                        }
+                        if(added) {
+                            StateHasChanged();
+                            await JS.InvokeVoidAsync("jumpToBottom", new object[] { Id ?? "mud-container" });
+                        }
+                    }
+                    lastLength = reader.BaseStream.Length;
+                }
+            }
+        }
+    }
+}

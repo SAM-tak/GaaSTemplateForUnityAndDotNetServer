@@ -10,7 +10,8 @@
 <MudLayout>
     <MudAppBar Elevation="25">
         <MudHidden Breakpoint="Breakpoint.SmAndDown">
-            <MudIcon Icon="@Icons.Custom.Brands.MudBlazor" Size="Size.Large" />
+            @* <MudIcon Icon="@Icons.Custom.Brands.MudBlazor" Size="Size.Large" /> *@
+            <MudIconButton Icon="@Icons.Material.Outlined.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="DrawerToggle" />
         </MudHidden>
         <MudHidden Breakpoint="Breakpoint.MdAndUp">
             <MudIconButton Icon="@Icons.Material.Outlined.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="DrawerToggle" />
@@ -37,11 +38,11 @@
     </MudDrawer>
     <MudMainContent>
         <MudHidden Breakpoint="Breakpoint.SmAndDown">
-            <MudToolBar DisableGutters="true">
-                <MudIconButton Icon="@Icons.Material.Outlined.Menu" Color="Color.Inherit" OnClick="@((e) => DrawerToggle())" Class="ml-3" />
-                <MudBreadcrumbs Items="_items"></MudBreadcrumbs>
+            @* <MudToolBar DisableGutters="true">
+                <MudIconButton Icon="@Icons.Material.Outlined.Menu" Color="Color.Inherit" OnClick="DrawerToggle" Class="ml-3" />
+                <MudBreadcrumbs Items="_items" />
                 <MudSpacer />
-            </MudToolBar>
+            </MudToolBar> *@
         </MudHidden>
         <MudContainer MaxWidth="MaxWidth.False" Class="mt-4">
             @Body
@@ -65,7 +66,7 @@
 
     public bool _drawerOpen = true;
 
-    void DrawerToggle()
+    void DrawerToggle(MouseEventArgs _)
     {
         _drawerOpen = !_drawerOpen;
     }

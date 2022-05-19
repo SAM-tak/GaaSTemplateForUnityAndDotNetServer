@@ -1,14 +1,9 @@
 ﻿@page "/"
 @page "/dashboard"
 
-@using YourGameServer.Pages.PlayerAccounts
-
 <MudText Typo="Typo.h5" Color="Color.Primary" Class="mb-4">Dashboard</MudText>
 
 <MudGrid>
-    <MudItem xs="12">
-        <CreateDummyPlayer />
-    </MudItem>
     <MudItem xs="12" sm="6" md="3">
         <MudPaper Class="d-flex flex-row pt-6 pb-4" Style="height:100px;">
             <MudIcon Icon="@Icons.Material.Filled.Euro" Color="Color.Primary" Class="mx-4" Style="width:54px; height:54px;"></MudIcon>
@@ -46,8 +41,8 @@
         </MudPaper>
     </MudItem>
     <MudItem xs="12" sm="8">
-        <MudPaper Class="pa-4" Style="height:300px;">
-            Charts comming soon ish...
+        <MudPaper Class="pa-4" Style="height:300px;overflow: scroll" id="logview">
+            <YourGameServer.Pages.Utility.LogView Id="logview" MaxLength="10240" />
         </MudPaper>
     </MudItem>
     <MudItem xs="12" sm="4">

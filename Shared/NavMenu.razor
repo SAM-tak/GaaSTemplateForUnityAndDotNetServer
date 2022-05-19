@@ -3,21 +3,32 @@
 <MudDivider Class="mb-4" />
 <MudNavMenu>
     <MudNavLink Href="/dashboard" Match="NavLinkMatch.All" Icon="@Icons.Material.Outlined.Dashboard">Dashboard</MudNavLink>
+    <MudNavLink Href="/utility/logview/" Match="NavLinkMatch.All" Icon="@Icons.Outlined.PermDeviceInformation">Recent Log</MudNavLink>
+    <MudText Typo="Typo.subtitle2" Color="Color.Inherit" Class="ml-4 my-3">API Reference</MudText>
     @* Dont use Href="/swagger", use NavigateTo instead. 'cos Href NavLink make wrong referer *@
     <MudNavLink OnClick="Swagger" Icon="@SwaggerIcon">Swagger</MudNavLink>
     @* Dont use Href="/rpcswagger", use NavigateTo instead. 'cos Href NavLink make wrong referer *@
     <MudNavLink OnClick="RPCSwagger" Icon="@SwaggerIcon">RPC Swagger</MudNavLink>
 
-    <MudText Typo="Typo.subtitle2" Color="Color.Inherit" Class="ml-4 my-3">Tables</MudText>
-    <MudNavLink Href="/tables/playeraccount" Icon="@Icons.Material.Outlined.PeopleAlt">Player Accounts</MudNavLink>
-    <MudNavLink Href="/tables/playerdevice" Icon="@Icons.Material.Outlined.PeopleAlt">Player Devices</MudNavLink>
-    <MudNavLink Href="/tables/playerprofile" Icon="@Icons.Material.Outlined.PeopleAlt">Player Profiles</MudNavLink>
-    <MudNavLink Href="/tables/playerownedfreeservicetoken" Icon="@Icons.Material.Outlined.PeopleAlt">Player Owned Free Service Tokens</MudNavLink>
-    <MudNavLink Href="/tables/playerownedpaidservicetoken" Icon="@Icons.Material.Outlined.PeopleAlt">Player Owned Paid Service Tokens</MudNavLink>
-    <MudNavLink Href="/tables/playerownedserviceticket" Icon="@Icons.Material.Outlined.PeopleAlt">Player Owned Service Tickets</MudNavLink>
-    <MudNavLink Href="/tables/servicetoken" Icon="@Icons.Material.Outlined.PeopleAlt">Service Tokens</MudNavLink>
-    <MudNavLink Href="/tables/serviceticket" Icon="@Icons.Material.Outlined.PeopleAlt">Service Tickets</MudNavLink>
-    <MudNavLink Href="/tables/lootbox" Icon="@Icons.Material.Outlined.PeopleAlt">Loot Boxes</MudNavLink>
+    <MudText Typo="Typo.subtitle2" Color="Color.Inherit" Class="ml-4 my-3">Database Tables</MudText>
+    <MudNavGroup Title="Players" Icon="@Icons.Filled.TableRows" HideExpandIcon="true">
+        <MudNavLink Href="/tables/playeraccount" Icon="@Icons.Material.Outlined.PeopleAlt">Player Accounts</MudNavLink>
+        <MudNavLink Href="/tables/playerdevice" Icon="@Icons.Material.Outlined.PeopleAlt">Player Devices</MudNavLink>
+        <MudNavLink Href="/tables/playerprofile" Icon="@Icons.Material.Outlined.PeopleAlt">Player Profiles</MudNavLink>
+        <MudNavLink Href="/tables/playerownedfreeservicetoken" Icon="@Icons.Material.Outlined.PeopleAlt">Player Owned Free Service Tokens</MudNavLink>
+        <MudNavLink Href="/tables/playerownedpaidservicetoken" Icon="@Icons.Material.Outlined.PeopleAlt">Player Owned Paid Service Tokens</MudNavLink>
+        <MudNavLink Href="/tables/playerownedserviceticket" Icon="@Icons.Material.Outlined.PeopleAlt">Player Owned Service Tickets</MudNavLink>
+    </MudNavGroup>
+    <MudNavGroup Title="Products" Icon="@Icons.Filled.TableRows" HideExpandIcon="true">
+        <MudNavLink Href="/tables/servicetoken" Icon="@Icons.Material.Outlined.PeopleAlt">Service Tokens</MudNavLink>
+        <MudNavLink Href="/tables/serviceticket" Icon="@Icons.Material.Outlined.PeopleAlt">Service Tickets</MudNavLink>
+        <MudNavLink Href="/tables/lootbox" Icon="@Icons.Material.Outlined.PeopleAlt">Loot Boxes</MudNavLink>
+    </MudNavGroup>
+
+    <MudText Typo="Typo.subtitle2" Color="Color.Inherit" Class="ml-4 my-3">Cheats</MudText>
+    <MudNavGroup Title="Player Accounts" Icon="@Icons.Filled.TableRows" HideExpandIcon="true">
+        <MudNavLink Href="/cheats/createdummyplayers" Icon="@Icons.Material.Outlined.PeopleAlt">Create Dummy Players</MudNavLink>
+    </MudNavGroup>
 
     <MudText Typo="Typo.subtitle2" Color="Color.Inherit" Class="ml-4 my-3">Pages</MudText>
     <MudNavGroup Title="Error" Icon="@AlertAssignmentIcon" HideExpandIcon="true">

@@ -33,20 +33,20 @@
                     </MudSelect>
                 </MudTd>
                 <MudTd>
-                    <MudDatePicker @bind-Date="_newItem.Period" Label="@(TextHelper.LabelFor<PlayerOwnedServiceTicket>(i => i.Period))" />
-                    <MudTimePicker Time="_newItem.Period?.TimeOfDay" Label="Period" TimeChanged="(t) => _newItem.Period = _newItem.Period?.Date + t" />
+                    <MudDatePicker Editable="true" @bind-Date="_newItem.Period" Label="@(TextHelper.LabelFor<PlayerOwnedServiceTicket>(i => i.Period))" />
+                    <MudTimePicker Editable="true" Time="_newItem.Period?.TimeOfDay" Label="Period" TimeChanged="(t) => _newItem.Period = _newItem.Period?.Date + t" />
                 </MudTd>
                 <MudTd>
-                    <MudDatePicker @bind-Date="_newItem.UsedDate" Label="@(TextHelper.LabelFor<PlayerOwnedServiceTicket>(i => i.UsedDate))" />
-                    <MudTimePicker Time="_newItem.UsedDate?.TimeOfDay" Label="UsedDate" TimeChanged="(t) => _newItem.UsedDate = _newItem.UsedDate?.Date + t" />
+                    <MudDatePicker Editable="true" @bind-Date="_newItem.UsedDate" Label="@(TextHelper.LabelFor<PlayerOwnedServiceTicket>(i => i.UsedDate))" />
+                    <MudTimePicker Editable="true" Time="_newItem.UsedDate?.TimeOfDay" Label="UsedDate" TimeChanged="(t) => _newItem.UsedDate = _newItem.UsedDate?.Date + t" />
                 </MudTd>
                 <MudTd>
-                    <MudDatePicker @bind-Date="_newItem.InvalidateDate" Label="@(TextHelper.LabelFor<PlayerOwnedServiceTicket>(i => i.InvalidateDate))" />
-                    <MudTimePicker Time="_newItem.InvalidateDate?.TimeOfDay" Label="InvalidateDate" TimeChanged="(t) => _newItem.InvalidateDate = _newItem.InvalidateDate?.Date + t" />
+                    <MudDatePicker Editable="true" @bind-Date="_newItem.InvalidateDate" Label="@(TextHelper.LabelFor<PlayerOwnedServiceTicket>(i => i.InvalidateDate))" />
+                    <MudTimePicker Editable="true" Time="_newItem.InvalidateDate?.TimeOfDay" Label="InvalidateDate" TimeChanged="(t) => _newItem.InvalidateDate = _newItem.InvalidateDate?.Date + t" />
                 </MudTd>
                 <MudTd>
-                    <MudDatePicker @bind-Date="_newItem.ExpireDate" Label="@(TextHelper.LabelFor<PlayerOwnedServiceTicket>(i => i.ExpireDate))" />
-                    <MudTimePicker Time="_newItem.ExpireDate?.TimeOfDay" TimeChanged="(t) => _newItem.ExpireDate = _newItem.ExpireDate?.Date + t" />
+                    <MudDatePicker Editable="true" @bind-Date="_newItem.ExpireDate" Label="@(TextHelper.LabelFor<PlayerOwnedServiceTicket>(i => i.ExpireDate))" />
+                    <MudTimePicker Editable="true" Time="_newItem.ExpireDate?.TimeOfDay" TimeChanged="(t) => _newItem.ExpireDate = _newItem.ExpireDate?.Date + t" />
                 </MudTd>
             </MudCardContent>
             <MudCardActions>
@@ -57,18 +57,18 @@
     </EditForm>
 </MudExpansionPanel>
 <br />
-<MudDataGrid Items="dbContext.PlayerOwnedServiceTickets" Sortable="true" Filterable="true" QuickFilter="QuickFilter" ReadOnly="false" EditMode="@DataGridEditMode.Inline">
+<MudDataGrid Items="dbContext.PlayerOwnedServiceTickets" Sortable="true" Filterable="true" QuickFilter="QuickFilter" ReadOnly="false" EditMode="@DataGridEditMode.Form" EditTrigger="@DataGridEditTrigger.Manual">
     <ToolBarContent>
         <MudText Typo="Typo.h6">@ListPanelText</MudText>
         <MudSpacer />
         <MudTextField @bind-Value="_searchString" Placeholder="Search for PlayerProfiles..." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" />
     </ToolBarContent>
     <Columns>
-        <Column T="PlayerOwnedServiceTicket" Field="Id">
+        <SelectColumn T="PlayerOwnedServiceTicket" />
+        <Column T="PlayerOwnedServiceTicket" Field="Id" Sortable="false" Filterable="false" IsEditable="false">
             <EditTemplate>
-                @context.Id
                 <MudTooltip Text="Delete">
-                    <MudIconButton @onclick="@(async () => await Delete(@context))" Color="Color.Primary" Icon="@Icons.Material.Filled.Delete" />
+                    <MudIconButton @onclick="@(async () => await Delete(@context.Item))" Color="Color.Primary" Icon="@Icons.Material.Filled.Delete" />
                 </MudTooltip>
             </EditTemplate>
         </Column>
@@ -76,7 +76,7 @@
         <Column T="PlayerOwnedServiceTicket" Field="ServiceTicketId" />
         <Column T="PlayerOwnedServiceTicket" Field="Origin">
             <EditTemplate>
-                <MudSelect T="ConsumableOrigin" @bind-Value="context.Origin">
+                <MudSelect T="ConsumableOrigin" @bind-Value="context.Item.Origin">
                     @foreach (ConsumableOrigin item in Enum.GetValues(typeof(ConsumableOrigin)))
                     {
                         <MudSelectItem Value="@item">@item.GetDisplayName()</MudSelectItem>
@@ -86,7 +86,7 @@
         </Column>
         <Column T="PlayerOwnedServiceTicket" Field="Status">
             <EditTemplate>
-                <MudSelect T="ConsumableStatus" @bind-Value="context.Status">
+                <MudSelect T="ConsumableStatus" @bind-Value="context.Item.Status">
                     @foreach (ConsumableStatus item in Enum.GetValues(typeof(ConsumableStatus)))
                     {
                         <MudSelectItem Value="@item">@item.GetDisplayName()</MudSelectItem>
@@ -96,27 +96,32 @@
         </Column>
         <Column T="PlayerOwnedServiceTicket" Field="Period">
             <EditTemplate>
-                <MudDatePicker @bind-Date="context.Period" />
-                <MudTimePicker Time="context.Period?.TimeOfDay" TimeChanged="(t) => context.Period = context.Period?.Date + t" />
+                <MudDatePicker Editable="true" @bind-Date="context.Item.Period" />
+                <MudTimePicker Editable="true" Time="context.Item.Period?.TimeOfDay" TimeChanged="(t) => context.Item.Period = context.Item.Period?.Date + t" />
             </EditTemplate>
         </Column>
         <Column T="PlayerOwnedServiceTicket" Field="UsedDate">
             <EditTemplate>
-                <MudDatePicker @bind-Date="context.UsedDate" />
-                <MudTimePicker Time="context.UsedDate?.TimeOfDay" TimeChanged="(t) => context.UsedDate = context.UsedDate?.Date + t" />
+                <MudDatePicker Editable="true" @bind-Date="context.Item.UsedDate" />
+                <MudTimePicker Editable="true" Time="context.Item.UsedDate?.TimeOfDay" TimeChanged="(t) => context.Item.UsedDate = context.Item.UsedDate?.Date + t" />
             </EditTemplate>
         </Column>
         <Column T="PlayerOwnedServiceTicket" Field="InvalidateDate">
             <EditTemplate>
-                <MudDatePicker @bind-Date="context.InvalidateDate" />
-                <MudTimePicker Time="context.InvalidateDate?.TimeOfDay" TimeChanged="(t) => context.InvalidateDate = context.InvalidateDate?.Date + t" />
+                <MudDatePicker Editable="true" @bind-Date="context.Item.InvalidateDate" />
+                <MudTimePicker Editable="true" Time="context.Item.InvalidateDate?.TimeOfDay" TimeChanged="(t) => context.Item.InvalidateDate = context.Item.InvalidateDate?.Date + t" />
             </EditTemplate>
         </Column>
         <Column T="PlayerOwnedServiceTicket" Field="ExpireDate">
             <EditTemplate>
-                <MudDatePicker @bind-Date="context.ExpireDate" />
-                <MudTimePicker Time="context.ExpireDate?.TimeOfDay" TimeChanged="(t) => context.ExpireDate = context.ExpireDate?.Date + t" />
+                <MudDatePicker Editable="true" @bind-Date="context.Item.ExpireDate" />
+                <MudTimePicker Editable="true" Time="context.Item.ExpireDate?.TimeOfDay" TimeChanged="(t) => context.Item.ExpireDate = context.Item.ExpireDate?.Date + t" />
             </EditTemplate>
+        </Column>
+        <Column T="PlayerOwnedServiceTicket" CellClass="d-flex justify-end">
+            <CellTemplate>
+                <MudIconButton Size="@Size.Small" Icon="@Icons.Outlined.Edit" OnClick="@context.Actions.StartEditingItem" />
+            </CellTemplate>
         </Column>
     </Columns>
     <PagerContent>

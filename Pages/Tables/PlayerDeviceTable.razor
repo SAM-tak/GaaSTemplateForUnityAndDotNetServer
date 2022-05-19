@@ -25,12 +25,12 @@
                     <MudTextField @bind-Value="_newItem.DeviceId" Label="@(TextHelper.LabelFor<PlayerDevice>(i => i.DeviceId))" />
                 </MudTd>
                 <MudTd>
-                    <MudDatePicker @bind-Date="_newItem.Since" Label="@(TextHelper.LabelFor<PlayerDevice>(i => i.Since))"/>
-                    <MudTimePicker Time="_newItem.Since?.TimeOfDay"TimeChanged="(t) => _newItem.Since = _newItem.Since?.Date + t" />
+                    <MudDatePicker Editable="true" @bind-Date="_newItem.Since" Label="@(TextHelper.LabelFor<PlayerDevice>(i => i.Since))"/>
+                    <MudTimePicker Editable="true" Time="_newItem.Since?.TimeOfDay"TimeChanged="(t) => _newItem.Since = _newItem.Since?.Date + t" />
                 </MudTd>
                 <MudTd>
-                    <MudDatePicker @bind-Date="_newItem.LastUsed" Label="@(TextHelper.LabelFor<PlayerDevice>(i => i.LastUsed))" />
-                    <MudTimePicker Time="_newItem.LastUsed?.TimeOfDay" TimeChanged="(t) => _newItem.LastUsed = _newItem.LastUsed?.Date + t" />
+                    <MudDatePicker Editable="true" @bind-Date="_newItem.LastUsed" Label="@(TextHelper.LabelFor<PlayerDevice>(i => i.LastUsed))" />
+                    <MudTimePicker Editable="true" Time="_newItem.LastUsed?.TimeOfDay" TimeChanged="(t) => _newItem.LastUsed = _newItem.LastUsed?.Date + t" />
                 </MudTd>
             </MudCardContent>
             <MudCardActions>
@@ -41,25 +41,25 @@
     </EditForm>
 </MudExpansionPanel>
 <br />
-<MudDataGrid Items="dbContext.PlayerDevices" Sortable="true" Filterable="true" QuickFilter="QuickFilter" ReadOnly="false" EditMode="@DataGridEditMode.Inline">
+<MudDataGrid Items="dbContext.PlayerDevices" Sortable="true" Filterable="true" QuickFilter="QuickFilter" ReadOnly="false" EditMode="@DataGridEditMode.Form" EditTrigger="@DataGridEditTrigger.Manual">
     <ToolBarContent>
         <MudText Typo="Typo.h6">@ListPanelText</MudText>
         <MudSpacer />
         <MudTextField @bind-Value="_searchString" Placeholder="Search for PlayerDevices..." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" />
     </ToolBarContent>
     <Columns>
-        <Column T="PlayerDevice" Field="Id">
+        <SelectColumn T="PlayerDevice" />
+        <Column T="PlayerDevice" Field="Id" Sortable="false" Filterable="false" IsEditable="false">
             <EditTemplate>
-                @context.Id
                 <MudTooltip Text="Delete">
-                    <MudIconButton @onclick="@(async () => await Delete(@context))" Color="Color.Primary" Icon="@Icons.Material.Filled.Delete" />
+                    <MudIconButton @onclick="@(async () => await Delete(@context.Item))" Color="Color.Primary" Icon="@Icons.Material.Filled.Delete" />
                 </MudTooltip>
             </EditTemplate>
         </Column>
         <Column T="PlayerDevice" Field="OwnerId" />
         <Column T="PlayerDevice" Field="DeviceType">
             <EditTemplate>
-                <MudSelect @bind-Value="context.DeviceType">
+                <MudSelect @bind-Value="context.Item.DeviceType">
                     @foreach (DeviceType item in Enum.GetValues(typeof(DeviceType)))
                     {
                         <MudSelectItem Value="@item">@(item.GetDisplayName())</MudSelectItem>
@@ -67,18 +67,23 @@
                 </MudSelect>
             </EditTemplate>
         </Column>
-        <Column T="PlayerDevice" Field="DeviceId" />
+        <Column T="PlayerDevice" Field="DeviceId" CellStyle="word-break: break-all" />
         <Column T="PlayerDevice" Field="Since">
             <EditTemplate>
-                <MudDatePicker @bind-Date="context.Since" />
-                <MudTimePicker Time="context.Since?.TimeOfDay" />
+                <MudDatePicker Editable="true" @bind-Date="context.Item.Since" />
+                <MudTimePicker Editable="true" Time="context.Item.Since?.TimeOfDay" />
             </EditTemplate>
         </Column>
         <Column T="PlayerDevice" Field="LastUsed">
             <EditTemplate>
-                <MudDatePicker @bind-Date="context.LastUsed" />
-                <MudTimePicker Time="context.LastUsed?.TimeOfDay" />
+                <MudDatePicker Editable="true" @bind-Date="context.Item.LastUsed" />
+                <MudTimePicker Editable="true" Time="context.Item.LastUsed?.TimeOfDay" />
             </EditTemplate>
+        </Column>
+        <Column T="PlayerDevice" CellClass="d-flex justify-end">
+            <CellTemplate>
+                <MudIconButton Size="@Size.Small" Icon="@Icons.Outlined.Edit" OnClick="@context.Actions.StartEditingItem" />
+            </CellTemplate>
         </Column>
     </Columns>
     <PagerContent>

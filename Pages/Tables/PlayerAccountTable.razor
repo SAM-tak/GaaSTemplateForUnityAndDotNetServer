@@ -32,24 +32,24 @@
                     </MudSelect>
                 </MudTd>
                 <MudTd>
-                    <MudDatePicker @bind-Date="_newItem.Since" Label="@(TextHelper.LabelFor<PlayerAccount>(i => i.Since))" />
-                    <MudTimePicker Time="_newItem.Since?.TimeOfDay" TimeChanged="(t) => _newItem.Since = _newItem.Since?.Date + t" />
+                    <MudDatePicker Editable="true" @bind-Date="_newItem.Since" Label="@(TextHelper.LabelFor<PlayerAccount>(i => i.Since))" />
+                    <MudTimePicker Editable="true" Time="_newItem.Since?.TimeOfDay" TimeChanged="(t) => _newItem.Since = _newItem.Since?.Date + t" />
                 </MudTd>
                 <MudTd>
-                    <MudDatePicker @bind-Date="_newItem.LastLogin" Label="@(TextHelper.LabelFor<PlayerAccount>(i => i.LastLogin))" />
-                    <MudTimePicker Time="_newItem.LastLogin?.TimeOfDay" TimeChanged="(t) => _newItem.LastLogin = _newItem.LastLogin?.Date + t" />
+                    <MudDatePicker Editable="true" @bind-Date="_newItem.LastLogin" Label="@(TextHelper.LabelFor<PlayerAccount>(i => i.LastLogin))" />
+                    <MudTimePicker Editable="true" Time="_newItem.LastLogin?.TimeOfDay" TimeChanged="(t) => _newItem.LastLogin = _newItem.LastLogin?.Date + t" />
                 </MudTd>
                 <MudTd>
-                    <MudDatePicker @bind-Date="_newItem.InactivateDate" Label="@(TextHelper.LabelFor<PlayerAccount>(i => i.InactivateDate))" />
-                    <MudTimePicker Time="_newItem.InactivateDate?.TimeOfDay" TimeChanged="(t) => _newItem.InactivateDate = _newItem.InactivateDate?.Date + t" />
+                    <MudDatePicker Editable="true" @bind-Date="_newItem.InactivateDate" Label="@(TextHelper.LabelFor<PlayerAccount>(i => i.InactivateDate))" />
+                    <MudTimePicker Editable="true" Time="_newItem.InactivateDate?.TimeOfDay" TimeChanged="(t) => _newItem.InactivateDate = _newItem.InactivateDate?.Date + t" />
                 </MudTd>
                 <MudTd>
-                    <MudDatePicker @bind-Date="_newItem.BanDate" Label="@(TextHelper.LabelFor<PlayerAccount>(i => i.BanDate))" />
-                    <MudTimePicker Time="_newItem.BanDate?.TimeOfDay" TimeChanged="(t) => _newItem.BanDate = _newItem.BanDate?.Date + t" />
+                    <MudDatePicker Editable="true" @bind-Date="_newItem.BanDate" Label="@(TextHelper.LabelFor<PlayerAccount>(i => i.BanDate))" />
+                    <MudTimePicker Editable="true" Time="_newItem.BanDate?.TimeOfDay" TimeChanged="(t) => _newItem.BanDate = _newItem.BanDate?.Date + t" />
                 </MudTd>
                 <MudTd>
-                    <MudDatePicker @bind-Date="_newItem.ExpireDate" Label="@(TextHelper.LabelFor<PlayerAccount>(i => i.ExpireDate))" />
-                    <MudTimePicker Time="_newItem.ExpireDate?.TimeOfDay" TimeChanged="(t) => _newItem.ExpireDate = _newItem.ExpireDate?.Date + t" />
+                    <MudDatePicker Editable="true" @bind-Date="_newItem.ExpireDate" Label="@(TextHelper.LabelFor<PlayerAccount>(i => i.ExpireDate))" />
+                    <MudTimePicker Editable="true" Time="_newItem.ExpireDate?.TimeOfDay" TimeChanged="(t) => _newItem.ExpireDate = _newItem.ExpireDate?.Date + t" />
                 </MudTd>
             </MudCardContent>
             <MudCardActions>
@@ -60,18 +60,18 @@
     </EditForm>
 </MudExpansionPanel>
 <br />
-<MudDataGrid Items="dbContext.PlayerAccounts" Sortable="true" Filterable="true" QuickFilter="QuickFilter" ReadOnly="false" EditMode="@DataGridEditMode.Inline">
+<MudDataGrid Items="dbContext.PlayerAccounts" Sortable="true" Filterable="true" QuickFilter="QuickFilter" ReadOnly="false" EditMode="@DataGridEditMode.Form" EditTrigger="@DataGridEditTrigger.Manual">
     <ToolBarContent>
         <MudText Typo="Typo.h6">@ListPanelText</MudText>
         <MudSpacer />
         <MudTextField @bind-Value="_searchString" Placeholder="@PlaceholderText" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" />
     </ToolBarContent>
     <Columns>
-        <Column T="PlayerAccount" Field="Id">
+        <SelectColumn T="PlayerAccount" />
+        <Column T="PlayerAccount" Field="Id" Sortable="false" Filterable="false" IsEditable="false">
             <EditTemplate>
-                @context.Id
                 <MudTooltip Text="Delete">
-                    <MudIconButton @onclick="@(async () => await Delete(@context))" Color="Color.Primary" Icon="@Icons.Material.Filled.Delete" />
+                    <MudIconButton @onclick="@(async () => await Delete(@context.Item))" Color="Color.Primary" Icon="@Icons.Material.Filled.Delete" />
                 </MudTooltip>
             </EditTemplate>
         </Column>
@@ -79,7 +79,7 @@
         <Column T="PlayerAccount" Field="CurrentDeviceId" />
         <Column T="PlayerAccount" Field="Kind">
             <EditTemplate>
-                <MudSelect T="PlayerAccountKind" @bind-Value="context.Kind">
+                <MudSelect T="PlayerAccountKind" @bind-Value="context.Item.Kind">
                     @foreach (PlayerAccountKind item in Enum.GetValues(typeof(PlayerAccountKind)))
                     {
                         <MudSelectItem Value="@item">@item.GetDisplayName()</MudSelectItem>
@@ -89,7 +89,7 @@
         </Column>
         <Column T="PlayerAccount" Field="Status">
             <EditTemplate>
-                <MudSelect T="PlayerAccountStatus" @bind-Value="context.Status">
+                <MudSelect T="PlayerAccountStatus" @bind-Value="context.Item.Status">
                     @foreach (PlayerAccountStatus item in Enum.GetValues(typeof(PlayerAccountStatus)))
                     {
                         <MudSelectItem Value="@item">@item.GetDisplayName()</MudSelectItem>
@@ -99,33 +99,38 @@
         </Column>
         <Column T="PlayerAccount" Field="Since">
             <EditTemplate>
-                <MudDatePicker @bind-Date="context.Since" />
-                <MudTimePicker Time="context.Since?.TimeOfDay" TimeChanged="(t) => context.Since = context.Since?.Date + t" />
+                <MudDatePicker Editable="true" @bind-Date="context.Item.Since" />
+                <MudTimePicker Editable="true" Time="context.Item.Since?.TimeOfDay" TimeChanged="(t) => context.Item.Since = context.Item.Since?.Date + t" />
             </EditTemplate>
         </Column>
         <Column T="PlayerAccount" Field="LastLogin">
             <EditTemplate>
-                <MudDatePicker @bind-Date="context.LastLogin" />
-                <MudTimePicker Time="context.LastLogin?.TimeOfDay" TimeChanged="(t) => context.LastLogin = context.LastLogin?.Date + t" />
+                <MudDatePicker Editable="true" @bind-Date="context.Item.LastLogin" />
+                <MudTimePicker Editable="true" Time="context.Item.LastLogin?.TimeOfDay" TimeChanged="(t) => context.Item.LastLogin = context.Item.LastLogin?.Date + t" />
             </EditTemplate>
         </Column>
         <Column T="PlayerAccount" Field="InactivateDate">
             <EditTemplate>
-                <MudDatePicker @bind-Date="context.InactivateDate" />
-                <MudTimePicker Time="context.InactivateDate?.TimeOfDay" TimeChanged="(t) => context.InactivateDate = context.InactivateDate?.Date + t" />
+                <MudDatePicker Editable="true" @bind-Date="context.Item.InactivateDate" />
+                <MudTimePicker Editable="true" Time="context.Item.InactivateDate?.TimeOfDay" TimeChanged="(t) => context.Item.InactivateDate = context.Item.InactivateDate?.Date + t" />
             </EditTemplate>
         </Column>
         <Column T="PlayerAccount" Field="BanDate">
             <EditTemplate>
-                <MudDatePicker @bind-Date="context.BanDate" />
-                <MudTimePicker Time="context.BanDate?.TimeOfDay" TimeChanged="(t) => context.BanDate = context.Since?.Date + t" />
+                <MudDatePicker Editable="true" @bind-Date="context.Item.BanDate" />
+                <MudTimePicker Editable="true" Time="context.Item.BanDate?.TimeOfDay" TimeChanged="(t) => context.Item.BanDate = context.Item.Since?.Date + t" />
             </EditTemplate>
         </Column>
         <Column T="PlayerAccount" Field="ExpireDate">
             <EditTemplate>
-                <MudDatePicker @bind-Date="context.ExpireDate" />
-                <MudTimePicker Time="context.ExpireDate?.TimeOfDay" TimeChanged="(t) => context.ExpireDate = context.ExpireDate?.Date + t" />
+                <MudDatePicker Editable="true" @bind-Date="context.Item.ExpireDate" />
+                <MudTimePicker Editable="true" Time="context.Item.ExpireDate?.TimeOfDay" TimeChanged="(t) => context.Item.ExpireDate = context.Item.ExpireDate?.Date + t" />
             </EditTemplate>
+        </Column>
+        <Column T="PlayerAccount" CellClass="d-flex justify-end">
+            <CellTemplate>
+                <MudIconButton Size="@Size.Small" Icon="@Icons.Outlined.Edit" OnClick="@context.Actions.StartEditingItem" />
+            </CellTemplate>
         </Column>
     </Columns>
     <PagerContent>

@@ -24,18 +24,19 @@
     </EditForm>
 </MudExpansionPanel>
 <br />
-<MudDataGrid Items="dbContext.ServiceTokens" Sortable="true" Filterable="true" QuickFilter="QuickFilter" ReadOnly="false" EditMode="@DataGridEditMode.Inline">
+<MudDataGrid Items="dbContext.ServiceTokens" Sortable="true" Filterable="true" QuickFilter="QuickFilter" ReadOnly="false" EditMode="@DataGridEditMode.Form" EditTrigger="@DataGridEditTrigger.Manual">
     <ToolBarContent>
         <MudText Typo="Typo.h6">@ListPanelText</MudText>
         <MudSpacer />
         <MudTextField @bind-Value="_searchString" Placeholder="Search for ServiceTokens..." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" />
     </ToolBarContent>
     <Columns>
-        <Column T="ServiceToken" Field="Id">
+        <SelectColumn T="ServiceToken" />
+        <Column T="ServiceToken" Field="Id" Sortable="false" Filterable="false" IsEditable="false">
             <EditTemplate>
-                @context.Id
+                @context.Item.Id
                 <MudTooltip Text="Delete">
-                    <MudIconButton @onclick="@(async () => await Delete(@context))" Color="Color.Primary" Icon="@Icons.Material.Filled.Delete" />
+                    <MudIconButton @onclick="@(async () => await Delete(@context.Item))" Color="Color.Primary" Icon="@Icons.Material.Filled.Delete" />
                 </MudTooltip>
             </EditTemplate>
         </Column>
@@ -44,6 +45,11 @@
         <Column T="ServiceToken" Field="DisplayName" />
         <Column T="ServiceToken" Field="Description" />
         <Column T="ServiceToken" Field="IconBlobId" />
+        <Column T="ServiceToken" CellClass="d-flex justify-end">
+            <CellTemplate>
+                <MudIconButton Size="@Size.Small" Icon="@Icons.Outlined.Edit" OnClick="@context.Actions.StartEditingItem" />
+            </CellTemplate>
+        </Column>
     </Columns>
     <PagerContent>
         <MudDataGridPager T="ServiceToken" />

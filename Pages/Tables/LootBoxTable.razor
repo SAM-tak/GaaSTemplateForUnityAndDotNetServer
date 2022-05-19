@@ -37,18 +37,18 @@
     </EditForm>
 </MudExpansionPanel>
 <br />
-<MudDataGrid Items="dbContext.LootBoxes" Sortable="true" Filterable="true" QuickFilter="QuickFilter" ReadOnly="false" EditMode="@DataGridEditMode.Inline">
+<MudDataGrid Items="dbContext.LootBoxes" Sortable="true" Filterable="true" QuickFilter="QuickFilter" ReadOnly="false" EditMode="@DataGridEditMode.Form" EditTrigger="@DataGridEditTrigger.Manual">
     <ToolBarContent>
         <MudText Typo="Typo.h6">@ListPanelText</MudText>
         <MudSpacer />
         <MudTextField @bind-Value="_searchString" Placeholder="Search for LootBoxes..." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" />
     </ToolBarContent>
     <Columns>
-        <Column T="LootBox" Field="Id">
+        <SelectColumn T="LootBox" />
+        <Column T="LootBox" Field="Id" Sortable="false" Filterable="false" IsEditable="false">
             <EditTemplate>
-                @context.Id
                 <MudTooltip Text="Delete">
-                    <MudIconButton @onclick="@(async () => await Delete(@context))" Color="Color.Primary" Icon="@Icons.Material.Filled.Delete" />
+                    <MudIconButton @onclick="@(async () => await Delete(@context.Item))" Color="Color.Primary" Icon="@Icons.Material.Filled.Delete" />
                 </MudTooltip>
             </EditTemplate>
         </Column>
@@ -58,6 +58,11 @@
         <Column T="LootBox" Field="Description" />
         <Column T="LootBox" Field="IconAddress" />
         <Column T="LootBox" Field="BannerAddress" />
+        <Column T="LootBox" CellClass="d-flex justify-end">
+            <CellTemplate>
+                <MudIconButton Size="@Size.Small" Icon="@Icons.Outlined.Edit" OnClick="@context.Actions.StartEditingItem" />
+            </CellTemplate>
+        </Column>
     </Columns>
     <PagerContent>
         <MudDataGridPager T="LootBox" />

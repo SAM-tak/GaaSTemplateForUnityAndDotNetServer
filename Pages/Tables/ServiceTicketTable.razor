@@ -45,25 +45,25 @@
     </EditForm>
 </MudExpansionPanel>
 <br />
-<MudDataGrid Items="dbContext.ServiceTickets" Sortable="true" Filterable="true" QuickFilter="QuickFilter" ReadOnly="false" EditMode="@DataGridEditMode.Inline">
+<MudDataGrid Items="dbContext.ServiceTickets" Sortable="true" Filterable="true" QuickFilter="QuickFilter" ReadOnly="false" EditMode="@DataGridEditMode.Form" EditTrigger="@DataGridEditTrigger.Manual">
     <ToolBarContent>
         <MudText Typo="Typo.h6">@ListPanelText</MudText>
         <MudSpacer />
         <MudTextField @bind-Value="_searchString" Placeholder="Search for ServiceTickets..." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" />
     </ToolBarContent>
     <Columns>
-        <Column T="ServiceTicket" Field="Id">
+        <SelectColumn T="ServiceTicket" />
+        <Column T="ServiceTicket" Field="Id" Sortable="false" Filterable="false" IsEditable="false">
             <EditTemplate>
-                @context.Id
                 <MudTooltip Text="Delete">
-                    <MudIconButton @onclick="@(async () => await Delete(@context))" Color="Color.Primary" Icon="@Icons.Material.Filled.Delete" />
+                    <MudIconButton @onclick="@(async () => await Delete(@context.Item))" Color="Color.Primary" Icon="@Icons.Material.Filled.Delete" />
                 </MudTooltip>
             </EditTemplate>
         </Column>
         <Column T="ServiceTicket" Field="Name" />
         <Column T="ServiceTicket" Field="Kind">
             <EditTemplate>
-                <MudSelect T="ServiceTicketKind" @bind-Value="context.Kind">
+                <MudSelect T="ServiceTicketKind" @bind-Value="context.Item.Kind">
                     @foreach (ServiceTicketKind item in Enum.GetValues(typeof(ServiceTicketKind)))
                     {
                         <MudSelectItem Value="@item">@item.GetDisplayName()</MudSelectItem>
@@ -76,6 +76,11 @@
         <Column T="ServiceTicket" Field="Description" />
         <Column T="ServiceTicket" Field="DetailId" />
         <Column T="ServiceTicket" Field="IconBlobId" />
+        <Column T="ServiceTicket" CellClass="d-flex justify-end">
+            <CellTemplate>
+                <MudIconButton Size="@Size.Small" Icon="@Icons.Outlined.Edit" OnClick="@context.Actions.StartEditingItem" />
+            </CellTemplate>
+        </Column>
     </Columns>
     <PagerContent>
         <MudDataGridPager T="ServiceTicket" />

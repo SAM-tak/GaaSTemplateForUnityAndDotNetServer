@@ -14,8 +14,8 @@
                     <MudNumericField @bind-Value="_newItem.OwnerId" Label="@(TextHelper.LabelFor<PlayerProfile>(i => i.OwnerId))" T="ulong" Min="0" />
                 </MudTd>
                 <MudTd>
-                    <MudDatePicker @bind-Date="_newItem.LastUpdate" Label="@(TextHelper.LabelFor<PlayerProfile>(i => i.LastUpdate))" />
-                    <MudTimePicker Time="_newItem.LastUpdate?.TimeOfDay" Label="LastUpdate" TimeChanged="(t) => _newItem.LastUpdate = _newItem.LastUpdate?.Date + t" />
+                    <MudDatePicker Editable="true" @bind-Date="_newItem.LastUpdate" Label="@(TextHelper.LabelFor<PlayerProfile>(i => i.LastUpdate))" />
+                    <MudTimePicker Editable="true" Time="_newItem.LastUpdate?.TimeOfDay" Label="LastUpdate" TimeChanged="(t) => _newItem.LastUpdate = _newItem.LastUpdate?.Date + t" />
                 </MudTd>
                 <MudTd>
                     <MudTextField @bind-Value="_newItem.Name" Label="@(TextHelper.LabelFor<PlayerProfile>(i => i.Name))" />
@@ -35,31 +35,36 @@
     </EditForm>
 </MudExpansionPanel>
 <br />
-<MudDataGrid Items="dbContext.PlayerProfiles" Sortable="true" Filterable="true" QuickFilter="QuickFilter" ReadOnly="false" EditMode="@DataGridEditMode.Inline">
+<MudDataGrid Items="dbContext.PlayerProfiles" Sortable="true" Filterable="true" QuickFilter="QuickFilter" ReadOnly="false" EditMode="@DataGridEditMode.Form" EditTrigger="@DataGridEditTrigger.Manual">
     <ToolBarContent>
         <MudText Typo="Typo.h6">@ListPanelText</MudText>
         <MudSpacer />
         <MudTextField @bind-Value="_searchString" Placeholder="Search for PlayerProfiles..." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" />
     </ToolBarContent>
     <Columns>
-        <Column T="PlayerProfile" Field="Id">
+        <SelectColumn T="PlayerProfile" />
+        <Column T="PlayerProfile" Field="Id" Sortable="false" Filterable="false" IsEditable="false">
             <EditTemplate>
-                @context.Id
                 <MudTooltip Text="Delete">
-                    <MudIconButton @onclick="@(async () => await Delete(@context))" Color="Color.Primary" Icon="@Icons.Material.Filled.Delete" />
+                    <MudIconButton @onclick="@(async () => await Delete(@context.Item))" Color="Color.Primary" Icon="@Icons.Material.Filled.Delete" />
                 </MudTooltip>
             </EditTemplate>
         </Column>
         <Column T="PlayerProfile" Field="OwnerId" />
         <Column T="PlayerProfile" Field="LastUpdate">
             <EditTemplate>
-                <MudDatePicker @bind-Date="context.LastUpdate" />
-                <MudTimePicker Time="context.LastUpdate?.TimeOfDay" TimeChanged="(t) => context.LastUpdate = context.LastUpdate?.Date + t" />
+                <MudDatePicker Editable="true" @bind-Date="context.Item.LastUpdate" />
+                <MudTimePicker Editable="true" Time="context.Item.LastUpdate?.TimeOfDay" TimeChanged="(t) => context.Item.LastUpdate = context.Item.LastUpdate?.Date + t" />
             </EditTemplate>
         </Column>
         <Column T="PlayerProfile" Field="Name" />
         <Column T="PlayerProfile" Field="Motto" />
         <Column T="PlayerProfile" Field="IconBlobId" />
+        <Column T="PlayerProfile" CellClass="d-flex justify-end">
+            <CellTemplate>
+                <MudIconButton Size="@Size.Small" Icon="@Icons.Outlined.Edit" OnClick="@context.Actions.StartEditingItem" />
+            </CellTemplate>
+        </Column>
     </Columns>
     <PagerContent>
         <MudDataGridPager T="PlayerProfile" />

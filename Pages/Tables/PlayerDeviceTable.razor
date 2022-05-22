@@ -25,12 +25,14 @@
                     <MudTextField @bind-Value="_newItem.DeviceId" Label="@(TextHelper.LabelFor<PlayerDevice>(i => i.DeviceId))" />
                 </MudTd>
                 <MudTd>
-                    <MudDatePicker Editable="true" @bind-Date="_newItem.Since" Label="@(TextHelper.LabelFor<PlayerDevice>(i => i.Since))"/>
-                    <MudTimePicker Editable="true" Time="_newItem.Since?.TimeOfDay"TimeChanged="(t) => _newItem.Since = _newItem.Since?.Date + t" />
+                    <MudTextField Format="s" Label="@(TextHelper.LabelFor<PlayerDevice>(i => i.Since))" InputType="InputType.DateTimeLocal" @bind-Value="_newItem.Since"/>
+                    <MudNumericField T="double?" Label="Millisecond" Adornment="Adornment.End" AdornmentText="ms" Min="0.0" Max="999.9999"
+                        Value="_newItem.Since?.GetMillisecondPart()" ValueChanged="t => _newItem.Since = _newItem.Since?.ReplacedMillisecondPart(t)" />
                 </MudTd>
                 <MudTd>
-                    <MudDatePicker Editable="true" @bind-Date="_newItem.LastUsed" Label="@(TextHelper.LabelFor<PlayerDevice>(i => i.LastUsed))" />
-                    <MudTimePicker Editable="true" Time="_newItem.LastUsed?.TimeOfDay" TimeChanged="(t) => _newItem.LastUsed = _newItem.LastUsed?.Date + t" />
+                    <MudTextField Format="s" Label="@(TextHelper.LabelFor<PlayerDevice>(i => i.LastUsed))" InputType="InputType.DateTimeLocal" @bind-Value="_newItem.LastUsed"/>
+                    <MudNumericField T="double?" Label="Millisecond" Adornment="Adornment.End" AdornmentText="ms" Min="0.0" Max="999.9999"
+                        Value="_newItem.LastUsed?.GetMillisecondPart()" ValueChanged="t => _newItem.LastUsed = _newItem.LastUsed?.ReplacedMillisecondPart(t)" />
                 </MudTd>
             </MudCardContent>
             <MudCardActions>
@@ -41,21 +43,15 @@
     </EditForm>
 </MudExpansionPanel>
 <br />
-<MudDataGrid Items="dbContext.PlayerDevices" Sortable="true" Filterable="true" QuickFilter="QuickFilter" ReadOnly="false" EditMode="@DataGridEditMode.Form" EditTrigger="@DataGridEditTrigger.Manual">
+<MudDataGrid T="PlayerDevice" Items="dbContext.PlayerDevices" Sortable="true" Filterable="true" QuickFilter="QuickFilter" ReadOnly="false"
+    CommittedItemChanges="@(async () => await dbContext.SaveChangesAsync())" EditMode="@DataGridEditMode.Form" EditTrigger="@DataGridEditTrigger.Manual">
     <ToolBarContent>
         <MudText Typo="Typo.h6">@ListPanelText</MudText>
         <MudSpacer />
         <MudTextField @bind-Value="_searchString" Placeholder="Search for PlayerDevices..." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" />
     </ToolBarContent>
     <Columns>
-        <SelectColumn T="PlayerDevice" />
-        <Column T="PlayerDevice" Field="Id" Sortable="false" Filterable="false" IsEditable="false">
-            <EditTemplate>
-                <MudTooltip Text="Delete">
-                    <MudIconButton @onclick="@(async () => await Delete(@context.Item))" Color="Color.Primary" Icon="@Icons.Material.Filled.Delete" />
-                </MudTooltip>
-            </EditTemplate>
-        </Column>
+        <Column T="PlayerDevice" Field="Id" IsEditable="false" />
         <Column T="PlayerDevice" Field="OwnerId" />
         <Column T="PlayerDevice" Field="DeviceType">
             <EditTemplate>
@@ -70,19 +66,24 @@
         <Column T="PlayerDevice" Field="DeviceId" CellStyle="word-break: break-all" />
         <Column T="PlayerDevice" Field="Since">
             <EditTemplate>
-                <MudDatePicker Editable="true" @bind-Date="context.Item.Since" />
-                <MudTimePicker Editable="true" Time="context.Item.Since?.TimeOfDay" />
+                <MudTextField Format="s" Label="@(TextHelper.LabelFor<PlayerDevice>(i => i.Since))" InputType="InputType.DateTimeLocal" @bind-Value="context.Item.Since"/>
+                <MudNumericField T="double?" Label="Millisecond" Adornment="Adornment.End" AdornmentText="ms" Min="0.0" Max="999.9999"
+                    Value="context.Item.Since?.GetMillisecondPart()" ValueChanged="t => context.Item.Since = context.Item.Since?.ReplacedMillisecondPart(t)" />
             </EditTemplate>
         </Column>
         <Column T="PlayerDevice" Field="LastUsed">
             <EditTemplate>
-                <MudDatePicker Editable="true" @bind-Date="context.Item.LastUsed" />
-                <MudTimePicker Editable="true" Time="context.Item.LastUsed?.TimeOfDay" />
+                <MudTextField Format="s" Label="@(TextHelper.LabelFor<PlayerDevice>(i => i.LastUsed))" InputType="InputType.DateTimeLocal" @bind-Value="context.Item.LastUsed"/>
+                <MudNumericField T="double?" Label="Millisecond" Adornment="Adornment.End" AdornmentText="ms" Min="0.0" Max="999.9999"
+                    Value="context.Item.LastUsed?.GetMillisecondPart()" ValueChanged="t => context.Item.LastUsed = context.Item.LastUsed?.ReplacedMillisecondPart(t)" />
             </EditTemplate>
         </Column>
-        <Column T="PlayerDevice" CellClass="d-flex justify-end">
+        <Column T="PlayerDevice" Sortable="false" Filterable="false">
             <CellTemplate>
-                <MudIconButton Size="@Size.Small" Icon="@Icons.Outlined.Edit" OnClick="@context.Actions.StartEditingItem" />
+                <MudStack Spacing="1" Row="true">
+                    <MudIconButton Size="Size.Small" Icon="@Icons.Material.Filled.Delete" OnClick="@(async () => await Delete(@context.Item))" />
+                    <MudIconButton Size="Size.Small" Icon="@Icons.Outlined.Edit" OnClick="@context.Actions.StartEditingItem" />
+                </MudStack>
             </CellTemplate>
         </Column>
     </Columns>

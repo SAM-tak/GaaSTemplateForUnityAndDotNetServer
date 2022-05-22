@@ -37,30 +37,27 @@
     </EditForm>
 </MudExpansionPanel>
 <br />
-<MudDataGrid Items="dbContext.LootBoxes" Sortable="true" Filterable="true" QuickFilter="QuickFilter" ReadOnly="false" EditMode="@DataGridEditMode.Form" EditTrigger="@DataGridEditTrigger.Manual">
+<MudDataGrid T="LootBox" Items="dbContext.LootBoxes" Sortable="true" Filterable="true" QuickFilter="QuickFilter" ReadOnly="false"
+    CommittedItemChanges="@(async () => await dbContext.SaveChangesAsync())" EditMode="@DataGridEditMode.Form" EditTrigger="@DataGridEditTrigger.Manual">
     <ToolBarContent>
         <MudText Typo="Typo.h6">@ListPanelText</MudText>
         <MudSpacer />
         <MudTextField @bind-Value="_searchString" Placeholder="Search for LootBoxes..." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" />
     </ToolBarContent>
     <Columns>
-        <SelectColumn T="LootBox" />
-        <Column T="LootBox" Field="Id" Sortable="false" Filterable="false" IsEditable="false">
-            <EditTemplate>
-                <MudTooltip Text="Delete">
-                    <MudIconButton @onclick="@(async () => await Delete(@context.Item))" Color="Color.Primary" Icon="@Icons.Material.Filled.Delete" />
-                </MudTooltip>
-            </EditTemplate>
-        </Column>
+        <Column T="LootBox" Field="Id" IsEditable="false" />
         <Column T="LootBox" Field="Name" />
         <Column T="LootBox" Field="ProductName" />
         <Column T="LootBox" Field="DisplayName" />
         <Column T="LootBox" Field="Description" />
         <Column T="LootBox" Field="IconAddress" />
         <Column T="LootBox" Field="BannerAddress" />
-        <Column T="LootBox" CellClass="d-flex justify-end">
+        <Column T="LootBox" Sortable="false" Filterable="false">
             <CellTemplate>
-                <MudIconButton Size="@Size.Small" Icon="@Icons.Outlined.Edit" OnClick="@context.Actions.StartEditingItem" />
+                <MudStack Spacing="1" Row="true">
+                    <MudIconButton Size="Size.Small" Icon="@Icons.Material.Filled.Delete" OnClick="@(async () => await Delete(@context.Item))" />
+                    <MudIconButton Size="Size.Small" Icon="@Icons.Outlined.Edit" OnClick="@context.Actions.StartEditingItem" />
+                </MudStack>
             </CellTemplate>
         </Column>
     </Columns>

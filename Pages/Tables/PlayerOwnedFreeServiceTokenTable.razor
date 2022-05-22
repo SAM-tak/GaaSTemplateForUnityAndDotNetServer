@@ -14,7 +14,7 @@
                     <MudNumericField @bind-Value="_newItem.OwnerId" Label="@(TextHelper.LabelFor<PlayerOwnedFreeServiceToken>(i => i.OwnerId))" T="ulong" Min="0" />
                 </MudTd>
                 <MudTd>
-                    <MudSelect T="ConsumableOrigin" @bind-Value="_newItem.Origin">
+                    <MudSelect T="ConsumableOrigin" @bind-Value="_newItem.Origin" Label="@(TextHelper.LabelFor<PlayerOwnedFreeServiceToken>(i => i.Origin))">
                         @foreach (ConsumableOrigin item in Enum.GetValues(typeof(ConsumableOrigin)))
                         {
                             <MudSelectItem Value="@item">@item.GetDisplayName()</MudSelectItem>
@@ -22,7 +22,7 @@
                     </MudSelect>
                 </MudTd>
                 <MudTd>
-                    <MudSelect T="ConsumableStatus" @bind-Value="_newItem.Status">
+                    <MudSelect T="ConsumableStatus" @bind-Value="_newItem.Status" Label="@(TextHelper.LabelFor<PlayerOwnedFreeServiceToken>(i => i.Status))">
                         @foreach (ConsumableStatus item in Enum.GetValues(typeof(ConsumableStatus)))
                         {
                             <MudSelectItem Value="@item">@item.GetDisplayName()</MudSelectItem>
@@ -30,20 +30,24 @@
                     </MudSelect>
                 </MudTd>
                 <MudTd>
-                    <MudDatePicker Editable="true" @bind-Date="_newItem.Period" Label="@(TextHelper.LabelFor<PlayerOwnedFreeServiceToken>(i => i.Period))" />
-                    <MudTimePicker Editable="true" Time="_newItem.Period?.TimeOfDay"TimeChanged="(t) => _newItem.Period = _newItem.Period?.Date + t" />
+                    <MudTextField Format="s" Label="@(TextHelper.LabelFor<PlayerOwnedFreeServiceToken>(i => i.Period))" InputType="InputType.DateTimeLocal" @bind-Value="_newItem.Period"/>
+                    <MudNumericField T="double?" Label="Millisecond" Adornment="Adornment.End" AdornmentText="ms" Min="0.0" Max="999.9999"
+                        Value="_newItem.Period?.GetMillisecondPart()" ValueChanged="t => _newItem.Period = _newItem.Period?.ReplacedMillisecondPart(t)" />
                 </MudTd>
                 <MudTd>
-                    <MudDatePicker Editable="true" @bind-Date="_newItem.UsedDate" Label="@(TextHelper.LabelFor<PlayerOwnedFreeServiceToken>(i => i.UsedDate))" />
-                    <MudTimePicker Editable="true" Time="_newItem.UsedDate?.TimeOfDay"TimeChanged="(t) => _newItem.UsedDate = _newItem.UsedDate?.Date + t" />
+                    <MudTextField Format="s" Label="@(TextHelper.LabelFor<PlayerOwnedFreeServiceToken>(i => i.UsedDate))" InputType="InputType.DateTimeLocal" @bind-Value="_newItem.UsedDate"/>
+                    <MudNumericField T="double?" Label="Millisecond" Adornment="Adornment.End" AdornmentText="ms" Min="0.0" Max="999.9999"
+                        Value="_newItem.UsedDate?.GetMillisecondPart()" ValueChanged="t => _newItem.UsedDate = _newItem.UsedDate?.ReplacedMillisecondPart(t)" />
                 </MudTd>
                 <MudTd>
-                    <MudDatePicker Editable="true" @bind-Date="_newItem.InvalidateDate" Label="@(TextHelper.LabelFor<PlayerOwnedFreeServiceToken>(i => i.InvalidateDate))" />
-                    <MudTimePicker Editable="true" Time="_newItem.InvalidateDate?.TimeOfDay" TimeChanged="(t) => _newItem.InvalidateDate = _newItem.InvalidateDate?.Date + t" />
+                    <MudTextField Format="s" Label="@(TextHelper.LabelFor<PlayerOwnedFreeServiceToken>(i => i.InvalidateDate))" InputType="InputType.DateTimeLocal" @bind-Value="_newItem.InvalidateDate"/>
+                    <MudNumericField T="double?" Label="Millisecond" Adornment="Adornment.End" AdornmentText="ms" Min="0.0" Max="999.9999"
+                        Value="_newItem.InvalidateDate?.GetMillisecondPart()" ValueChanged="t => _newItem.InvalidateDate = _newItem.InvalidateDate?.ReplacedMillisecondPart(t)" />
                 </MudTd>
                 <MudTd>
-                    <MudDatePicker Editable="true" @bind-Date="_newItem.ExpireDate" Label="@(TextHelper.LabelFor<PlayerOwnedFreeServiceToken>(i => i.ExpireDate))" />
-                    <MudTimePicker Editable="true" Time="_newItem.ExpireDate?.TimeOfDay" TimeChanged="(t) => _newItem.ExpireDate = _newItem.ExpireDate?.Date + t" />
+                    <MudTextField Format="s" Label="@(TextHelper.LabelFor<PlayerOwnedFreeServiceToken>(i => i.ExpireDate))" InputType="InputType.DateTimeLocal" @bind-Value="_newItem.ExpireDate"/>
+                    <MudNumericField T="double?" Label="Millisecond" Adornment="Adornment.End" AdornmentText="ms" Min="0.0" Max="999.9999"
+                        Value="_newItem.ExpireDate?.GetMillisecondPart()" ValueChanged="t => _newItem.ExpireDate = _newItem.ExpireDate?.ReplacedMillisecondPart(t)" />
                 </MudTd>
             </MudCardContent>
             <MudCardActions>
@@ -54,25 +58,19 @@
     </EditForm>
 </MudExpansionPanel>
 <br />
-<MudDataGrid Items="dbContext.PlayerOwnedFreeServiceTokens" Sortable="true" Filterable="true" QuickFilter="QuickFilter" ReadOnly="false" EditMode="@DataGridEditMode.Form" EditTrigger="@DataGridEditTrigger.Manual">
+<MudDataGrid T="PlayerOwnedFreeServiceToken" Items="dbContext.PlayerOwnedFreeServiceTokens" Sortable="true" Filterable="true" QuickFilter="QuickFilter" ReadOnly="false"
+    CommittedItemChanges="@(async () => await dbContext.SaveChangesAsync())" EditMode="@DataGridEditMode.Form" EditTrigger="@DataGridEditTrigger.Manual">
     <ToolBarContent>
         <MudText Typo="Typo.h6">@ListPanelText</MudText>
         <MudSpacer />
         <MudTextField @bind-Value="_searchString" Placeholder="Search for PlayerProfiles..." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" />
     </ToolBarContent>
     <Columns>
-        <SelectColumn T="PlayerOwnedFreeServiceToken" />
-        <Column T="PlayerOwnedFreeServiceToken" Field="Id" Sortable="false" Filterable="false" IsEditable="false">
-            <EditTemplate>
-                <MudTooltip Text="Delete">
-                    <MudIconButton @onclick="@(async () => await Delete(@context.Item))" Color="Color.Primary" Icon="@Icons.Material.Filled.Delete" />
-                </MudTooltip>
-            </EditTemplate>
-        </Column>
+        <Column T="PlayerOwnedFreeServiceToken" Field="Id" IsEditable="false" />
         <Column T="PlayerOwnedFreeServiceToken" Field="OwnerId" />
         <Column T="PlayerOwnedFreeServiceToken" Field="Origin">
             <EditTemplate>
-                <MudSelect T="ConsumableOrigin" @bind-Value="context.Item.Origin">
+                <MudSelect T="ConsumableOrigin" @bind-Value="context.Item.Origin" Label="@(TextHelper.LabelFor<PlayerOwnedFreeServiceToken>(i => i.Origin))">
                     @foreach (ConsumableOrigin item in Enum.GetValues(typeof(ConsumableOrigin)))
                     {
                         <MudSelectItem Value="@item">@item.GetDisplayName()</MudSelectItem>
@@ -82,7 +80,7 @@
         </Column>
         <Column T="PlayerOwnedFreeServiceToken" Field="Status">
             <EditTemplate>
-                <MudSelect T="ConsumableStatus" @bind-Value="context.Item.Status">
+                <MudSelect T="ConsumableStatus" @bind-Value="context.Item.Status" Label="@(TextHelper.LabelFor<PlayerOwnedFreeServiceToken>(i => i.Status))">
                     @foreach (ConsumableStatus item in Enum.GetValues(typeof(ConsumableStatus)))
                     {
                         <MudSelectItem Value="@item">@item.GetDisplayName()</MudSelectItem>
@@ -92,31 +90,38 @@
         </Column>
         <Column T="PlayerOwnedFreeServiceToken" Field="Period">
             <EditTemplate>
-                <MudDatePicker Editable="true" @bind-Date="context.Item.Period" />
-                <MudTimePicker Editable="true" Time="context.Item.Period?.TimeOfDay" TimeChanged="(t) => context.Item.Period = context.Item.Period?.Date + t" />
+                <MudTextField Format="s" Label="@(TextHelper.LabelFor<PlayerOwnedFreeServiceToken>(i => i.Period))" InputType="InputType.DateTimeLocal" @bind-Value="context.Item.Period"/>
+                <MudNumericField T="double?" Label="Millisecond" Adornment="Adornment.End" AdornmentText="ms" Min="0.0" Max="999.9999"
+                    Value="context.Item.Period?.GetMillisecondPart()" ValueChanged="t => context.Item.Period = context.Item.Period?.ReplacedMillisecondPart(t)" />
             </EditTemplate>
         </Column>
         <Column T="PlayerOwnedFreeServiceToken" Field="UsedDate">
             <EditTemplate>
-                <MudDatePicker Editable="true" @bind-Date="context.Item.UsedDate" />
-                <MudTimePicker Editable="true" Time="context.Item.UsedDate?.TimeOfDay" TimeChanged="(t) => context.Item.UsedDate = context.Item.UsedDate?.Date + t" />
+                <MudTextField Format="s" Label="@(TextHelper.LabelFor<PlayerOwnedFreeServiceToken>(i => i.UsedDate))" InputType="InputType.DateTimeLocal" @bind-Value="context.Item.UsedDate"/>
+                <MudNumericField T="double?" Label="Millisecond" Adornment="Adornment.End" AdornmentText="ms" Min="0.0" Max="999.9999"
+                    Value="context.Item.UsedDate?.GetMillisecondPart()" ValueChanged="t => context.Item.UsedDate = context.Item.UsedDate?.ReplacedMillisecondPart(t)" />
             </EditTemplate>
         </Column>
         <Column T="PlayerOwnedFreeServiceToken" Field="InvalidateDate">
-        <EditTemplate>
-            <MudDatePicker Editable="true" @bind-Date="context.Item.InvalidateDate" />
-            <MudTimePicker Editable="true" Time="context.Item.InvalidateDate?.TimeOfDay" TimeChanged="(t) => context.Item.InvalidateDate = context.Item.InvalidateDate?.Date + t" />
-        </EditTemplate>
+            <EditTemplate>
+                <MudTextField Format="s" Label="@(TextHelper.LabelFor<PlayerOwnedFreeServiceToken>(i => i.InvalidateDate))" InputType="InputType.DateTimeLocal" @bind-Value="context.Item.InvalidateDate"/>
+                <MudNumericField T="double?" Label="Millisecond" Adornment="Adornment.End" AdornmentText="ms" Min="0.0" Max="999.9999"
+                    Value="context.Item.InvalidateDate?.GetMillisecondPart()" ValueChanged="t => context.Item.InvalidateDate = context.Item.InvalidateDate?.ReplacedMillisecondPart(t)" />
+            </EditTemplate>
         </Column>
         <Column T="PlayerOwnedFreeServiceToken" Field="ExpireDate">
             <EditTemplate>
-                <MudDatePicker Editable="true" @bind-Date="context.Item.ExpireDate" />
-                <MudTimePicker Editable="true" Time="context.Item.ExpireDate?.TimeOfDay" TimeChanged="(t) => context.Item.ExpireDate = context.Item.ExpireDate?.Date + t" />
+                <MudTextField Format="s" Label="@(TextHelper.LabelFor<PlayerOwnedFreeServiceToken>(i => i.ExpireDate))" InputType="InputType.DateTimeLocal" @bind-Value="context.Item.ExpireDate"/>
+                <MudNumericField T="double?" Label="Millisecond" Adornment="Adornment.End" AdornmentText="ms" Min="0.0" Max="999.9999"
+                    Value="context.Item.ExpireDate?.GetMillisecondPart()" ValueChanged="t => context.Item.ExpireDate = context.Item.ExpireDate?.ReplacedMillisecondPart(t)" />
             </EditTemplate>
         </Column>
-        <Column T="PlayerOwnedFreeServiceToken" CellClass="d-flex justify-end">
+        <Column T="PlayerOwnedFreeServiceToken" Sortable="false" Filterable="false">
             <CellTemplate>
-                <MudIconButton Size="@Size.Small" Icon="@Icons.Outlined.Edit" OnClick="@context.Actions.StartEditingItem" />
+                <MudStack Spacing="1" Row="true">
+                    <MudIconButton Size="Size.Small" Icon="@Icons.Material.Filled.Delete" OnClick="@(async () => await Delete(@context.Item))" />
+                    <MudIconButton Size="Size.Small" Icon="@Icons.Outlined.Edit" OnClick="@context.Actions.StartEditingItem" />
+                </MudStack>
             </CellTemplate>
         </Column>
     </Columns>
@@ -154,7 +159,6 @@
     void Clear()
     {
         _newItem = new();
-
     }
 
     async Task Delete(PlayerOwnedFreeServiceToken x)

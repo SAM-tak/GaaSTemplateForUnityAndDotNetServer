@@ -14,8 +14,9 @@
                     <MudNumericField @bind-Value="_newItem.OwnerId" Label="@(TextHelper.LabelFor<PlayerProfile>(i => i.OwnerId))" T="ulong" Min="0" />
                 </MudTd>
                 <MudTd>
-                    <MudDatePicker Editable="true" @bind-Date="_newItem.LastUpdate" Label="@(TextHelper.LabelFor<PlayerProfile>(i => i.LastUpdate))" />
-                    <MudTimePicker Editable="true" Time="_newItem.LastUpdate?.TimeOfDay" Label="LastUpdate" TimeChanged="(t) => _newItem.LastUpdate = _newItem.LastUpdate?.Date + t" />
+                    <MudTextField Format="s" Label="@(TextHelper.LabelFor<PlayerProfile>(i => i.LastUpdate))" InputType="InputType.DateTimeLocal" @bind-Value="_newItem.LastUpdate"/>
+                    <MudNumericField T="double?" Label="Millisecond" Adornment="Adornment.End" AdornmentText="ms" Min="0.0" Max="999.9999"
+                        Value="_newItem.LastUpdate?.GetMillisecondPart()" ValueChanged="t => _newItem.LastUpdate = _newItem.LastUpdate?.ReplacedMillisecondPart(t)" />
                 </MudTd>
                 <MudTd>
                     <MudTextField @bind-Value="_newItem.Name" Label="@(TextHelper.LabelFor<PlayerProfile>(i => i.Name))" />
@@ -35,34 +36,32 @@
     </EditForm>
 </MudExpansionPanel>
 <br />
-<MudDataGrid Items="dbContext.PlayerProfiles" Sortable="true" Filterable="true" QuickFilter="QuickFilter" ReadOnly="false" EditMode="@DataGridEditMode.Form" EditTrigger="@DataGridEditTrigger.Manual">
+<MudDataGrid T="PlayerProfile" Items="dbContext.PlayerProfiles" Sortable="true" Filterable="true" QuickFilter="QuickFilter" ReadOnly="false"
+    CommittedItemChanges="@(async () => await dbContext.SaveChangesAsync())" EditMode="@DataGridEditMode.Form" EditTrigger="@DataGridEditTrigger.Manual">
     <ToolBarContent>
         <MudText Typo="Typo.h6">@ListPanelText</MudText>
         <MudSpacer />
         <MudTextField @bind-Value="_searchString" Placeholder="Search for PlayerProfiles..." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" />
     </ToolBarContent>
     <Columns>
-        <SelectColumn T="PlayerProfile" />
-        <Column T="PlayerProfile" Field="Id" Sortable="false" Filterable="false" IsEditable="false">
-            <EditTemplate>
-                <MudTooltip Text="Delete">
-                    <MudIconButton @onclick="@(async () => await Delete(@context.Item))" Color="Color.Primary" Icon="@Icons.Material.Filled.Delete" />
-                </MudTooltip>
-            </EditTemplate>
-        </Column>
+        <Column T="PlayerProfile" Field="Id" IsEditable="false" />
         <Column T="PlayerProfile" Field="OwnerId" />
         <Column T="PlayerProfile" Field="LastUpdate">
             <EditTemplate>
-                <MudDatePicker Editable="true" @bind-Date="context.Item.LastUpdate" />
-                <MudTimePicker Editable="true" Time="context.Item.LastUpdate?.TimeOfDay" TimeChanged="(t) => context.Item.LastUpdate = context.Item.LastUpdate?.Date + t" />
+                <MudTextField Format="s" Label="@(TextHelper.LabelFor<PlayerProfile>(i => i.LastUpdate))" InputType="InputType.DateTimeLocal" @bind-Value="context.Item.LastUpdate"/>
+                <MudNumericField T="double?" Label="Millisecond" Adornment="Adornment.End" AdornmentText="ms" Min="0.0" Max="999.9999"
+                    Value="context.Item.LastUpdate?.GetMillisecondPart()" ValueChanged="t => context.Item.LastUpdate = context.Item.LastUpdate?.ReplacedMillisecondPart(t)" />
             </EditTemplate>
         </Column>
         <Column T="PlayerProfile" Field="Name" />
         <Column T="PlayerProfile" Field="Motto" />
         <Column T="PlayerProfile" Field="IconBlobId" />
-        <Column T="PlayerProfile" CellClass="d-flex justify-end">
+        <Column T="PlayerProfile" Sortable="false" Filterable="false">
             <CellTemplate>
-                <MudIconButton Size="@Size.Small" Icon="@Icons.Outlined.Edit" OnClick="@context.Actions.StartEditingItem" />
+                <MudStack Spacing="1" Row="true">
+                    <MudIconButton Size="Size.Small" Icon="@Icons.Material.Filled.Delete" OnClick="@(async () => await Delete(@context.Item))" />
+                    <MudIconButton Size="Size.Small" Icon="@Icons.Outlined.Edit" OnClick="@context.Actions.StartEditingItem" />
+                </MudStack>
             </CellTemplate>
         </Column>
     </Columns>

@@ -55,7 +55,7 @@
         <Column T="PlayerDevice" Field="OwnerId" />
         <Column T="PlayerDevice" Field="DeviceType">
             <EditTemplate>
-                <MudSelect @bind-Value="context.Item.DeviceType">
+                <MudSelect @bind-Value="context.Item.DeviceType" Label="@(TextHelper.LabelFor<PlayerDevice>(i => i.DeviceType))">
                     @foreach (DeviceType item in Enum.GetValues(typeof(DeviceType)))
                     {
                         <MudSelectItem Value="@item">@(item.GetDisplayName())</MudSelectItem>
@@ -80,7 +80,7 @@
         </Column>
         <Column T="PlayerDevice" Sortable="false" Filterable="false">
             <CellTemplate>
-                <MudStack Spacing="1" Row="true">
+                <MudStack Spacing="1" Justify="Justify.FlexEnd" Row="true">
                     <MudIconButton Size="Size.Small" Icon="@Icons.Material.Filled.Delete" OnClick="@(async () => await Delete(@context.Item))" />
                     <MudIconButton Size="Size.Small" Icon="@Icons.Outlined.Edit" OnClick="@context.Actions.StartEditingItem" />
                 </MudStack>

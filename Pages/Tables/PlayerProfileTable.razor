@@ -58,7 +58,7 @@
         <Column T="PlayerProfile" Field="IconBlobId" />
         <Column T="PlayerProfile" Sortable="false" Filterable="false">
             <CellTemplate>
-                <MudStack Spacing="1" Row="true">
+                <MudStack Spacing="1" Justify="Justify.FlexEnd" Row="true">
                     <MudIconButton Size="Size.Small" Icon="@Icons.Material.Filled.Delete" OnClick="@(async () => await Delete(@context.Item))" />
                     <MudIconButton Size="Size.Small" Icon="@Icons.Outlined.Edit" OnClick="@context.Actions.StartEditingItem" />
                 </MudStack>

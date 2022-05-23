@@ -29,8 +29,8 @@ public struct PlayerCode : IEquatable<PlayerCode>
     private static readonly int[] _digitToShift = { 3, 9, 4, 12, 7, 2, 14, 5, 1, 11, 13, 6, 10, 15, 0, 8 };
 #endif
 #if USE_MHASH
-    private const ulong _prime = 0x1FFFFFFFFFFFFFFF;  // Mersenne prime number #9
-    private const ulong _modinv = 0xDFFFFFFFFFFFFFFF; // precomputed mod inverse for 0x1FFFFFFFFFFFFFFF mod 0x10000000000000000
+    private const ulong _prime = 0x1FFFFFFFFFFFFFFF; // Mersenne prime number #9
+    private const ulong _modinv = 0xDFFFFFFFFFFFFFFF; // Precomputed modular multiplicative inverse for 0x1FFFFFFFFFFFFFFF mod 0x10000000000000000
 #endif
 
     /// <summary>

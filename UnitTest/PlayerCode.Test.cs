@@ -10,13 +10,29 @@ public class PlayerCode_IsSane
     [TestMethod]
     public void CanDecodeFromStringCorrectly()
     {
-        var pc = new PlayerCode(111);
+        var pc = new PlayerCode(12345);
         var pc2 = PlayerCode.FromString(pc.ToString());
         Assert.IsTrue(pc == pc2, $"decoded from string should be same with origin. {pc} : {pc2}");
     }
 
     [TestMethod]
-    public void Exam()
+    public void CanDecodeFromStringCorrectly_LargeID()
+    {
+        var pc = new PlayerCode(1234567890);
+        var pc2 = PlayerCode.FromString(pc.ToString());
+        Assert.IsTrue(pc == pc2, $"decoded from string should be same with origin. {pc} : {pc2}");
+    }
+
+    [TestMethod]
+    public void CanDecodeFromStringCorrectly_VeryLargeID()
+    {
+        var pc = new PlayerCode(1234567890123456);
+        var pc2 = PlayerCode.FromString(pc.ToString());
+        Assert.IsTrue(pc == pc2, $"decoded from string should be same with origin. {pc} : {pc2}");
+    }
+
+    [TestMethod]
+    public void ExamEquality()
     {
         ulong oid = 123456;
         ulong id1 = oid * 0x1FFFFFFFFFFFFFFF;

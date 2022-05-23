@@ -97,7 +97,7 @@ public struct PlayerCode : IEquatable<PlayerCode>
     }
 #else
     public ulong ID64 =>
-               (id0 &  0xF)                                  // 4bit
+               (id0 & 0xF)                                   // 4bit
             | ((id0 & ((ulong)0xF0 << 1)) >> 1)              // 8bit
             | ((id0 & ((ulong)0xF00 << 2)) >> 2)             // 12bit
             | ((id0 & ((ulong)0xF000 << 3)) >> 3)            // 16bit
@@ -122,6 +122,7 @@ public struct PlayerCode : IEquatable<PlayerCode>
         if(modulo < 2) throw new ArgumentOutOfRangeException(nameof(modulo));
         var n = number;
         var m = modulo;
+        // Extended Euclidean Algorithm
         BigInteger v = 0, d = 1;
         while(n > 0) {
             var t = m / n;

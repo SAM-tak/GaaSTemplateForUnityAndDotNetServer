@@ -15,12 +15,14 @@ public struct PlayerCode : IEquatable<PlayerCode>
 
     // ABCDEFGHJKLMNPQRSTUVWXYZ23456789 upper case only, expect 1 & I, 0 & O
 #if USE_SUFFLEDCHARLIST
+    // must be randomize per project
     private static readonly char[] _validCharacters = "YXEJLVCS465ZKBM8G9TRAPD7NF2HW3UQ".ToCharArray(); // length = 32
 #else
     private static readonly char[] _validCharacters = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789".ToCharArray(); // length = 32
 #endif
     public const int StringPresentationLength = 16;
 #if USE_SHIFTCIPER
+    // must be randomize per project
     private static readonly int[] _digitToShift = { 3, 9, 4, 12, 7, 2, 14, 5, 1, 11, 13, 6, 10, 15, 0, 8 };
 #endif
 
@@ -86,6 +88,37 @@ public struct PlayerCode : IEquatable<PlayerCode>
         while(isUnique != null && !await isUnique(result)) result = New().ToString();
         return result;
     }
+#else
+    public ulong ID64 =>
+               (id0 &  0xF)                                  // 4bit
+            | ((id0 & (0xF0 << 1)) >> 1)                     // 8bit
+            | ((id0 & (0xF00 << 2)) >> 2)                    // 12bit
+            | ((id0 & (0xF000 << 3)) >> 3)                   // 16bit
+            | ((id0 & (0xF0000 << 4)) >> 4)                  // 20bit
+            | ((id0 & (0xF00000 << 5)) >> 5)                 // 24bit
+            | ((id0 & ((ulong)0xF000000 << 6)) >> 6)         // 28bit
+            | ((id0 & (0xF0000000 << 7)) >> 7)               // 32bit
+            | ((id0 & (0xF00000000 << 8)) >> 8)              // 36bit
+            | ((id0 & (0xF000000000 << 9)) >> 9)             // 40bit
+            | ((id0 & (0xF0000000000 << 10)) >> 10)          // 44bit
+            | ((id0 & (0xF00000000000 << 11)) >> 11)         // 48bit
+            | ((id0 & ((ulong)0xF000000000000 << 12)) >> 12) // 52bit
+            | (((ulong)id1 & (0xF << 1)) << (52 - 1))        // 56bit
+            | (((ulong)id1 & (0xF0 << 2)) << (52 - 2))       // 60bit
+            | (((ulong)id1 & (0xF00 << 3)) << (52 - 3))      // 64bit
+            ;
+    
+//     public ulong ToID()
+//     {
+//         ulong id = ID64;
+// #if USE_MHASH
+//         --id;
+//         for(int i = 0; i < 32; ++i) id *= 0x1FFFFFFFFFFFFFFF;
+//         return id;
+// #else
+//         return id;
+// #endif
+//     }
 #endif
 
     public static PlayerCode FromString(string source)
@@ -93,7 +126,7 @@ public struct PlayerCode : IEquatable<PlayerCode>
         var ret = new PlayerCode();
         var digit = 0;
 #if USE_SHIFTCIPER
-        static int FromCharacter(char c, int digit) => (Array.IndexOf(_validCharacters, c) - _digitToShift[digit]) % 32;
+        static int FromCharacter(char c, int digit) => (Array.IndexOf(_validCharacters, c) + 32 - _digitToShift[digit]) % 32;
 #else
         static int FromCharacter(char c, int _) => Array.IndexOf(_validCharacters, c);
 #endif

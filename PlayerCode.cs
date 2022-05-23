@@ -2,9 +2,12 @@
 #define USE_SUFFLEDCHARLIST
 #define USE_SHIFTCIPER
 #define USE_MHASH
+//#define COMPUTE_MODINV
+#if COMPUTE_MODINV
+using System.Numerics;
+#endif
 #endif
 using System.Security.Cryptography;
-
 namespace YourGameServer;
 
 [Serializable]
@@ -25,6 +28,10 @@ public struct PlayerCode : IEquatable<PlayerCode>
     // must be randomize per project
     private static readonly int[] _digitToShift = { 3, 9, 4, 12, 7, 2, 14, 5, 1, 11, 13, 6, 10, 15, 0, 8 };
 #endif
+#if USE_MHASH
+    private const ulong _prime = 0x1FFFFFFFFFFFFFFF;  // Mersenne prime number #9
+    private const ulong _modinv = 0xDFFFFFFFFFFFFFFF; // precomputed mod inverse for 0x1FFFFFFFFFFFFFFF mod 0x10000000000000000
+#endif
 
     /// <summary>
     /// create from player id
@@ -35,7 +42,7 @@ public struct PlayerCode : IEquatable<PlayerCode>
     public PlayerCode(ulong id)
     {
 #if USE_MHASH
-        id = id * 0x1FFFFFFFFFFFFFFF /* Mersenne prime number #9 */ + 1; // this is minimum perfect hash function.
+        id = id * _prime + 1; // this is minimum perfect hash function.
 #endif
         var rnd = (ulong)RandomNumberGenerator.GetInt32(0x10000); // 16bit width random number
         id0 = ((rnd & 0b1) << 4)               |  (id & 0xF)                       // 5bit
@@ -91,34 +98,66 @@ public struct PlayerCode : IEquatable<PlayerCode>
 #else
     public ulong ID64 =>
                (id0 &  0xF)                                  // 4bit
-            | ((id0 & (0xF0 << 1)) >> 1)                     // 8bit
-            | ((id0 & (0xF00 << 2)) >> 2)                    // 12bit
-            | ((id0 & (0xF000 << 3)) >> 3)                   // 16bit
-            | ((id0 & (0xF0000 << 4)) >> 4)                  // 20bit
-            | ((id0 & (0xF00000 << 5)) >> 5)                 // 24bit
+            | ((id0 & ((ulong)0xF0 << 1)) >> 1)              // 8bit
+            | ((id0 & ((ulong)0xF00 << 2)) >> 2)             // 12bit
+            | ((id0 & ((ulong)0xF000 << 3)) >> 3)            // 16bit
+            | ((id0 & ((ulong)0xF0000 << 4)) >> 4)           // 20bit
+            | ((id0 & ((ulong)0xF00000 << 5)) >> 5)          // 24bit
             | ((id0 & ((ulong)0xF000000 << 6)) >> 6)         // 28bit
-            | ((id0 & (0xF0000000 << 7)) >> 7)               // 32bit
-            | ((id0 & (0xF00000000 << 8)) >> 8)              // 36bit
-            | ((id0 & (0xF000000000 << 9)) >> 9)             // 40bit
-            | ((id0 & (0xF0000000000 << 10)) >> 10)          // 44bit
-            | ((id0 & (0xF00000000000 << 11)) >> 11)         // 48bit
+            | ((id0 & ((ulong)0xF0000000 << 7)) >> 7)        // 32bit
+            | ((id0 & ((ulong)0xF00000000 << 8)) >> 8)       // 36bit
+            | ((id0 & ((ulong)0xF000000000 << 9)) >> 9)      // 40bit
+            | ((id0 & ((ulong)0xF0000000000 << 10)) >> 10)   // 44bit
+            | ((id0 & ((ulong)0xF00000000000 << 11)) >> 11)  // 48bit
             | ((id0 & ((ulong)0xF000000000000 << 12)) >> 12) // 52bit
             | (((ulong)id1 & (0xF << 1)) << (52 - 1))        // 56bit
             | (((ulong)id1 & (0xF0 << 2)) << (52 - 2))       // 60bit
             | (((ulong)id1 & (0xF00 << 3)) << (52 - 3))      // 64bit
             ;
-    
-//     public ulong ToID()
-//     {
-//         ulong id = ID64;
-// #if USE_MHASH
-//         --id;
-//         for(int i = 0; i < 32; ++i) id *= 0x1FFFFFFFFFFFFFFF;
-//         return id;
-// #else
-//         return id;
-// #endif
-//     }
+
+#if COMPUTE_MODINV
+    public static bool TryModInverse(BigInteger number, BigInteger modulo, out BigInteger result)
+    {
+        if(number < 1) throw new ArgumentOutOfRangeException(nameof(number));
+        if(modulo < 2) throw new ArgumentOutOfRangeException(nameof(modulo));
+        var n = number;
+        var m = modulo;
+        BigInteger v = 0, d = 1;
+        while(n > 0) {
+            var t = m / n;
+            var x = n;
+            n = m % x;
+            m = x;
+            x = d;
+            d = checked(v - t * x); // Just in case
+            v = x;
+        }
+        result = v % modulo;
+        if(result < 0) result += modulo;
+        if(number * result % modulo == 1) return true;
+        result = default;
+        return false;
+    }
+#endif
+
+    public ulong ToID()
+    {
+#if USE_MHASH
+        // a = x*p + 1 (mod m)
+        // x = (a - 1)*p^-1 (mod m)
+#if COMPUTE_MODINV
+        if(TryModInverse(_prime, new BigInteger(ulong.MaxValue) + 1, out var modinv)) {
+            Console.WriteLine($"modinv 0x{modinv:X}");
+            return (ID64 - 1) * (ulong)modinv;
+        }
+        return 0;
+#else
+        return (ID64 - 1) * _modinv;
+#endif
+#else
+        return ID64;
+#endif
+    }
 #endif
 
     public static PlayerCode FromString(string source)

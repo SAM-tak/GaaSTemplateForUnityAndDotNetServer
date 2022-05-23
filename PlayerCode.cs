@@ -31,7 +31,9 @@ public struct PlayerCode : IEquatable<PlayerCode>
 #endif
 #if USE_MHASH
     private const ulong _prime = 0x1FFFFFFFFFFFFFFF; // Mersenne prime number #9
+#if !COMPUTE_MODINV
     private const ulong _modinv = 0xDFFFFFFFFFFFFFFF; // Precomputed modular multiplicative inverse for 0x1FFFFFFFFFFFFFFF mod 0x10000000000000000
+#endif
 #endif
 
     /// <summary>
@@ -97,24 +99,23 @@ public struct PlayerCode : IEquatable<PlayerCode>
         return result;
     }
 #else
-    public ulong ID64 =>
-               (id0 & 0xF)                                   // 4bit
-            | ((id0 & ((ulong)0xF0 << 1)) >> 1)              // 8bit
-            | ((id0 & ((ulong)0xF00 << 2)) >> 2)             // 12bit
-            | ((id0 & ((ulong)0xF000 << 3)) >> 3)            // 16bit
-            | ((id0 & ((ulong)0xF0000 << 4)) >> 4)           // 20bit
-            | ((id0 & ((ulong)0xF00000 << 5)) >> 5)          // 24bit
-            | ((id0 & ((ulong)0xF000000 << 6)) >> 6)         // 28bit
-            | ((id0 & ((ulong)0xF0000000 << 7)) >> 7)        // 32bit
-            | ((id0 & ((ulong)0xF00000000 << 8)) >> 8)       // 36bit
-            | ((id0 & ((ulong)0xF000000000 << 9)) >> 9)      // 40bit
-            | ((id0 & ((ulong)0xF0000000000 << 10)) >> 10)   // 44bit
-            | ((id0 & ((ulong)0xF00000000000 << 11)) >> 11)  // 48bit
-            | ((id0 & ((ulong)0xF000000000000 << 12)) >> 12) // 52bit
-            | (((ulong)id1 & (0xF << 1)) << (52 - 1))        // 56bit
-            | (((ulong)id1 & (0xF0 << 2)) << (52 - 2))       // 60bit
-            | (((ulong)id1 & (0xF00 << 3)) << (52 - 3))      // 64bit
-            ;
+    public ulong ID64 => (id0 & 0xF)                     // 4bit
+        | ((id0 & ((ulong)0xF0 << 1)) >> 1)              // 8bit
+        | ((id0 & ((ulong)0xF00 << 2)) >> 2)             // 12bit
+        | ((id0 & ((ulong)0xF000 << 3)) >> 3)            // 16bit
+        | ((id0 & ((ulong)0xF0000 << 4)) >> 4)           // 20bit
+        | ((id0 & ((ulong)0xF00000 << 5)) >> 5)          // 24bit
+        | ((id0 & ((ulong)0xF000000 << 6)) >> 6)         // 28bit
+        | ((id0 & ((ulong)0xF0000000 << 7)) >> 7)        // 32bit
+        | ((id0 & ((ulong)0xF00000000 << 8)) >> 8)       // 36bit
+        | ((id0 & ((ulong)0xF000000000 << 9)) >> 9)      // 40bit
+        | ((id0 & ((ulong)0xF0000000000 << 10)) >> 10)   // 44bit
+        | ((id0 & ((ulong)0xF00000000000 << 11)) >> 11)  // 48bit
+        | ((id0 & ((ulong)0xF000000000000 << 12)) >> 12) // 52bit
+        | (((ulong)id1 & (0xF << 1)) << (52 - 1))        // 56bit
+        | (((ulong)id1 & (0xF0 << 2)) << (52 - 2))       // 60bit
+        | (((ulong)id1 & (0xF00 << 3)) << (52 - 3))      // 64bit
+        ;
 
 #if COMPUTE_MODINV
     public static bool TryModInverse(BigInteger number, BigInteger modulo, out BigInteger result)

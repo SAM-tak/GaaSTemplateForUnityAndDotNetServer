@@ -10,7 +10,7 @@ public class PlayerCode_IsSane
     [TestMethod]
     public void CanDecodeFromStringCorrectly()
     {
-        var pc1 = PlayerCode.FromID(12345);
+        var pc1 = PlayerCode.FromID(123456);
         var pc2 = PlayerCode.FromString(pc1.ToString());
         Assert.IsTrue(pc1 == pc2, $"decoded from string should be same with origin. {pc1} : {pc2}");
     }

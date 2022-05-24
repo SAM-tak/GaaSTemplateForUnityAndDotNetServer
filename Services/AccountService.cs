@@ -157,7 +157,7 @@ public class AccountService : ServiceBase<IAccountService>, IAccountService
         };
         await context.AddAsync(playerAccount);
         await context.SaveChangesAsync();
-        playerAccount.Code = PlayerCode.NewString(playerAccount.Id);
+        playerAccount.Code = PlayerCode.NewStringFromID(playerAccount.Id);
         playerAccount.CurrentDeviceId = playerAccount.DeviceList.First().Id;
         await context.SaveChangesAsync();
         return playerAccount;

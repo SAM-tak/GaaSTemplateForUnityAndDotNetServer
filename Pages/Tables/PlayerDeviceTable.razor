@@ -26,13 +26,13 @@
                 </MudTd>
                 <MudTd>
                     <MudTextField Format="s" Label="@(TextHelper.LabelFor<PlayerDevice>(i => i.Since))" InputType="InputType.DateTimeLocal" @bind-Value="_newItem.Since"/>
-                    <MudNumericField T="double?" Label="Millisecond" Adornment="Adornment.End" AdornmentText="ms" Min="0.0" Max="999.9999"
-                        Value="_newItem.Since?.GetMillisecondPart()" ValueChanged="t => _newItem.Since = _newItem.Since?.ReplacedMillisecondPart(t)" />
+                    <MudNumericField T="double?" Label="Second" Adornment="Adornment.End" AdornmentText="s" Min="0.0" Max="59.9999999"
+                        Value="_newItem.Since?.GetSecondPart()" ValueChanged="t => _newItem.Since = _newItem.Since?.ReplacedSecondPart(t)" />
                 </MudTd>
                 <MudTd>
                     <MudTextField Format="s" Label="@(TextHelper.LabelFor<PlayerDevice>(i => i.LastUsed))" InputType="InputType.DateTimeLocal" @bind-Value="_newItem.LastUsed"/>
-                    <MudNumericField T="double?" Label="Millisecond" Adornment="Adornment.End" AdornmentText="ms" Min="0.0" Max="999.9999"
-                        Value="_newItem.LastUsed?.GetMillisecondPart()" ValueChanged="t => _newItem.LastUsed = _newItem.LastUsed?.ReplacedMillisecondPart(t)" />
+                    <MudNumericField T="double?" Label="Second" Adornment="Adornment.End" AdornmentText="s" Min="0.0" Max="59.9999999"
+                        Value="_newItem.LastUsed?.GetSecondPart()" ValueChanged="t => _newItem.LastUsed = _newItem.LastUsed?.ReplacedSecondPart(t)" />
                 </MudTd>
             </MudCardContent>
             <MudCardActions>
@@ -67,15 +67,15 @@
         <Column T="PlayerDevice" Field="Since">
             <EditTemplate>
                 <MudTextField Format="s" Label="@(TextHelper.LabelFor<PlayerDevice>(i => i.Since))" InputType="InputType.DateTimeLocal" @bind-Value="context.Item.Since"/>
-                <MudNumericField T="double?" Label="Millisecond" Adornment="Adornment.End" AdornmentText="ms" Min="0.0" Max="999.9999"
-                    Value="context.Item.Since?.GetMillisecondPart()" ValueChanged="t => context.Item.Since = context.Item.Since?.ReplacedMillisecondPart(t)" />
+                <MudNumericField T="double?" Label="Second" Adornment="Adornment.End" AdornmentText="s" Min="0.0" Max="59.9999999"
+                    Value="context.Item.Since?.GetSecondPart()" ValueChanged="t => context.Item.Since = context.Item.Since?.ReplacedSecondPart(t)" />
             </EditTemplate>
         </Column>
         <Column T="PlayerDevice" Field="LastUsed">
             <EditTemplate>
                 <MudTextField Format="s" Label="@(TextHelper.LabelFor<PlayerDevice>(i => i.LastUsed))" InputType="InputType.DateTimeLocal" @bind-Value="context.Item.LastUsed"/>
-                <MudNumericField T="double?" Label="Millisecond" Adornment="Adornment.End" AdornmentText="ms" Min="0.0" Max="999.9999"
-                    Value="context.Item.LastUsed?.GetMillisecondPart()" ValueChanged="t => context.Item.LastUsed = context.Item.LastUsed?.ReplacedMillisecondPart(t)" />
+                <MudNumericField T="double?" Label="Second" Adornment="Adornment.End" AdornmentText="s" Min="0.0" Max="59.9999999"
+                    Value="context.Item.LastUsed?.GetSecondPart()" ValueChanged="t => context.Item.LastUsed = context.Item.LastUsed?.ReplacedSecondPart(t)" />
             </EditTemplate>
         </Column>
         <Column T="PlayerDevice" Sortable="false" Filterable="false">

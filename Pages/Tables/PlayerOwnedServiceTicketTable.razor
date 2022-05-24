@@ -34,23 +34,23 @@
                 </MudTd>
                 <MudTd>
                     <MudTextField Format="s" Label="@(TextHelper.LabelFor<PlayerOwnedServiceTicket>(i => i.Period))" InputType="InputType.DateTimeLocal" @bind-Value="_newItem.Period"/>
-                    <MudNumericField T="double?" Label="Millisecond" Adornment="Adornment.End" AdornmentText="ms" Min="0.0" Max="999.9999"
-                        Value="_newItem.Period?.GetMillisecondPart()" ValueChanged="t => _newItem.Period = _newItem.Period?.ReplacedMillisecondPart(t)" />
+                    <MudNumericField T="double?" Label="Second" Adornment="Adornment.End" AdornmentText="s" Min="0.0" Max="59.9999999"
+                        Value="_newItem.Period?.GetSecondPart()" ValueChanged="t => _newItem.Period = _newItem.Period?.ReplacedSecondPart(t)" />
                 </MudTd>
                 <MudTd>
                     <MudTextField Format="s" Label="@(TextHelper.LabelFor<PlayerOwnedServiceTicket>(i => i.UsedDate))" InputType="InputType.DateTimeLocal" @bind-Value="_newItem.UsedDate"/>
-                    <MudNumericField T="double?" Label="Millisecond" Adornment="Adornment.End" AdornmentText="ms" Min="0.0" Max="999.9999"
-                        Value="_newItem.UsedDate?.GetMillisecondPart()" ValueChanged="t => _newItem.UsedDate = _newItem.UsedDate?.ReplacedMillisecondPart(t)" />
+                    <MudNumericField T="double?" Label="Second" Adornment="Adornment.End" AdornmentText="s" Min="0.0" Max="59.9999999"
+                        Value="_newItem.UsedDate?.GetSecondPart()" ValueChanged="t => _newItem.UsedDate = _newItem.UsedDate?.ReplacedSecondPart(t)" />
                 </MudTd>
                 <MudTd>
                     <MudTextField Format="s" Label="@(TextHelper.LabelFor<PlayerOwnedServiceTicket>(i => i.InvalidateDate))" InputType="InputType.DateTimeLocal" @bind-Value="_newItem.InvalidateDate"/>
-                    <MudNumericField T="double?" Label="Millisecond" Adornment="Adornment.End" AdornmentText="ms" Min="0.0" Max="999.9999"
-                        Value="_newItem.InvalidateDate?.GetMillisecondPart()" ValueChanged="t => _newItem.InvalidateDate = _newItem.InvalidateDate?.ReplacedMillisecondPart(t)" />
+                    <MudNumericField T="double?" Label="Second" Adornment="Adornment.End" AdornmentText="s" Min="0.0" Max="59.9999999"
+                        Value="_newItem.InvalidateDate?.GetSecondPart()" ValueChanged="t => _newItem.InvalidateDate = _newItem.InvalidateDate?.ReplacedSecondPart(t)" />
                 </MudTd>
                 <MudTd>
                     <MudTextField Format="s" Label="@(TextHelper.LabelFor<PlayerOwnedServiceTicket>(i => i.ExpireDate))" InputType="InputType.DateTimeLocal" @bind-Value="_newItem.ExpireDate"/>
-                    <MudNumericField T="double?" Label="Millisecond" Adornment="Adornment.End" AdornmentText="ms" Min="0.0" Max="999.9999"
-                        Value="_newItem.ExpireDate?.GetMillisecondPart()" ValueChanged="t => _newItem.ExpireDate = _newItem.ExpireDate?.ReplacedMillisecondPart(t)" />
+                    <MudNumericField T="double?" Label="Second" Adornment="Adornment.End" AdornmentText="s" Min="0.0" Max="59.9999999"
+                        Value="_newItem.ExpireDate?.GetSecondPart()" ValueChanged="t => _newItem.ExpireDate = _newItem.ExpireDate?.ReplacedSecondPart(t)" />
                 </MudTd>
             </MudCardContent>
             <MudCardActions>
@@ -95,29 +95,29 @@
         <Column T="PlayerOwnedServiceTicket" Field="Period">
             <EditTemplate>
                 <MudTextField Format="s" Label="@(TextHelper.LabelFor<PlayerOwnedServiceTicket>(i => i.Period))" InputType="InputType.DateTimeLocal" @bind-Value="context.Item.Period"/>
-                <MudNumericField T="double?" Label="Millisecond" Adornment="Adornment.End" AdornmentText="ms" Min="0.0" Max="999.9999"
-                    Value="context.Item.Period?.GetMillisecondPart()" ValueChanged="t => context.Item.Period = context.Item.Period?.ReplacedMillisecondPart(t)" />
+                <MudNumericField T="double?" Label="Second" Adornment="Adornment.End" AdornmentText="s" Min="0.0" Max="59.9999999"
+                    Value="context.Item.Period?.GetSecondPart()" ValueChanged="t => context.Item.Period = context.Item.Period?.ReplacedSecondPart(t)" />
             </EditTemplate>
         </Column>
         <Column T="PlayerOwnedServiceTicket" Field="UsedDate">
             <EditTemplate>
                 <MudTextField Format="s" Label="@(TextHelper.LabelFor<PlayerOwnedServiceTicket>(i => i.UsedDate))" InputType="InputType.DateTimeLocal" @bind-Value="context.Item.UsedDate"/>
-                <MudNumericField T="double?" Label="Millisecond" Adornment="Adornment.End" AdornmentText="ms" Min="0.0" Max="999.9999"
-                    Value="context.Item.UsedDate?.GetMillisecondPart()" ValueChanged="t => context.Item.UsedDate = context.Item.UsedDate?.ReplacedMillisecondPart(t)" />
+                <MudNumericField T="double?" Label="Second" Adornment="Adornment.End" AdornmentText="s" Min="0.0" Max="59.9999999"
+                    Value="context.Item.UsedDate?.GetSecondPart()" ValueChanged="t => context.Item.UsedDate = context.Item.UsedDate?.ReplacedSecondPart(t)" />
             </EditTemplate>
         </Column>
         <Column T="PlayerOwnedServiceTicket" Field="InvalidateDate">
             <EditTemplate>
                 <MudTextField Format="s" Label="@(TextHelper.LabelFor<PlayerOwnedServiceTicket>(i => i.InvalidateDate))" InputType="InputType.DateTimeLocal" @bind-Value="context.Item.InvalidateDate"/>
-                <MudNumericField T="double?" Label="Millisecond" Adornment="Adornment.End" AdornmentText="ms" Min="0.0" Max="999.9999"
-                    Value="context.Item.InvalidateDate?.GetMillisecondPart()" ValueChanged="t => context.Item.InvalidateDate = context.Item.InvalidateDate?.ReplacedMillisecondPart(t)" />
+                <MudNumericField T="double?" Label="Second" Adornment="Adornment.End" AdornmentText="s" Min="0.0" Max="59.9999999"
+                    Value="context.Item.InvalidateDate?.GetSecondPart()" ValueChanged="t => context.Item.InvalidateDate = context.Item.InvalidateDate?.ReplacedSecondPart(t)" />
             </EditTemplate>
         </Column>
         <Column T="PlayerOwnedServiceTicket" Field="ExpireDate">
             <EditTemplate>
                 <MudTextField Format="s" Label="@(TextHelper.LabelFor<PlayerOwnedServiceTicket>(i => i.ExpireDate))" InputType="InputType.DateTimeLocal" @bind-Value="context.Item.ExpireDate"/>
-                <MudNumericField T="double?" Label="Millisecond" Adornment="Adornment.End" AdornmentText="ms" Min="0.0" Max="999.9999"
-                    Value="context.Item.ExpireDate?.GetMillisecondPart()" ValueChanged="t => context.Item.ExpireDate = context.Item.ExpireDate?.ReplacedMillisecondPart(t)" />
+                <MudNumericField T="double?" Label="Second" Adornment="Adornment.End" AdornmentText="s" Min="0.0" Max="59.9999999"
+                    Value="context.Item.ExpireDate?.GetSecondPart()" ValueChanged="t => context.Item.ExpireDate = context.Item.ExpireDate?.ReplacedSecondPart(t)" />
             </EditTemplate>
         </Column>
         <Column T="PlayerOwnedServiceTicket" Sortable="false" Filterable="false">

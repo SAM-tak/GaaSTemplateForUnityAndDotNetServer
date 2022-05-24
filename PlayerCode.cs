@@ -1,8 +1,6 @@
-//#define USE_RANDOMGEN
-#if !USE_RANDOMGEN
-#define USE_SUFFLEDCHARLIST
 #define USE_SHIFTCIPER
-#define USE_MHASH
+#define USE_MMHASH
+#if USE_MMHASH
 //#define COMPUTE_MODINV
 #if COMPUTE_MODINV
 using System.Numerics;
@@ -18,22 +16,19 @@ public struct PlayerCode : IEquatable<PlayerCode>
     public ushort id1;
 
     // ABCDEFGHJKLMNPQRSTUVWXYZ23456789 upper case only, expect 1 & I, 0 & O
-#if USE_SUFFLEDCHARLIST
-    // must be randomize per project
-    private static readonly char[] _validCharacters = "YXEJLVCS465ZKBM8G9TRAPD7NF2HW3UQ".ToCharArray(); // length = 32
-#else
     private static readonly char[] _validCharacters = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789".ToCharArray(); // length = 32
-#endif
     public const int StringPresentationLength = 16;
 #if USE_SHIFTCIPER
     // must be randomize per project
     private static readonly int[] _digitToShift = { 3, 9, 4, 12, 7, 2, 14, 5, 1, 11, 13, 6, 10, 15, 0, 8 };
 #endif
-#if USE_MHASH
-    private const ulong _prime = 0x1FFFFFFFFFFFFFFF; // Mersenne prime number #9
+#if USE_MMHASH
+    public const ulong Prime = 0x1FFFFFFFFFFFFFFF; // Mersenne prime number #9
 #if !COMPUTE_MODINV
     private const ulong _modinv = 0xDFFFFFFFFFFFFFFF; // Precomputed modular multiplicative inverse for 0x1FFFFFFFFFFFFFFF mod 0x10000000000000000
 #endif
+#else
+    public const ulong Prime = 10007;
 #endif
 
     /// <summary>
@@ -42,37 +37,41 @@ public struct PlayerCode : IEquatable<PlayerCode>
     /// <remarks>
     /// This is guaranteed colision-free when id is unique.
     /// </remarks>
-    public PlayerCode(ulong id)
+    public static PlayerCode FromID(ulong id)
     {
-#if USE_MHASH
-        id = id * _prime + 1; // this is minimum perfect hash function.
+#if USE_MMHASH
+        // Mercari(metal_unk)'s multiplicative hash
+        // source : https://engineering.mercari.com/blog/entry/2017-08-29-115047/
+        // source : https://qiita.com/epsilon/items/aeefa085417b7134f793
+        // a * p + 1 (mod m); p is prime, p ⊥ m, 3 <= p < m
+        id = id * Prime + 1; // this is minimum perfect hash function.
 #endif
         var rnd = (ulong)RandomNumberGenerator.GetInt32(0x10000); // 16bit width random number
-        id0 = ((rnd & 0b1) << 4)               |  (id & 0xF)                       // 5bit
-            | ((rnd & 0b10) << 8)              | ((id & 0xF0) << 1)                // 10bit
-            | ((rnd & 0b100) << 12)            | ((id & 0xF00) << 2)               // 15bit
-            | ((rnd & 0b1000) << 16)           | ((id & 0xF000) << 3)              // 20bit
-            | ((rnd & 0b10000) << 20)          | ((id & 0xF0000) << 4)             // 25bit
-            | ((rnd & 0b100000) << 24)         | ((id & 0xF00000) << 5)            // 30bit
-            | ((rnd & 0b1000000) << 28)        | ((id & 0xF000000) << 6)           // 35bit
-            | ((rnd & 0b10000000) << 32)       | ((id & 0xF0000000) << 7)          // 40bit
-            | ((rnd & 0b100000000) << 36)      | ((id & 0xF00000000) << 8)         // 45bit
-            | ((rnd & 0b1000000000) << 40)     | ((id & 0xF000000000) << 9)        // 50bit
-            | ((rnd & 0b10000000000) << 44)    | ((id & 0xF0000000000) << 10)      // 55bit
-            | ((rnd & 0b100000000000) << 48)   | ((id & 0xF00000000000) << 11)     // 60bit
-            |                                    ((id & 0xF000000000000) << 12)    // 64bit
-        ;
-        id1 = (ushort)(
-              ((rnd & 0b1000000000000) >> 12)  | ((id & 0xF0000000000000) >> 51)   // 69bit
-            | ((rnd & 0b10000000000000) >> 8)  | ((id & 0xF00000000000000) >> 50)  // 74bit
-            | ((rnd & 0b100000000000000) >> 4) | ((id & 0xF000000000000000) >> 49) // 79bit
-            |  (rnd & 0b1000000000000000)                                          // 80bit
-        );
+        return new PlayerCode {
+            id0 = ((rnd & 0b1) << 4)             | (id & 0xF)                          // 5bit
+                | ((rnd & 0b10) << 8)            | ((id & 0xF0) << 1)                  // 10bit
+                | ((rnd & 0b100) << 12)          | ((id & 0xF00) << 2)                 // 15bit
+                | ((rnd & 0b1000) << 16)         | ((id & 0xF000) << 3)                // 20bit
+                | ((rnd & 0b10000) << 20)        | ((id & 0xF0000) << 4)               // 25bit
+                | ((rnd & 0b100000) << 24)       | ((id & 0xF00000) << 5)              // 30bit
+                | ((rnd & 0b1000000) << 28)      | ((id & 0xF000000) << 6)             // 35bit
+                | ((rnd & 0b10000000) << 32)     | ((id & 0xF0000000) << 7)            // 40bit
+                | ((rnd & 0b100000000) << 36)    | ((id & 0xF00000000) << 8)           // 45bit
+                | ((rnd & 0b1000000000) << 40)   | ((id & 0xF000000000) << 9)          // 50bit
+                | ((rnd & 0b10000000000) << 44)  | ((id & 0xF0000000000) << 10)        // 55bit
+                | ((rnd & 0b100000000000) << 48) | ((id & 0xF00000000000) << 11)       // 60bit
+                                                 | ((id & 0xF000000000000) << 12),     // 64bit
+            id1 = (ushort)(
+                  ((rnd & 0b1000000000000) >> 12)  | ((id & 0xF0000000000000) >> 51)   // 69bit
+                | ((rnd & 0b10000000000000) >> 8)  | ((id & 0xF00000000000000) >> 50)  // 74bit
+                | ((rnd & 0b100000000000000) >> 4) | ((id & 0xF000000000000000) >> 49) // 79bit
+                | (rnd & 0b1000000000000000)                                           // 80bit
+            )
+        };
     }
 
-    public static string NewString(ulong id) => new PlayerCode(id).ToString();
+    public static string NewStringFromID(ulong id) => FromID(id).ToString();
 
-#if USE_RANDOMGEN
     static PlayerCode New()
     {
         // RandomNumberGenerator.GetInt32(int.MinValue, int.MaxValue) returns weird value
@@ -98,7 +97,7 @@ public struct PlayerCode : IEquatable<PlayerCode>
         while(isUnique != null && !await isUnique(result)) result = New().ToString();
         return result;
     }
-#else
+
     public ulong ID64 => (id0 & 0xF)                     // 4bit
         | ((id0 & ((ulong)0xF0 << 1)) >> 1)              // 8bit
         | ((id0 & ((ulong)0xF00 << 2)) >> 2)             // 12bit
@@ -118,6 +117,7 @@ public struct PlayerCode : IEquatable<PlayerCode>
         ;
 
 #if COMPUTE_MODINV
+    // source : https://stackoverflow.com/a/64125658/2330420
     public static bool TryModInverse(BigInteger number, BigInteger modulo, out BigInteger result)
     {
         if(number < 1) throw new ArgumentOutOfRangeException(nameof(number));
@@ -145,11 +145,9 @@ public struct PlayerCode : IEquatable<PlayerCode>
 
     public ulong ToID()
     {
-#if USE_MHASH
-        // a = x*p + 1 (mod m)
-        // x = (a - 1)*p^-1 (mod m)
+#if USE_MMHASH
 #if COMPUTE_MODINV
-        if(TryModInverse(_prime, new BigInteger(ulong.MaxValue) + 1, out var modinv)) {
+        if(TryModInverse(Prime, new BigInteger(ulong.MaxValue) + 1, out var modinv)) {
             Console.WriteLine($"modinv 0x{modinv:X}");
             return (ID64 - 1) * (ulong)modinv;
         }
@@ -161,7 +159,6 @@ public struct PlayerCode : IEquatable<PlayerCode>
         return ID64;
 #endif
     }
-#endif
 
     public static PlayerCode FromString(string source)
     {

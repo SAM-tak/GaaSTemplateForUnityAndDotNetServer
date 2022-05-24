@@ -15,8 +15,8 @@
                 </MudTd>
                 <MudTd>
                     <MudTextField Format="s" Label="@(TextHelper.LabelFor<PlayerProfile>(i => i.LastUpdate))" InputType="InputType.DateTimeLocal" @bind-Value="_newItem.LastUpdate"/>
-                    <MudNumericField T="double?" Label="Millisecond" Adornment="Adornment.End" AdornmentText="ms" Min="0.0" Max="999.9999"
-                        Value="_newItem.LastUpdate?.GetMillisecondPart()" ValueChanged="t => _newItem.LastUpdate = _newItem.LastUpdate?.ReplacedMillisecondPart(t)" />
+                    <MudNumericField T="double?" Label="Second" Adornment="Adornment.End" AdornmentText="s" Min="0.0" Max="59.9999999"
+                        Value="_newItem.LastUpdate?.GetSecondPart()" ValueChanged="t => _newItem.LastUpdate = _newItem.LastUpdate?.ReplacedSecondPart(t)" />
                 </MudTd>
                 <MudTd>
                     <MudTextField @bind-Value="_newItem.Name" Label="@(TextHelper.LabelFor<PlayerProfile>(i => i.Name))" />
@@ -49,8 +49,8 @@
         <Column T="PlayerProfile" Field="LastUpdate">
             <EditTemplate>
                 <MudTextField Format="s" Label="@(TextHelper.LabelFor<PlayerProfile>(i => i.LastUpdate))" InputType="InputType.DateTimeLocal" @bind-Value="context.Item.LastUpdate"/>
-                <MudNumericField T="double?" Label="Millisecond" Adornment="Adornment.End" AdornmentText="ms" Min="0.0" Max="999.9999"
-                    Value="context.Item.LastUpdate?.GetMillisecondPart()" ValueChanged="t => context.Item.LastUpdate = context.Item.LastUpdate?.ReplacedMillisecondPart(t)" />
+                <MudNumericField T="double?" Label="Second" Adornment="Adornment.End" AdornmentText="s" Min="0.0" Max="59.9999999"
+                    Value="context.Item.LastUpdate?.GetSecondPart()" ValueChanged="t => context.Item.LastUpdate = context.Item.LastUpdate?.ReplacedSecondPart(t)" />
             </EditTemplate>
         </Column>
         <Column T="PlayerProfile" Field="Name" />

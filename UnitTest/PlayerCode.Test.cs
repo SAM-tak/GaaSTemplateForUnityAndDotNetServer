@@ -10,25 +10,25 @@ public class PlayerCode_IsSane
     [TestMethod]
     public void CanDecodeFromStringCorrectly()
     {
-        var pc = new PlayerCode(12345);
-        var pc2 = PlayerCode.FromString(pc.ToString());
-        Assert.IsTrue(pc == pc2, $"decoded from string should be same with origin. {pc} : {pc2}");
+        var pc1 = PlayerCode.FromID(12345);
+        var pc2 = PlayerCode.FromString(pc1.ToString());
+        Assert.IsTrue(pc1 == pc2, $"decoded from string should be same with origin. {pc1} : {pc2}");
     }
 
     [TestMethod]
     public void CanDecodeFromStringCorrectly_LargeID()
     {
-        var pc = new PlayerCode(1234567890);
-        var pc2 = PlayerCode.FromString(pc.ToString());
-        Assert.IsTrue(pc == pc2, $"decoded from string should be same with origin. {pc} : {pc2}");
+        var pc1 = PlayerCode.FromID(1234567890);
+        var pc2 = PlayerCode.FromString(pc1.ToString());
+        Assert.IsTrue(pc1 == pc2, $"decoded from string should be same with origin. {pc1} : {pc2}");
     }
 
     [TestMethod]
     public void CanDecodeFromStringCorrectly_VeryLargeID()
     {
-        var pc = new PlayerCode(1234567890123456);
-        var pc2 = PlayerCode.FromString(pc.ToString());
-        Assert.IsTrue(pc == pc2, $"decoded from string should be same with origin. {pc} : {pc2}");
+        var pc1 = PlayerCode.FromID(1234567890123456);
+        var pc2 = PlayerCode.FromString(pc1.ToString());
+        Assert.IsTrue(pc1 == pc2, $"decoded from string should be same with origin. {pc1} : {pc2}");
     }
 
     [TestMethod]
@@ -41,10 +41,20 @@ public class PlayerCode_IsSane
     }
 
     [TestMethod]
+    public void IsPrimePrimeToModulo()
+    {
+        var p = PlayerCode.Prime;
+        var m = BigInteger.Pow(2, 64);
+        Assert.IsTrue(p >= 3, $"not {p} >= 3");
+        Assert.IsTrue(m > p, $"not {m} > {p}");
+        Assert.IsTrue(m % p > 0, $"not {m} % {p} > 0");
+    }
+
+    [TestMethod]
     public void CanDecodeIDCorrectly()
     {
         ulong oid = 123456;
-        var pc = new PlayerCode(oid);
+        var pc = PlayerCode.FromID(oid);
         var id = pc.ToID();
         Assert.IsTrue(id == oid, $"decoded id should be same with origin. {oid} : {id}, {pc.ID64}");
     }
@@ -53,7 +63,7 @@ public class PlayerCode_IsSane
     public void CanDecodeIDCorrectly_LargeID()
     {
         ulong oid = 1234567890;
-        var pc = new PlayerCode(oid);
+        var pc = PlayerCode.FromID(oid);
         var id = pc.ToID();
         Assert.IsTrue(id == oid, $"decoded id should be same with origin. {oid} : {id}, {pc.ID64}");
     }
@@ -62,7 +72,7 @@ public class PlayerCode_IsSane
     public void CanDecodeIDCorrectly_VeryLargeID()
     {
         ulong oid = 1234567890123456;
-        var pc = new PlayerCode(oid);
+        var pc = PlayerCode.FromID(oid);
         var id = pc.ToID();
         Assert.IsTrue(id == oid, $"decoded id should be same with origin. {oid} : {id}, {pc.ID64}");
     }

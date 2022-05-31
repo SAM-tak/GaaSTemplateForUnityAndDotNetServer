@@ -174,7 +174,7 @@
     {
         if (string.IsNullOrWhiteSpace(_searchString)) return true;
 
-        if ($"{x.Id} {x.Secret} {x.PlayerCode.ToString()} {x.Code} {x.Since} {x.LastLogin}".Contains(_searchString)) return true;
+        if ($"{x.Id} {x.Secret} {x.Code} {x.Since} {x.LastLogin}".Contains(_searchString)) return true;
 
         return false;
     }

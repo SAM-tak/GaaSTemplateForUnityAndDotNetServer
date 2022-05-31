@@ -15,29 +15,6 @@
         <MudButton Class="pl-4 ml-8" Variant="Variant.Filled" Color="Color.Primary" Disabled="@buttonDisabled" @onclick="Execute">Execute</MudButton>
         <MudButton Class="pl-4 ml-8" Variant="Variant.Filled" Color="Color.Secondary" Disabled="@buttonDisabled" @onclick="DeleteAll">Delete All</MudButton>
     </MudGrid>
-    <MudTable Items="@Elements" Hover="true" Breakpoint="Breakpoint.Sm" LoadingProgressColor="Color.Info">
-        <HeaderContent>
-            <MudTh>Nr</MudTh>
-            <MudTh>MMHash</MudTh>
-            <MudTh>By Hashids</MudTh>
-            <MudTh>By Me</MudTh>
-            <MudTh>No Shift</MudTh>
-            <MudTh>No Hash</MudTh>
-            <MudTh>No Shift No Hash</MudTh>
-        </HeaderContent>
-        <RowTemplate>
-            <MudTd DataLabel="Nr">@context.Id.ToString("#,0")</MudTd>
-            <MudTd DataLabel="Hash">
-                @context.Hash.ToString("#,0")<br />
-                <MudText Typo="Typo.caption">@context.Hash.ToString("X")</MudText>
-            </MudTd>
-            <MudTd DataLabel="Code string">@context.Code1</MudTd>
-            <MudTd DataLabel="Code string">@context.Code2</MudTd>
-            <MudTd DataLabel="Code string">@context.Code3</MudTd>
-            <MudTd DataLabel="Code string">@context.Code4</MudTd>
-            <MudTd DataLabel="Code string">@context.Code5</MudTd>
-        </RowTemplate>
-    </MudTable>
     <MudOverlay Visible="buttonDisabled" DarkBackground="true">
         <MudProgressCircular Color="Color.Secondary" Indeterminate="true" />
     </MudOverlay>
@@ -47,71 +24,6 @@
     public int Count { get; set; } = 300;
 
     private bool buttonDisabled;
-
-    private IEnumerable<TestCode> Elements = new List<TestCode>();
-
-    public class TestCode
-    {
-        public ulong Id;
-        public ulong Hash;
-        public string Code1 = string.Empty;
-        public string Code2 = string.Empty;
-        public string Code3 = string.Empty;
-        public string Code4 = string.Empty;
-        public string Code5 = string.Empty;
-    }
-
-    protected override async Task OnInitializedAsync()
-    {
-        var codes = new List<TestCode>();
-        ulong[] radixl = {
-            1,
-            1_000,
-            1_000_000,
-            3_000_000,
-            5_000_000,
-            1_000_000_000,
-            2_000_000_000,
-            3_000_000_000,
-            5_000_000_000,
-            10_000_000_000,
-            100_000_000_000,
-            1_000_000_000_000,
-            1_000_000_000_000_000,
-            1_000_000_000_000_000_000,
-            9_000_000_000_000_000_000
-        };
-        for (int i = 0; i < radixl.Length; ++i) {
-            for(int j = 0; j < 10; ++j) {
-                ulong id = radixl[i] + (ulong)j;
-                ushort secret = (ushort)RandomNumberGenerator.GetInt32(0x10000);
-                codes.Add(new() {
-                    Id = id,
-                    Hash = id * PlayerCode.Prime + 1,
-                    Code1 = Regex.Replace(IDCoder.Encode(id, 0), ".{4}(?!$)", "$0-"),
-                    Code2 = PlayerCode.FromIDAndSecret(id, secret, true).ToString("-"),
-                    Code3 = PlayerCode.FromIDAndSecret(id, secret, true).ToString("-noshift"),
-                    Code4 = PlayerCode.FromIDAndSecret(id, secret, false).ToString("-"),
-                    Code5 = PlayerCode.FromIDAndSecret(id, 0, false).ToString("-noshift")
-                });
-            }
-        }
-        for(int i = 0; i < 10; ++i) {
-            ulong id = ulong.MaxValue - 9 + (ulong)i;
-            ushort secret = (ushort)RandomNumberGenerator.GetInt32(0x10000);
-            codes.Add(new() {
-                Id = id,
-                Hash = id * PlayerCode.Prime + 1,
-                Code1 = Regex.Replace(IDCoder.Encode(id, 0), ".{4}(?!$)", "$0-"),
-                Code2 = PlayerCode.FromIDAndSecret(id, secret, true).ToString("-"),
-                Code3 = PlayerCode.FromIDAndSecret(id, secret, true).ToString("-noshift"),
-                Code4 = PlayerCode.FromIDAndSecret(id, secret, false).ToString("-"),
-                Code5 = PlayerCode.FromIDAndSecret(id, 0, false).ToString("-noshift")
-            });
-        }
-        Elements = codes;
-        await Task.CompletedTask;
-    }
 
     private async Task Execute()
     {

@@ -160,7 +160,6 @@ public class AccountService : ServiceBase<IAccountService>, IAccountService
         await context.AddAsync(playerAccount);
         await context.SaveChangesAsync();
         playerAccount.CurrentDeviceId = playerAccount.DeviceList.First().Id;
-        playerAccount.CensorCodeIfNeeds();
         await context.SaveChangesAsync();
         return playerAccount;
     }

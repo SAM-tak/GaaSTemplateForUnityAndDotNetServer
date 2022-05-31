@@ -84,7 +84,7 @@ namespace YourGameServer.Models // Unity cannot accpect 'namespace YourProjectNa
 
         public FormalPlayerAccount MakeFormal() => new() {
             Id = Id,
-            Code = PlayerCode.ToString("-"),
+            Code = Code,
             Status = Status,
             Since = Since,
             LastLogin = LastLogin,
@@ -96,15 +96,6 @@ namespace YourGameServer.Models // Unity cannot accpect 'namespace YourProjectNa
             LastLogin = LastLogin,
             Profile = Profile?.MakeMasked()
         };
-
-        public PlayerCode PlayerCode => PlayerCode.FromIDAndSecret(Id, Secret, true);
-
-        public void CensorCodeIfNeeds()
-        {
-            while(PlayerCode.ContainsSensitiveWord) Secret = (ushort)RandomNumberGenerator.GetInt32(0x10000);
-        }
-
-        public PlayerCode NonHashedCode => PlayerCode.FromIDAndSecret(Id, Secret, false);
 
         public string Code => IDCoder.Encode(Id, Secret);
     }

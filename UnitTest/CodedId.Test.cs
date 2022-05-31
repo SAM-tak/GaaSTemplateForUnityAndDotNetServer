@@ -5,6 +5,13 @@ namespace YourGameServer.UnitTests;
 [TestClass]
 public class CodedId_IsSane
 {
+
+    [TestInitialize]
+    public void TestInitialize()
+    {
+        IDCoder.Initialize("this is my salt");
+    }
+    
     [TestMethod]
     public void CanDecodeHashidsCorrectly()
     {

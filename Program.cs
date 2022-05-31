@@ -19,6 +19,9 @@ logger.Debug("init main");
 try {
     var builder = WebApplication.CreateBuilder(args);
 
+    // setup IDCoder(hashids)
+    IDCoder.Initialize(builder.Configuration.GetSection("IDCoder")["Salt"]);
+
     // NLog: Setup NLog for Dependency injection
     builder.Logging.ClearProviders();
     builder.Logging.SetMinimumLevel(Microsoft.Extensions.Logging.LogLevel.Trace);

@@ -7,6 +7,7 @@ using System.Numerics;
 #endif
 #endif
 using System.Security.Cryptography;
+
 namespace YourGameServer;
 
 [Serializable]
@@ -23,9 +24,9 @@ public struct PlayerCode : IEquatable<PlayerCode>
     private static readonly int[] _digitToShift = { 3, 9, 4, 12, 7, 2, 14, 5, 1, 11, 13, 6, 10, 15, 0, 8 };
 #endif
 #if USE_MMHASH
-    public const ulong Prime = 0x1FFFFFFFFFFFFFFF; // Mersenne prime number #9
+    public const ulong Prime = 0x123456789ABCE1B;
 #if !COMPUTE_MODINV
-    private const ulong _modinv = 0xDFFFFFFFFFFFFFFF; // Precomputed modular multiplicative inverse for 0x1FFFFFFFFFFFFFFF mod 0x10000000000000000
+    private const ulong _modinv = 0x5BBAC5AA496A5C13; // Precomputed modular multiplicative inverse for 0x123456789ABCE18 mod 0x10000000000000000
 #endif
 #else
     public const ulong Prime = 10007;
@@ -37,40 +38,45 @@ public struct PlayerCode : IEquatable<PlayerCode>
     /// <remarks>
     /// This is guaranteed colision-free when id is unique.
     /// </remarks>
-    public static PlayerCode FromID(ulong id)
+    public static PlayerCode FromIDAndSecret(ulong id, ushort secret, bool hash)
     {
-#if USE_MMHASH
-        // Mercari(metal_unk)'s multiplicative hash
-        // source : https://engineering.mercari.com/blog/entry/2017-08-29-115047/
-        // source : https://qiita.com/epsilon/items/aeefa085417b7134f793
-        // a * p + 1 (mod m); p is prime, p ⊥ m, 3 <= p < m
-        id = id * Prime + 1; // this is minimum perfect hash function.
-#endif
-        var rnd = (ulong)RandomNumberGenerator.GetInt32(0x10000); // 16bit width random number
+        if(hash) {
+            // Mercari(metal_unk)'s multiplicative hash
+            // source : https://engineering.mercari.com/blog/entry/2017-08-29-115047/
+            // source : https://qiita.com/epsilon/items/aeefa085417b7134f793
+            // a * p + 1 (mod m); p is prime, p ⊥ m, 3 <= p < m
+            id = id * Prime + 1; // this is minimum perfect hash function.
+        }
+
+        var rnd = (ulong)secret; // 16bit width random number
         return new PlayerCode {
-            id0 = ((rnd & 0b1) << 4)               |  (id & 0xF)                       // 5bit
-                | ((rnd & 0b10) << 8)              | ((id & 0xF0) << 1)                // 10bit
-                | ((rnd & 0b100) << 12)            | ((id & 0xF00) << 2)               // 15bit
-                | ((rnd & 0b1000) << 16)           | ((id & 0xF000) << 3)              // 20bit
-                | ((rnd & 0b10000) << 20)          | ((id & 0xF0000) << 4)             // 25bit
-                | ((rnd & 0b100000) << 24)         | ((id & 0xF00000) << 5)            // 30bit
-                | ((rnd & 0b1000000) << 28)        | ((id & 0xF000000) << 6)           // 35bit
-                | ((rnd & 0b10000000) << 32)       | ((id & 0xF0000000) << 7)          // 40bit
-                | ((rnd & 0b100000000) << 36)      | ((id & 0xF00000000) << 8)         // 45bit
-                | ((rnd & 0b1000000000) << 40)     | ((id & 0xF000000000) << 9)        // 50bit
-                | ((rnd & 0b10000000000) << 44)    | ((id & 0xF0000000000) << 10)      // 55bit
-                | ((rnd & 0b100000000000) << 48)   | ((id & 0xF00000000000) << 11)     // 60bit
-                                                   | ((id & 0xF000000000000) << 12),   // 64bit
+            id0 = ((rnd & 0b0000000000000001) << 4)  |  (id & 0x000000000000000F)         // 5bit
+                | ((rnd & 0b0000000000000010) << 8)  | ((id & 0x00000000000000F0) << 1)   // 10bit
+                | ((rnd & 0b0000000000000100) << 12) | ((id & 0x0000000000000F00) << 2)   // 15bit
+                | ((rnd & 0b0000000000001000) << 16) | ((id & 0x000000000000F000) << 3)   // 20bit
+                | ((rnd & 0b0000000000010000) << 20) | ((id & 0x00000000000F0000) << 4)   // 25bit
+                | ((rnd & 0b0000000000100000) << 24) | ((id & 0x0000000000F00000) << 5)   // 30bit
+                | ((rnd & 0b0000000001000000) << 28) | ((id & 0x000000000F000000) << 6)   // 35bit
+                | ((rnd & 0b0000000010000000) << 32) | ((id & 0x00000000F0000000) << 7)   // 40bit
+                | ((rnd & 0b0000000100000000) << 36) | ((id & 0x0000000F00000000) << 8)   // 45bit
+                | ((rnd & 0b0000001000000000) << 40) | ((id & 0x000000F000000000) << 9)   // 50bit
+                | ((rnd & 0b0000010000000000) << 44) | ((id & 0x00000F0000000000) << 10)  // 55bit
+                | ((rnd & 0b0000100000000000) << 48) | ((id & 0x0000F00000000000) << 11)  // 60bit
+                                                     | ((id & 0x000F000000000000) << 12), // 64bit
             id1 = (ushort)(
-                  ((rnd & 0b1000000000000) >> 12)  | ((id & 0xF0000000000000) >> 51)   // 69bit
-                | ((rnd & 0b10000000000000) >> 8)  | ((id & 0xF00000000000000) >> 50)  // 74bit
-                | ((rnd & 0b100000000000000) >> 4) | ((id & 0xF000000000000000) >> 49) // 79bit
-                |  (rnd & 0b1000000000000000)                                          // 80bit
+                  ((rnd & 0b0001000000000000) >> 12) | ((id & 0x00F0000000000000) >> 51)  // 69bit
+                | ((rnd & 0b0010000000000000) >> 8)  | ((id & 0x0F00000000000000) >> 50)  // 74bit
+                | ((rnd & 0b0100000000000000) >> 4)  | ((id & 0xF000000000000000) >> 49)  // 79bit
+                |  (rnd & 0b1000000000000000)                                             // 80bit
             )
         };
     }
 
-    public static string NewStringFromID(ulong id) => FromID(id).ToString();
+    public static PlayerCode FromID(ulong id, bool hash = true) => FromIDAndSecret(id, (ushort)RandomNumberGenerator.GetInt32(0x10000), hash);
+
+    public static string NewStringFromIDAndSecret(ulong id, ushort secret, bool hash) => FromIDAndSecret(id, secret, hash).ToString("-");
+
+    public static string NewStringFromID(ulong id) => FromID(id, true).ToString();
 
     static PlayerCode New()
     {
@@ -98,77 +104,44 @@ public struct PlayerCode : IEquatable<PlayerCode>
         return result;
     }
 
-    public ulong ID64 => (id0 & 0xF)                     // 4bit
-        | ((id0 & ((ulong)0xF0 << 1)) >> 1)              // 8bit
-        | ((id0 & ((ulong)0xF00 << 2)) >> 2)             // 12bit
-        | ((id0 & ((ulong)0xF000 << 3)) >> 3)            // 16bit
-        | ((id0 & ((ulong)0xF0000 << 4)) >> 4)           // 20bit
-        | ((id0 & ((ulong)0xF00000 << 5)) >> 5)          // 24bit
-        | ((id0 & ((ulong)0xF000000 << 6)) >> 6)         // 28bit
-        | ((id0 & ((ulong)0xF0000000 << 7)) >> 7)        // 32bit
-        | ((id0 & ((ulong)0xF00000000 << 8)) >> 8)       // 36bit
-        | ((id0 & ((ulong)0xF000000000 << 9)) >> 9)      // 40bit
-        | ((id0 & ((ulong)0xF0000000000 << 10)) >> 10)   // 44bit
-        | ((id0 & ((ulong)0xF00000000000 << 11)) >> 11)  // 48bit
+    public ulong ID64 =>
+          ((id0 & ((ulong)0x000000000000F << 0)) >> 0)   // 4bit
+        | ((id0 & ((ulong)0x00000000000F0 << 1)) >> 1)   // 8bit
+        | ((id0 & ((ulong)0x0000000000F00 << 2)) >> 2)   // 12bit
+        | ((id0 & ((ulong)0x000000000F000 << 3)) >> 3)   // 16bit
+        | ((id0 & ((ulong)0x00000000F0000 << 4)) >> 4)   // 20bit
+        | ((id0 & ((ulong)0x0000000F00000 << 5)) >> 5)   // 24bit
+        | ((id0 & ((ulong)0x000000F000000 << 6)) >> 6)   // 28bit
+        | ((id0 & ((ulong)0x00000F0000000 << 7)) >> 7)   // 32bit
+        | ((id0 & ((ulong)0x0000F00000000 << 8)) >> 8)   // 36bit
+        | ((id0 & ((ulong)0x000F000000000 << 9)) >> 9)   // 40bit
+        | ((id0 & ((ulong)0x00F0000000000 << 10)) >> 10) // 44bit
+        | ((id0 & ((ulong)0x0F00000000000 << 11)) >> 11) // 48bit
         | ((id0 & ((ulong)0xF000000000000 << 12)) >> 12) // 52bit
-        | (((ulong)id1 & (0xF << 1)) << (52 - 1))        // 56bit
-        | (((ulong)id1 & (0xF0 << 2)) << (52 - 2))       // 60bit
-        | (((ulong)id1 & (0xF00 << 3)) << (52 - 3))      // 64bit
+        | (((ulong)id1 & (0x000F << 1)) << (52 - 1))     // 56bit
+        | (((ulong)id1 & (0x00F0 << 2)) << (52 - 2))     // 60bit
+        | (((ulong)id1 & (0x0F00 << 3)) << (52 - 3))     // 64bit
         ;
 
-#if COMPUTE_MODINV
-    // source : https://stackoverflow.com/a/64125658/2330420
-    public static bool TryModInverse(BigInteger number, BigInteger modulo, out BigInteger result)
+    public ulong ToID(bool hash = true)
     {
-        if(number < 1) throw new ArgumentOutOfRangeException(nameof(number));
-        if(modulo < 2) throw new ArgumentOutOfRangeException(nameof(modulo));
-        var n = number;
-        var m = modulo;
-        // Extended Euclidean Algorithm
-        BigInteger v = 0, d = 1;
-        while(n > 0) {
-            var t = m / n;
-            var x = n;
-            n = m % x;
-            m = x;
-            x = d;
-            d = checked(v - t * x); // Just in case
-            v = x;
-        }
-        result = v % modulo;
-        if(result < 0) result += modulo;
-        if(number * result % modulo == 1) return true;
-        result = default;
-        return false;
-    }
-#endif
-
-    public ulong ToID()
-    {
-#if USE_MMHASH
+        if(hash) {
 #if COMPUTE_MODINV
-        if(TryModInverse(Prime, new BigInteger(ulong.MaxValue) + 1, out var modinv)) {
+            var modinv = new BigInteger(Prime).ModInverse(new BigInteger(ulong.MaxValue) + 1);
             Console.WriteLine($"modinv 0x{modinv:X}");
             return (ID64 - 1) * (ulong)modinv;
+#else
+            return (ID64 - 1) * _modinv;
+#endif
         }
-        return 0;
-#else
-        return (ID64 - 1) * _modinv;
-#endif
-#else
         return ID64;
-#endif
     }
 
-    public static PlayerCode FromString(string source)
+    public static PlayerCode FromString(string source, bool shift = true)
     {
         var ret = new PlayerCode();
         var digit = 0;
-#if USE_SHIFTCIPER
-        static int FromCharacter(char c, int digit) => (Array.IndexOf(_validCharacters, c) + 32 - _digitToShift[digit]) % 32;
-#else
-        static int FromCharacter(char c, int _) => Array.IndexOf(_validCharacters, c);
-#endif
+        int FromCharacter(char c, int digit) => shift ? (Array.IndexOf(_validCharacters, c) + 32 - _digitToShift[digit]) % 32 : Array.IndexOf(_validCharacters, c);
         foreach(var c in source) {
             if(_validCharacters.Contains(c)) {
                 var i = FromCharacter(c, digit);
@@ -201,14 +174,12 @@ public struct PlayerCode : IEquatable<PlayerCode>
 
     public override int GetHashCode() => HashCode.Combine(id0, id1);
 
-    public override string ToString()
+    public override string ToString() => ToString(true);
+
+    public string ToString(bool shift)
     {
         var mid = (id1 & 0x1) << 4 | (int)(id0 >> 5 * 12) & 0x1F;
-#if USE_SHIFTCIPER
-        static char ToCharacter(int i, int digit) => _validCharacters[(i + _digitToShift[digit]) % 32];
-#else
-        static char ToCharacter(int i, int _) => _validCharacters[i];
-#endif
+        char ToCharacter(int i, int digit) => shift ? _validCharacters[(i + _digitToShift[digit]) % 32] : _validCharacters[i];
         return new string(new char[] {
             ToCharacter(id1 >> 5 * 2 + 1   , 0),
             ToCharacter(id1 >> 5 + 1 & 0x1F, 1),
@@ -230,6 +201,24 @@ public struct PlayerCode : IEquatable<PlayerCode>
             ToCharacter((int)(id0 >> 5      & 0x1F), 14),
             ToCharacter((int)(id0           & 0x1F), 15)
         });
+    }
+
+    public string ToString(string fmt)
+    {
+        var ret = ToString(!fmt.Contains("noshift"));
+        if(fmt.Contains('-')) {
+            return $"{ret.AsSpan()[..4]}-{ret.AsSpan()[4..8]}-{ret.AsSpan()[8..12]}-{ret.AsSpan()[12..16]}";
+        }
+        return ret;
+    }
+
+    static readonly string[] _ngwords = { "FUCK", "PUSSY", "CUNT", "ANUS", "ASS" };
+
+    public bool ContainsSensitiveWord {
+        get {
+            var code = ToString();
+            return _ngwords.Any(i => code.Contains(i));
+        }
     }
 
     public static bool operator ==(PlayerCode left, PlayerCode right) => left.Equals(right);

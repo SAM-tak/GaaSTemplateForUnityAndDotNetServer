@@ -5,6 +5,7 @@
 @inject MudBlazor.ISnackbar snackBar
 
 @using YourGameServer.Extensions
+@using System.Text.RegularExpressions
 
 <MudExpansionPanel id="@EditPanelId" Text="@EditPanelText" @bind-IsExpanded="_editPanelExpanded">
     <EditForm Model="@_newItem" OnValidSubmit="OnValidSubmit">
@@ -12,10 +13,10 @@
         <MudCard>
             <MudCardContent>
                 <MudTd>
-                    <MudTextField @bind-Value="@_newItem.Code" Label="@(TextHelper.LabelFor<PlayerAccount>(i => i.Code))" />
+                    <MudNumericField T="ushort" @bind-Value="@_newItem.Secret" Min="0" Label="@(TextHelper.LabelFor<PlayerAccount>(i => i.Secret))" />
                 </MudTd>
                 <MudTd>
-                    <MudNumericField @bind-Value="@_newItem.CurrentDeviceId" T="ulong" Min="0" Label="@(TextHelper.LabelFor<PlayerAccount>(i => i.CurrentDeviceId))" />
+                    <MudNumericField T="ulong" @bind-Value="@_newItem.CurrentDeviceId" Min="0" Label="@(TextHelper.LabelFor<PlayerAccount>(i => i.CurrentDeviceId))" />
                 </MudTd>
                 <MudTd>
                     <MudSelect T="PlayerAccountKind" @bind-Value="_newItem.Kind" Label="@(TextHelper.LabelFor<PlayerAccount>(i => i.Kind))">
@@ -76,8 +77,20 @@
     </ToolBarContent>
     <Columns>
         <Column T="PlayerAccount" Field="Id" IsEditable="false" />
-        <Column T="PlayerAccount" Field="Code" />
-        <Column T="PlayerAccount" Field="CurrentDeviceId" />
+        <Column T="PlayerAccount" Field="Secret">
+            <CellTemplate>
+                <MudText>@context.Item.Secret</MudText>
+                @* <MudText Typo="Typo.caption" Style="white-space:nowrap">@context.Item.Code.ToString("-")</MudText> *@
+                @* <MudText Typo="Typo.caption" Style="white-space:nowrap">@context.Item.NonHashedCode.ToString("-")</MudText> *@
+                @* <MudText Typo="Typo.caption" Style="white-space:nowrap">@context.Item.NonHashedCode.ToString("-noshift")</MudText> *@
+                <MudText Typo="Typo.caption" Style="white-space:nowrap">@Regex.Replace(context.Item.Code, ".{4}(?!$)", "$0-")</MudText>
+            </CellTemplate>
+        </Column>
+        <Column T="PlayerAccount" Field="CurrentDeviceId">
+            <EditTemplate>
+                <MudNumericField T="ulong" @bind-Value="@context.Item.CurrentDeviceId" Min="0" Label="@(TextHelper.LabelFor<PlayerAccount>(i => i.CurrentDeviceId))" />
+            </EditTemplate>
+        </Column>
         <Column T="PlayerAccount" Field="Kind">
             <EditTemplate>
                 <MudSelect T="PlayerAccountKind" @bind-Value="context.Item.Kind" Label="@(TextHelper.LabelFor<PlayerAccount>(i => i.Kind))">
@@ -161,9 +174,7 @@
     {
         if (string.IsNullOrWhiteSpace(_searchString)) return true;
 
-        if (x.Code.Contains(_searchString, StringComparison.OrdinalIgnoreCase)) return true;
-
-        if ($"{x.Id} {x.Since} {x.LastLogin}".Contains(_searchString)) return true;
+        if ($"{x.Id} {x.Secret} {x.PlayerCode.ToString()} {x.Code} {x.Since} {x.LastLogin}".Contains(_searchString)) return true;
 
         return false;
     }

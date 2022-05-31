@@ -1,4 +1,5 @@
 #nullable disable
+using System.Security.Cryptography;
 using Grpc.Core;
 using MagicOnion;
 using MagicOnion.Server;
@@ -141,6 +142,7 @@ public class AccountService : ServiceBase<IAccountService>, IAccountService
     {
         var curDateTime = DateTime.UtcNow;
         var playerAccount = new PlayerAccount {
+            Secret = (ushort)RandomNumberGenerator.GetInt32(0x10000),
             DeviceList = new() {
                 new () {
                     DeviceType = accountCreationModel.DeviceType,
@@ -157,8 +159,8 @@ public class AccountService : ServiceBase<IAccountService>, IAccountService
         };
         await context.AddAsync(playerAccount);
         await context.SaveChangesAsync();
-        playerAccount.Code = PlayerCode.NewStringFromID(playerAccount.Id);
         playerAccount.CurrentDeviceId = playerAccount.DeviceList.First().Id;
+        playerAccount.CensorCodeIfNeeds();
         await context.SaveChangesAsync();
         return playerAccount;
     }

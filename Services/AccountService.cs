@@ -58,6 +58,7 @@ public class AccountService : ServiceBase<IAccountService>, IAccountService
                 playerAccount.CurrentDeviceId = playerDevice.Id;
                 await _context.SaveChangesAsync();
                 return new LogInRequestResult {
+                    Code = playerAccount.Code,
                     Token = _jwt.CreateToken(playerAccount.Id, playerDevice.Id, out var period),
                     Period = period
                 };

@@ -19,9 +19,6 @@ logger.Debug("init main");
 try {
     var builder = WebApplication.CreateBuilder(args);
 
-    // setup IDCoder(hashids)
-    IDCoder.Initialize(builder.Configuration.GetSection("IDCoder")["Salt"]);
-
     // NLog: Setup NLog for Dependency injection
     builder.Logging.ClearProviders();
     builder.Logging.SetMinimumLevel(Microsoft.Extensions.Logging.LogLevel.Trace);
@@ -33,6 +30,9 @@ try {
         options.AssumeDefaultVersionWhenUnspecified = true;
         options.DefaultApiVersion = new ApiVersion(1, 0);
     });
+
+    // Setup IDCoder(hashids)
+    IDCoder.Initialize(builder.Configuration.GetSection("IDCoder")["Salt"]);
 
     // https://stackoverflow.com/questions/4804086/is-there-any-connection-string-parser-in-c
     var connectionString = builder.Configuration.GetConnectionString(builder.Configuration["GameDbConnectionStringKey"]);

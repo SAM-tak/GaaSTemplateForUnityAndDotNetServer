@@ -1,6 +1,6 @@
-using System.Numerics;
+namespace YourGameServer.Extensions;
 
-namespace YourGameServer;
+using System.Numerics;
 
 public static class BigIntegerExtensions
 {

@@ -8,6 +8,7 @@ using MessagePack;
 using Microsoft.EntityFrameworkCore;
 using Bogus;
 using System.Security.Cryptography;
+using YourGameServer.Extensions;
 #if UNITY_5_3_OR_NEWER
 using Newtonsoft.Json;
 #else

@@ -1,0 +1,74 @@
+@page "/utility/playercodeexamples"
+
+@using System.Security.Cryptography
+
+<MudPaper Class="pa-4 mr-16">
+    <MudText Typo="Typo.h6" GutterBottom="true">PlayerCode Exmaples</MudText>
+    <MudTable Items="@Elements" Hover="true" Breakpoint="Breakpoint.Sm" LoadingProgressColor="Color.Info">
+        <HeaderContent>
+            <MudTh>Id</MudTh>
+            <MudTh>Hashids</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Id">@context.Id.ToString("#,0")</MudTd>
+            <MudTd DataLabel="Code string">@context.Code</MudTd>
+        </RowTemplate>
+    </MudTable>
+</MudPaper>
+
+@code {
+    private IEnumerable<CodeExample> Elements = new List<CodeExample>();
+
+    public class CodeExample
+    {
+        public ulong Id;
+        public string Code = string.Empty;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var codes = new List<CodeExample>();
+        ulong[] radixl = {
+            1,
+            1_000,
+            10_000,
+            100_000,
+            1_000_000,
+            2_000_000,
+            3_000_000,
+            5_000_000,
+            10_000_000,
+            100_000_000,
+            1_000_000_000,
+            2_000_000_000,
+            3_000_000_000,
+            5_000_000_000,
+            10_000_000_000,
+            100_000_000_000,
+            1_000_000_000_000,
+            1_000_000_000_000_000,
+            1_000_000_000_000_000_000,
+            9_000_000_000_000_000_000
+        };
+        for (int i = 0; i < radixl.Length; ++i) {
+            for(int j = 0; j < 3; ++j) {
+                ulong id = radixl[i] + (ulong)j;
+                ushort secret = (ushort)RandomNumberGenerator.GetInt32(0x10000);
+                codes.Add(new() {
+                    Id = id,
+                    Code = IDCoder.Encode(id, 0).ToHyphened()
+                });
+            }
+        }
+        for(int i = 0; i < 3; ++i) {
+            ulong id = ulong.MaxValue - 9 + (ulong)i;
+            ushort secret = (ushort)RandomNumberGenerator.GetInt32(0x10000);
+            codes.Add(new() {
+                Id = id,
+                Code = IDCoder.Encode(id, 0).ToHyphened()
+            });
+        }
+        Elements = codes;
+        await Task.CompletedTask;
+    }
+}

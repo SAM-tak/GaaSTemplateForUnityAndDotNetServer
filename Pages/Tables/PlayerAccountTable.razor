@@ -4,9 +4,6 @@
 @inject MudBlazor.IDialogService dialogService
 @inject MudBlazor.ISnackbar snackBar
 
-@using YourGameServer.Extensions
-@using System.Text.RegularExpressions
-
 <MudExpansionPanel id="@EditPanelId" Text="@EditPanelText" @bind-IsExpanded="_editPanelExpanded">
     <EditForm Model="@_newItem" OnValidSubmit="OnValidSubmit">
         <DataAnnotationsValidator />
@@ -80,10 +77,7 @@
         <Column T="PlayerAccount" Field="Secret">
             <CellTemplate>
                 <MudText>@context.Item.Secret</MudText>
-                @* <MudText Typo="Typo.caption" Style="white-space:nowrap">@context.Item.Code.ToString("-")</MudText> *@
-                @* <MudText Typo="Typo.caption" Style="white-space:nowrap">@context.Item.NonHashedCode.ToString("-")</MudText> *@
-                @* <MudText Typo="Typo.caption" Style="white-space:nowrap">@context.Item.NonHashedCode.ToString("-noshift")</MudText> *@
-                <MudText Typo="Typo.caption" Style="white-space:nowrap">@Regex.Replace(context.Item.Code, ".{4}(?!$)", "$0-")</MudText>
+                <MudText Typo="Typo.caption" Style="white-space:nowrap">@context.Item.Code.ToHyphened()</MudText>
             </CellTemplate>
         </Column>
         <Column T="PlayerAccount" Field="CurrentDeviceId">

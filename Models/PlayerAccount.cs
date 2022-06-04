@@ -1,19 +1,9 @@
 #nullable disable
 using System; // Unity needs this
-using System.Collections;
 using System.Collections.Generic; // Unity needs this
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using MessagePack;
-using Microsoft.EntityFrameworkCore;
-using Bogus;
-using System.Security.Cryptography;
-using YourGameServer.Extensions;
-#if UNITY_5_3_OR_NEWER
-using Newtonsoft.Json;
-#else
-using System.Text.Json.Serialization;
-#endif
 using KeyAttribute = MessagePack.KeyAttribute;
 
 namespace YourGameServer.Models // Unity cannot accpect 'namespace YourProjectName.Models;' yet
@@ -83,6 +73,13 @@ namespace YourGameServer.Models // Unity cannot accpect 'namespace YourProjectNa
             return hash.ToHashCode();
         }
 
+        public MaskedPlayerAccount MakeMasked() => new() {
+            Id = Id,
+            LastLogin = LastLogin,
+            Profile = Profile?.MakeMasked()
+        };
+
+#if !UNITY_5_3_OR_NEWER
         public FormalPlayerAccount MakeFormal() => new() {
             Id = Id,
             Code = Code,
@@ -92,13 +89,8 @@ namespace YourGameServer.Models // Unity cannot accpect 'namespace YourProjectNa
             Profile = Profile?.MakeMasked()
         };
 
-        public MaskedPlayerAccount MakeMasked() => new() {
-            Id = Id,
-            LastLogin = LastLogin,
-            Profile = Profile?.MakeMasked()
-        };
-
         public string Code => IDCoder.Encode(Id, Secret);
+#endif
     }
 
     [NotMapped]

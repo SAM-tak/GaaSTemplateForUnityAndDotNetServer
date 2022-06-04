@@ -56,7 +56,7 @@ public class PlayerAccountsController : ControllerBase
     /// <param name="id"></param>
     /// <returns></returns>
     [HttpGet("{id}")]
-    public async Task<ActionResult<PlayerAccount>> GetPlayerAccount([FromHeader] ulong playerId, ulong id)
+    public async Task<ActionResult<FormalPlayerAccount>> GetPlayerAccount([FromHeader] ulong playerId, ulong id)
     {
         if(playerId != id) {
             return BadRequest();
@@ -68,7 +68,7 @@ public class PlayerAccountsController : ControllerBase
             return NotFound();
         }
 
-        return playerAccount;
+        return playerAccount.MakeFormal();
     }
 
     /// <summary>
@@ -85,22 +85,24 @@ public class PlayerAccountsController : ControllerBase
         if(playerId != id || playerId != playerAccount.Id) {
             return BadRequest();
         }
+        await Task.CompletedTask;
+        return Forbid();
 
-        _context.Entry(playerAccount).State = EntityState.Modified;
+        // _context.Entry(playerAccount).State = EntityState.Modified;
 
-        try {
-            await _context.SaveChangesAsync();
-        }
-        catch(DbUpdateConcurrencyException) {
-            if(!PlayerAccountExists(playerId)) {
-                return NotFound();
-            }
-            else {
-                throw;
-            }
-        }
+        // try {
+        //     await _context.SaveChangesAsync();
+        // }
+        // catch(DbUpdateConcurrencyException) {
+        //     if(!PlayerAccountExists(playerId)) {
+        //         return NotFound();
+        //     }
+        //     else {
+        //         throw;
+        //     }
+        // }
 
-        return NoContent();
+        // return NoContent();
     }
 
     /// <summary>
@@ -145,8 +147,8 @@ public class PlayerAccountsController : ControllerBase
         return NoContent();
     }
 
-    private bool PlayerAccountExists(ulong id)
-    {
-        return _context.PlayerAccounts.Any(e => e.Id == id);
-    }
+    // private bool PlayerAccountExists(ulong id)
+    // {
+    //     return _context.PlayerAccounts.Any(e => e.Id == id);
+    // }
 }

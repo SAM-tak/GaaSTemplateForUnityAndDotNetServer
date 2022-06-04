@@ -9,7 +9,7 @@ public static class IDCoder
 
     public static void Initialize(string salt)
     {
-        _hashids = new(salt, 9, "abcdefghijknpqrstuvxyz23456789", "cfhistu");
+        _hashids = new(salt, 10, "abcdefghijknpqrstuvxyz23456789", "cfhistu");
     }
 
     public static string Encode(ulong id, ushort secret) => _hashids?.EncodeHex($"{id:X}{secret:X4}") ?? string.Empty;

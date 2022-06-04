@@ -131,6 +131,7 @@ public class AccountService : ServiceBase<IAccountService>, IAccountService
             var playerAccount = await CreateAccountAsync(_context, signup);
             return new SignInRequestResult {
                 Id = playerAccount.Id,
+                Code = playerAccount.Code,
                 Token = _jwt.CreateToken(playerAccount.Id, playerAccount.CurrentDeviceId, out var period),
                 Period = period
             };

@@ -1,7 +1,5 @@
 @page "/utility/playercodeexamples"
 
-@using System.Security.Cryptography
-
 <MudPaper Class="pa-4 mr-16">
     <MudText Typo="Typo.h6" GutterBottom="true">PlayerCode Exmaples</MudText>
     <MudTable Items="@Elements" Hover="true" Breakpoint="Breakpoint.Sm" LoadingProgressColor="Color.Info">
@@ -28,55 +26,25 @@
     protected override async Task OnInitializedAsync()
     {
         var codes = new List<CodeExample>();
-        ulong[] radixl = {
-            1,
-            1_000,
-            10_000,
-            100_000,
-            1_000_000,
-            1_010_000,
-            1_030_000,
-            1_050_000,
-            1_100_000,
-            1_200_000,
-            1_300_000,
-            1_500_000,
-            2_000_000,
-            3_000_000,
-            5_000_000,
-            10_000_000,
-            20_000_000,
-            30_000_000,
-            50_000_000,
-            100_000_000,
-            1_000_000_000,
-            2_000_000_000,
-            3_000_000_000,
-            5_000_000_000,
-            10_000_000_000,
-            100_000_000_000,
-            1_000_000_000_000,
-            1_000_000_000_000_000,
-            1_000_000_000_000_000_000,
-            9_000_000_000_000_000_000
-        };
-        for (int i = 0; i < radixl.Length; ++i) {
-            for(int j = 0; j < 3; ++j) {
-                ulong id = radixl[i] + (ulong)j;
-                ushort secret = (ushort)RandomNumberGenerator.GetInt32(0x10000);
-                codes.Add(new() {
-                    Id = id,
-                    Code = IDCoder.Encode(id, 0).ToHyphened()
-                });
+        for(ulong id = 0; id < 3; ++id) {
+            codes.Add(new() { Id = id, Code = IDCoder.Encode(id, 0).ToHyphened() });
+        }
+        var maxLetter = IDCoder.Encode(ulong.MaxValue, 0).Length;
+        ulong lower = 1, upper = 2;
+        for(int i = IDCoder.Encode(1, 0).Length; i < maxLetter; ++i) {
+            while(IDCoder.Encode(upper, 0).Length < i + 1) upper *= 2;
+            while(upper - lower > 1) {
+                var mid = lower + (upper - lower) / 2;
+                if(IDCoder.Encode(mid, 0).Length == i) lower = mid;
+                else upper = mid;
             }
+            codes.Add(new() { Id = lower, Code = IDCoder.Encode(lower, 0).ToHyphened() });
+            codes.Add(new() { Id = upper, Code = IDCoder.Encode(upper, 0).ToHyphened() });
+            lower = upper;
         }
         for(int i = 0; i < 3; ++i) {
-            ulong id = ulong.MaxValue - 9 + (ulong)i;
-            ushort secret = (ushort)RandomNumberGenerator.GetInt32(0x10000);
-            codes.Add(new() {
-                Id = id,
-                Code = IDCoder.Encode(id, 0).ToHyphened()
-            });
+            ulong id = ulong.MaxValue - 3 + (ulong)i;
+            codes.Add(new() { Id = id, Code = IDCoder.Encode(id, 0).ToHyphened() });
         }
         Elements = codes;
         await Task.CompletedTask;

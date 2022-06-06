@@ -8,18 +8,6 @@ using KeyAttribute = MessagePack.KeyAttribute;
 
 namespace YourGameServer.Models // Unity cannot accpect 'namespace YourProjectName.Models;' yet
 {
-    public enum PlayerAccountKind
-    {
-        [Display(Name = "Guest")]
-        Guest,
-        [Display(Name = "Special Guest")]
-        SpecialGuest,
-        [Display(Name = "Community Manager")]
-        CommunityManager,
-        [Display(Name = "Staff")]
-        Staff,
-    }
-
     public enum PlayerAccountStatus
     {
         [Display(Name = "Active")]
@@ -39,6 +27,18 @@ namespace YourGameServer.Models // Unity cannot accpect 'namespace YourProjectNa
         public ulong Id { get; init; }
     };
 #else
+    public enum PlayerAccountKind
+    {
+        [Display(Name = "Guest")]
+        Guest,
+        [Display(Name = "Special Guest")]
+        SpecialGuest,
+        [Display(Name = "Community Manager")]
+        CommunityManager,
+        [Display(Name = "Staff")]
+        Staff,
+    }
+
     public record PlayerAccount
     {
         [Display(Name = "ID")]
@@ -71,6 +71,7 @@ namespace YourGameServer.Models // Unity cannot accpect 'namespace YourProjectNa
             hash.Add(Id);
             hash.Add(Secret);
             hash.Add(CurrentDeviceId);
+            hash.Add(Kind);
             hash.Add(Status);
             hash.Add(Since);
             hash.Add(LastLogin);

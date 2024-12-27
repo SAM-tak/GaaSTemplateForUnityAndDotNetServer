@@ -45,21 +45,21 @@
         <MudTextField @bind-Value="_searchString" Placeholder="Search for LootBoxes..." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" />
     </ToolBarContent>
     <Columns>
-        <Column T="LootBox" Field="Id" IsEditable="false" />
-        <Column T="LootBox" Field="Name" />
-        <Column T="LootBox" Field="ProductName" />
-        <Column T="LootBox" Field="DisplayName" />
-        <Column T="LootBox" Field="Description" />
-        <Column T="LootBox" Field="IconAddress" />
-        <Column T="LootBox" Field="BannerAddress" />
-        <Column T="LootBox" Sortable="false" Filterable="false">
+        <PropertyColumn Property="x => x.Id" IsEditable="false" />
+        <PropertyColumn Property="x => x.Name" />
+        <PropertyColumn Property="x => x.ProductName" />
+        <PropertyColumn Property="x => x.DisplayName" />
+        <PropertyColumn Property="x => x.Description" />
+        <PropertyColumn Property="x => x.IconAddress" />
+        <PropertyColumn Property="x => x.BannerAddress" />
+        <TemplateColumn Sortable="false" Filterable="false">
             <CellTemplate>
                 <MudStack Spacing="1" Justify="Justify.FlexEnd" Row="true">
                     <MudIconButton Size="Size.Small" Icon="@Icons.Material.Filled.Delete" OnClick="@(async () => await Delete(@context.Item))" />
-                    <MudIconButton Size="Size.Small" Icon="@Icons.Outlined.Edit" OnClick="@context.Actions.StartEditingItem" />
+                    <MudIconButton Size="Size.Small" Icon="@Icons.Material.Outlined.Edit" OnClick="@context.Actions.StartEditingItemAsync" />
                 </MudStack>
             </CellTemplate>
-        </Column>
+        </TemplateColumn>
     </Columns>
     <PagerContent>
         <MudDataGridPager T="LootBox" />
@@ -101,7 +101,7 @@
         snackBar.Add($"New {nameof(LootBox)} (id:{_newItem.Id}) Created.", Severity.Success);
         _newItem = new ();
     }
-    
+
     void Clear()
     {
         _newItem = new();
@@ -115,7 +115,8 @@
         parameters.Add("ButtonText", "Delete");
         parameters.Add("Color", Color.Error);
 
-        if (!(await dialogService.Show<ConfirmDialog>("Delete", parameters, new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall }).Result).Cancelled) {
+        var result = await dialogService.Show<ConfirmDialog>("Delete", parameters, new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall }).Result;
+        if (result != null && !result.Canceled) {
             dbContext.LootBoxes.Remove(x);
             await dbContext.SaveChangesAsync();
             snackBar.Add($"{nameof(LootBox)} (id:{x.Id}) Deleted.", Severity.Success);

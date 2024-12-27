@@ -25,27 +25,27 @@
 </MudExpansionPanel>
 <br />
 <MudDataGrid T="ServiceToken" Items="dbContext.ServiceTokens" Sortable="true" Filterable="true" QuickFilter="QuickFilter" ReadOnly="false"
-    CommittedItemChanges="@(async () => await dbContext.SaveChangesAsync())" EditMode="@DataGridEditMode.Form" EditTrigger="@DataGridEditTrigger.Manual">
+CommittedItemChanges="@(async () => await dbContext.SaveChangesAsync())" EditMode="@DataGridEditMode.Form" EditTrigger="@DataGridEditTrigger.Manual">
     <ToolBarContent>
         <MudText Typo="Typo.h6">@ListPanelText</MudText>
         <MudSpacer />
         <MudTextField @bind-Value="_searchString" Placeholder="Search for ServiceTokens..." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" />
     </ToolBarContent>
     <Columns>
-        <Column T="ServiceToken" Field="Id" IsEditable="false" />
-        <Column T="ServiceToken" Field="Name" />
-        <Column T="ServiceToken" Field="ProductName" />
-        <Column T="ServiceToken" Field="DisplayName" />
-        <Column T="ServiceToken" Field="Description" />
-        <Column T="ServiceToken" Field="IconBlobId" />
-        <Column T="ServiceToken" Sortable="false" Filterable="false">
+        <PropertyColumn Property="x => x.Id" IsEditable="false" />
+        <PropertyColumn Property="x => x.Name" />
+        <PropertyColumn Property="x => x.ProductName" />
+        <PropertyColumn Property="x => x.DisplayName" />
+        <PropertyColumn Property="x => x.Description" />
+        <PropertyColumn Property="x => x.IconBlobId" />
+        <TemplateColumn T="ServiceToken" Sortable="false" Filterable="false">
             <CellTemplate>
                 <MudStack Spacing="1" Justify="Justify.FlexEnd" Row="true">
                     <MudIconButton Size="Size.Small" Icon="@Icons.Material.Filled.Delete" OnClick="@(async () => await Delete(@context.Item))" />
-                    <MudIconButton Size="Size.Small" Icon="@Icons.Outlined.Edit" OnClick="@context.Actions.StartEditingItem" />
+                    <MudIconButton Size="Size.Small" Icon="@Icons.Material.Outlined.Edit" OnClick="@context.Actions.StartEditingItemAsync" />
                 </MudStack>
             </CellTemplate>
-        </Column>
+        </TemplateColumn>
     </Columns>
     <PagerContent>
         <MudDataGridPager T="ServiceToken" />
@@ -97,7 +97,9 @@
         parameters.Add("ButtonText", "Delete");
         parameters.Add("Color", Color.Error);
 
-        if (!(await dialogService.Show<ConfirmDialog>("Delete", parameters, new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall }).Result).Cancelled) {
+        var result = await dialogService.Show<ConfirmDialog>("Delete", parameters, new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall }).Result;
+        if (result != null && !result.Canceled)
+        {
             dbContext.ServiceTokens.Remove(x);
             await dbContext.SaveChangesAsync();
             snackBar.Add($"{nameof(ServiceToken)} (id:{x.Id}) Deleted.", Severity.Success);

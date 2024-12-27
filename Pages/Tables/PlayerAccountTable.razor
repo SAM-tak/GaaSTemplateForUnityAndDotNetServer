@@ -34,27 +34,27 @@
                 <MudTd>
                     <MudTextField Format="s" InputType="InputType.DateTimeLocal" Label="@(TextHelper.LabelFor<PlayerAccount>(i => i.Since))" @bind-Value="_newItem.Since" Step="1"/>
                     <MudNumericField T="double?" Label="Second" Adornment="Adornment.End" AdornmentText="ms" Min="0.0" Max="59.9999999"
-                        Value="_newItem.Since?.GetSecondPart()" ValueChanged="t => _newItem.Since = _newItem.Since?.ReplacedSecondPart(t)" />
+                    Value="_newItem.Since?.GetSecondPart()" ValueChanged="t => _newItem.Since = _newItem.Since?.ReplacedSecondPart(t)" />
                 </MudTd>
                 <MudTd>
                     <MudTextField Format="s" InputType="InputType.DateTimeLocal" Label="@(TextHelper.LabelFor<PlayerAccount>(i => i.LastLogin))" @bind-Value="_newItem.LastLogin"/>
                     <MudNumericField T="double?" Label="Second" Adornment="Adornment.End" AdornmentText="s" Min="0.0" Max="59.9999999"
-                        Value="_newItem.LastLogin?.GetSecondPart()" ValueChanged="t => _newItem.LastLogin = _newItem.LastLogin?.ReplacedSecondPart(t)" />
+                    Value="_newItem.LastLogin?.GetSecondPart()" ValueChanged="t => _newItem.LastLogin = _newItem.LastLogin?.ReplacedSecondPart(t)" />
                 </MudTd>
                 <MudTd>
                     <MudTextField Format="s" InputType="InputType.DateTimeLocal" Label="@(TextHelper.LabelFor<PlayerAccount>(i => i.InactivateDate))" @bind-Value="_newItem.InactivateDate"/>
                     <MudNumericField T="double?" Label="Second" Adornment="Adornment.End" AdornmentText="s" Min="0.0" Max="59.9999999"
-                        Value="_newItem.InactivateDate?.GetSecondPart()" ValueChanged="t => _newItem.InactivateDate = _newItem.InactivateDate?.ReplacedSecondPart(t)" />
+                    Value="_newItem.InactivateDate?.GetSecondPart()" ValueChanged="t => _newItem.InactivateDate = _newItem.InactivateDate?.ReplacedSecondPart(t)" />
                 </MudTd>
                 <MudTd>
                     <MudTextField Format="s" InputType="InputType.DateTimeLocal" Label="@(TextHelper.LabelFor<PlayerAccount>(i => i.BanDate))" @bind-Value="_newItem.BanDate"/>
                     <MudNumericField T="double?" Label="Second" Adornment="Adornment.End" AdornmentText="s" Min="0.0" Max="59.9999999"
-                        Value="_newItem.BanDate?.GetSecondPart()" ValueChanged="t => _newItem.BanDate = _newItem.BanDate?.ReplacedSecondPart(t)" />
+                    Value="_newItem.BanDate?.GetSecondPart()" ValueChanged="t => _newItem.BanDate = _newItem.BanDate?.ReplacedSecondPart(t)" />
                 </MudTd>
                 <MudTd>
                     <MudTextField Format="s" InputType="InputType.DateTimeLocal" Label="@(TextHelper.LabelFor<PlayerAccount>(i => i.ExpireDate))" @bind-Value="_newItem.ExpireDate"/>
                     <MudNumericField T="double?" Label="Second" Adornment="Adornment.End" AdornmentText="s" Min="0.0" Max="59.9999999"
-                        Value="_newItem.ExpireDate?.GetSecondPart()" ValueChanged="t => _newItem.ExpireDate = _newItem.BanDate?.ReplacedSecondPart(t)" />
+                    Value="_newItem.ExpireDate?.GetSecondPart()" ValueChanged="t => _newItem.ExpireDate = _newItem.BanDate?.ReplacedSecondPart(t)" />
                 </MudTd>
             </MudCardContent>
             <MudCardActions>
@@ -66,26 +66,26 @@
 </MudExpansionPanel>
 <br />
 <MudDataGrid T="PlayerAccount" Items="dbContext.PlayerAccounts" Sortable="true" Filterable="true" QuickFilter="QuickFilter" ReadOnly="false"
-    CommittedItemChanges="@(async () => await dbContext.SaveChangesAsync())" EditMode="@DataGridEditMode.Form" EditTrigger="@DataGridEditTrigger.Manual">
+CommittedItemChanges="@(async () => await dbContext.SaveChangesAsync())" EditMode="@DataGridEditMode.Form" EditTrigger="@DataGridEditTrigger.Manual">
     <ToolBarContent>
         <MudText Typo="Typo.h6">@ListPanelText</MudText>
         <MudSpacer />
         <MudTextField @bind-Value="_searchString" Placeholder="@PlaceholderText" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" />
     </ToolBarContent>
     <Columns>
-        <Column T="PlayerAccount" Field="Id" IsEditable="false" />
-        <Column T="PlayerAccount" Field="Secret">
+        <PropertyColumn Property="x => x.Id" IsEditable="false" />
+        <PropertyColumn Property="x => x.Secret">
             <CellTemplate>
                 <MudText>@context.Item.Secret</MudText>
                 <MudText Typo="Typo.caption" Style="white-space:nowrap">@context.Item.Code.ToHyphened()</MudText>
             </CellTemplate>
-        </Column>
-        <Column T="PlayerAccount" Field="CurrentDeviceId">
+        </PropertyColumn>
+        <PropertyColumn Property="x => x.CurrentDeviceId">
             <EditTemplate>
                 <MudNumericField T="ulong" @bind-Value="@context.Item.CurrentDeviceId" Min="0" Label="@(TextHelper.LabelFor<PlayerAccount>(i => i.CurrentDeviceId))" />
             </EditTemplate>
-        </Column>
-        <Column T="PlayerAccount" Field="Kind">
+        </PropertyColumn>
+        <PropertyColumn Property="x => x.Kind">
             <EditTemplate>
                 <MudSelect T="PlayerAccountKind" @bind-Value="context.Item.Kind" Label="@(TextHelper.LabelFor<PlayerAccount>(i => i.Kind))">
                     @foreach (PlayerAccountKind item in Enum.GetValues(typeof(PlayerAccountKind)))
@@ -94,8 +94,8 @@
                     }
                 </MudSelect>
             </EditTemplate>
-        </Column>
-        <Column T="PlayerAccount" Field="Status">
+        </PropertyColumn>
+        <PropertyColumn Property="x => x.Status">
             <EditTemplate>
                 <MudSelect T="PlayerAccountStatus" @bind-Value="context.Item.Status" Label="@(TextHelper.LabelFor<PlayerAccount>(i => i.Status))">
                     @foreach (PlayerAccountStatus item in Enum.GetValues(typeof(PlayerAccountStatus)))
@@ -104,50 +104,50 @@
                     }
                 </MudSelect>
             </EditTemplate>
-        </Column>
-        <Column T="PlayerAccount" Field="Since">
+        </PropertyColumn>
+        <PropertyColumn Property="x => x.Since">
             <EditTemplate>
                 <MudTextField Format="s" InputType="InputType.DateTimeLocal" Label="@(TextHelper.LabelFor<PlayerAccount>(i => i.Since))" @bind-Value="context.Item.Since"/>
                 <MudNumericField T="double?" Label="Second" Adornment="Adornment.End" AdornmentText="s" Min="0.0" Max="59.9999999"
-                    Value="context.Item.Since?.GetSecondPart()" ValueChanged="t => context.Item.Since = context.Item.Since?.ReplacedSecondPart(t)" />
+                Value="context.Item.Since?.GetSecondPart()" ValueChanged="t => context.Item.Since = context.Item.Since?.ReplacedSecondPart(t)" />
             </EditTemplate>
-        </Column>
-        <Column T="PlayerAccount" Field="LastLogin">
+        </PropertyColumn>
+        <PropertyColumn Property="x => x.LastLogin">
             <EditTemplate>
                 <MudTextField Format="s" InputType="InputType.DateTimeLocal" Label="@(TextHelper.LabelFor<PlayerAccount>(i => i.LastLogin))" @bind-Value="context.Item.LastLogin"/>
                 <MudNumericField T="double?" Label="Second" Adornment="Adornment.End" AdornmentText="s" Min="0.0" Max="59.9999999"
-                    Value="context.Item.LastLogin?.GetSecondPart()" ValueChanged="t => context.Item.LastLogin = context.Item.LastLogin?.ReplacedSecondPart(t)" />
+                Value="context.Item.LastLogin?.GetSecondPart()" ValueChanged="t => context.Item.LastLogin = context.Item.LastLogin?.ReplacedSecondPart(t)" />
             </EditTemplate>
-        </Column>
-        <Column T="PlayerAccount" Field="InactivateDate">
+        </PropertyColumn>
+        <PropertyColumn Property="x => x.InactivateDate">
             <EditTemplate>
                 <MudTextField Format="s" InputType="InputType.DateTimeLocal" Label="@(TextHelper.LabelFor<PlayerAccount>(i => i.InactivateDate))" @bind-Value="context.Item.InactivateDate"/>
                 <MudNumericField T="double?" Label="Second" Adornment="Adornment.End" AdornmentText="s" Min="0.0" Max="59.9999999"
-                    Value="context.Item.InactivateDate?.GetSecondPart()" ValueChanged="t => context.Item.InactivateDate = context.Item.InactivateDate?.ReplacedSecondPart(t)" />
+                Value="context.Item.InactivateDate?.GetSecondPart()" ValueChanged="t => context.Item.InactivateDate = context.Item.InactivateDate?.ReplacedSecondPart(t)" />
             </EditTemplate>
-        </Column>
-        <Column T="PlayerAccount" Field="BanDate">
+        </PropertyColumn>
+        <PropertyColumn Property="x => x.BanDate">
             <EditTemplate>
                 <MudTextField Format="s" InputType="InputType.DateTimeLocal" Label="@(TextHelper.LabelFor<PlayerAccount>(i => i.BanDate))" @bind-Value="context.Item.BanDate"/>
                 <MudNumericField T="double?" Label="Second" Adornment="Adornment.End" AdornmentText="s" Min="0.0" Max="59.9999999"
-                    Value="context.Item.BanDate?.GetSecondPart()" ValueChanged="t => context.Item.BanDate = context.Item.BanDate?.ReplacedSecondPart(t)" />
+                Value="context.Item.BanDate?.GetSecondPart()" ValueChanged="t => context.Item.BanDate = context.Item.BanDate?.ReplacedSecondPart(t)" />
             </EditTemplate>
-        </Column>
-        <Column T="PlayerAccount" Field="ExpireDate">
+        </PropertyColumn>
+        <PropertyColumn Property="x => x.ExpireDate">
             <EditTemplate>
                 <MudTextField Format="s" InputType="InputType.DateTimeLocal" Label="@(TextHelper.LabelFor<PlayerAccount>(i => i.ExpireDate))" @bind-Value="context.Item.ExpireDate"/>
                 <MudNumericField T="double?" Label="Second" Adornment="Adornment.End" AdornmentText="s" Min="0.0" Max="59.9999999"
-                    Value="context.Item.ExpireDate?.GetSecondPart()" ValueChanged="t => context.Item.ExpireDate = context.Item.ExpireDate?.ReplacedSecondPart(t)" />
+                Value="context.Item.ExpireDate?.GetSecondPart()" ValueChanged="t => context.Item.ExpireDate = context.Item.ExpireDate?.ReplacedSecondPart(t)" />
             </EditTemplate>
-        </Column>
-        <Column T="PlayerAccount" Hideable="false" Sortable="false" Filterable="false">
+        </PropertyColumn>
+        <TemplateColumn Hideable="false" Sortable="false" Filterable="false">
             <CellTemplate>
                 <MudStack Spacing="1" Justify="Justify.FlexEnd" Row="true">
                     <MudIconButton Size="Size.Small" Icon="@Icons.Material.Filled.Delete" OnClick="@(async () => await Delete(@context.Item))" />
-                    <MudIconButton Size="Size.Small" Icon="@Icons.Outlined.Edit" OnClick="@context.Actions.StartEditingItem" />
+                    <MudIconButton Size="Size.Small" Icon="@Icons.Material.Outlined.Edit" OnClick="@context.Actions.StartEditingItemAsync" />
                 </MudStack>
             </CellTemplate>
-        </Column>
+        </TemplateColumn>
     </Columns>
     <PagerContent>
         <MudDataGridPager T="PlayerAccount" />
@@ -155,6 +155,7 @@
 </MudDataGrid>
 
 @code {
+
     bool _editPanelExpanded = false;
     string _searchString = "";
     PlayerAccount _newItem = new();
@@ -194,7 +195,8 @@
         parameters.Add("ButtonText", "Delete");
         parameters.Add("Color", Color.Error);
 
-        if (!(await dialogService.Show<ConfirmDialog>("Delete", parameters, new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall }).Result).Cancelled) {
+        var result = await dialogService.Show<ConfirmDialog>("Delete", parameters, new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall }).Result;
+        if (result != null && !result.Canceled) {
             dbContext.PlayerAccounts.Remove(x);
             await dbContext.SaveChangesAsync();
             snackBar.Add($"{nameof(PlayerAccount)} (id:{x.Id}) Deleted.", Severity.Success);

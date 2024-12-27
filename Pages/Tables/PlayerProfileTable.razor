@@ -16,7 +16,7 @@
                 <MudTd>
                     <MudTextField Format="s" Label="@(TextHelper.LabelFor<PlayerProfile>(i => i.LastUpdate))" InputType="InputType.DateTimeLocal" @bind-Value="_newItem.LastUpdate"/>
                     <MudNumericField T="double?" Label="Second" Adornment="Adornment.End" AdornmentText="s" Min="0.0" Max="59.9999999"
-                        Value="_newItem.LastUpdate?.GetSecondPart()" ValueChanged="t => _newItem.LastUpdate = _newItem.LastUpdate?.ReplacedSecondPart(t)" />
+                    Value="_newItem.LastUpdate?.GetSecondPart()" ValueChanged="t => _newItem.LastUpdate = _newItem.LastUpdate?.ReplacedSecondPart(t)" />
                 </MudTd>
                 <MudTd>
                     <MudTextField @bind-Value="_newItem.Name" Label="@(TextHelper.LabelFor<PlayerProfile>(i => i.Name))" />
@@ -37,33 +37,33 @@
 </MudExpansionPanel>
 <br />
 <MudDataGrid T="PlayerProfile" Items="dbContext.PlayerProfiles" Sortable="true" Filterable="true" QuickFilter="QuickFilter" ReadOnly="false"
-    CommittedItemChanges="@(async () => await dbContext.SaveChangesAsync())" EditMode="@DataGridEditMode.Form" EditTrigger="@DataGridEditTrigger.Manual">
+CommittedItemChanges="@(async () => await dbContext.SaveChangesAsync())" EditMode="@DataGridEditMode.Form" EditTrigger="@DataGridEditTrigger.Manual">
     <ToolBarContent>
         <MudText Typo="Typo.h6">@ListPanelText</MudText>
         <MudSpacer />
         <MudTextField @bind-Value="_searchString" Placeholder="Search for PlayerProfiles..." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" />
     </ToolBarContent>
     <Columns>
-        <Column T="PlayerProfile" Field="Id" IsEditable="false" />
-        <Column T="PlayerProfile" Field="OwnerId" />
-        <Column T="PlayerProfile" Field="LastUpdate">
+        <PropertyColumn Property="x => x.Id" IsEditable="false" />
+        <PropertyColumn Property="x => x.OwnerId" />
+        <PropertyColumn Property="x => x.LastUpdate">
             <EditTemplate>
                 <MudTextField Format="s" Label="@(TextHelper.LabelFor<PlayerProfile>(i => i.LastUpdate))" InputType="InputType.DateTimeLocal" @bind-Value="context.Item.LastUpdate"/>
                 <MudNumericField T="double?" Label="Second" Adornment="Adornment.End" AdornmentText="s" Min="0.0" Max="59.9999999"
-                    Value="context.Item.LastUpdate?.GetSecondPart()" ValueChanged="t => context.Item.LastUpdate = context.Item.LastUpdate?.ReplacedSecondPart(t)" />
+                Value="context.Item.LastUpdate?.GetSecondPart()" ValueChanged="t => context.Item.LastUpdate = context.Item.LastUpdate?.ReplacedSecondPart(t)" />
             </EditTemplate>
-        </Column>
-        <Column T="PlayerProfile" Field="Name" />
-        <Column T="PlayerProfile" Field="Motto" />
-        <Column T="PlayerProfile" Field="IconBlobId" />
-        <Column T="PlayerProfile" Sortable="false" Filterable="false">
+        </PropertyColumn>
+        <PropertyColumn Property="x => x.Name" />
+        <PropertyColumn Property="x => x.Motto" />
+        <PropertyColumn Property="x => x.IconBlobId" />
+        <TemplateColumn T="PlayerProfile" Sortable="false" Filterable="false">
             <CellTemplate>
                 <MudStack Spacing="1" Justify="Justify.FlexEnd" Row="true">
                     <MudIconButton Size="Size.Small" Icon="@Icons.Material.Filled.Delete" OnClick="@(async () => await Delete(@context.Item))" />
-                    <MudIconButton Size="Size.Small" Icon="@Icons.Outlined.Edit" OnClick="@context.Actions.StartEditingItem" />
+                    <MudIconButton Size="Size.Small" Icon="@Icons.Material.Outlined.Edit" OnClick="@context.Actions.StartEditingItemAsync" />
                 </MudStack>
             </CellTemplate>
-        </Column>
+        </TemplateColumn>
     </Columns>
     <PagerContent>
         <MudDataGridPager T="PlayerProfile" />
@@ -113,7 +113,8 @@
         parameters.Add("ButtonText", "Delete");
         parameters.Add("Color", Color.Error);
 
-        if (!(await dialogService.Show<ConfirmDialog>("Delete", parameters, new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall }).Result).Cancelled) {
+        var result = await dialogService.Show<ConfirmDialog>("Delete", parameters, new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall }).Result;
+        if (result != null && !result.Canceled) {
             dbContext.PlayerProfiles.Remove(x);
             await dbContext.SaveChangesAsync();
             snackBar.Add($"{nameof(PlayerProfile)} (id:{x.Id}) Deleted.", Severity.Success);

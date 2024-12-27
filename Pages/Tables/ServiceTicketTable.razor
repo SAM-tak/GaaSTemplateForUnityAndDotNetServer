@@ -53,9 +53,9 @@
         <MudTextField @bind-Value="_searchString" Placeholder="Search for ServiceTickets..." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" />
     </ToolBarContent>
     <Columns>
-        <Column T="ServiceTicket" Field="Id" IsEditable="false" />
-        <Column T="ServiceTicket" Field="Name" />
-        <Column T="ServiceTicket" Field="Kind">
+        <PropertyColumn Property="x => x.Id" IsEditable="false" />
+        <PropertyColumn Property="x => x.Name" />
+        <PropertyColumn Property="x => x.Kind">
             <EditTemplate>
                 <MudSelect T="ServiceTicketKind" @bind-Value="context.Item.Kind" Label="@(TextHelper.LabelFor<ServiceTicket>(i => i.Kind))">
                     @foreach (ServiceTicketKind item in Enum.GetValues(typeof(ServiceTicketKind)))
@@ -64,20 +64,20 @@
                     }
                 </MudSelect>
             </EditTemplate>
-        </Column>
-        <Column T="ServiceTicket" Field="ProductName" />
-        <Column T="ServiceTicket" Field="DisplayName" />
-        <Column T="ServiceTicket" Field="Description" />
-        <Column T="ServiceTicket" Field="DetailId" />
-        <Column T="ServiceTicket" Field="IconBlobId" />
-        <Column T="ServiceTicket" Sortable="false" Filterable="false">
+        </PropertyColumn>
+        <PropertyColumn Property="x => x.ProductName" />
+        <PropertyColumn Property="x => x.DisplayName" />
+        <PropertyColumn Property="x => x.Description" />
+        <PropertyColumn Property="x => x.DetailId" />
+        <PropertyColumn Property="x => x.IconBlobId" />
+        <TemplateColumn T="ServiceTicket" Sortable="false" Filterable="false">
             <CellTemplate>
                 <MudStack Spacing="1" Justify="Justify.FlexEnd" Row="true">
                     <MudIconButton Size="Size.Small" Icon="@Icons.Material.Filled.Delete" OnClick="@(async () => await Delete(@context.Item))" />
-                    <MudIconButton Size="Size.Small" Icon="@Icons.Outlined.Edit" OnClick="@context.Actions.StartEditingItem" />
+                    <MudIconButton Size="Size.Small" Icon="@Icons.Material.Outlined.Edit" OnClick="@context.Actions.StartEditingItemAsync" />
                 </MudStack>
             </CellTemplate>
-        </Column>
+        </TemplateColumn>
     </Columns>
     <PagerContent>
         <MudDataGridPager T="ServiceTicket" />
@@ -129,7 +129,8 @@
         parameters.Add("ButtonText", "Delete");
         parameters.Add("Color", Color.Error);
 
-        if (!(await dialogService.Show<ConfirmDialog>("Delete", parameters, new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall }).Result).Cancelled) {
+        var result = await dialogService.Show<ConfirmDialog>("Delete", parameters, new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall }).Result;
+        if (result != null && !result.Canceled) {
             dbContext.ServiceTickets.Remove(x);
             await dbContext.SaveChangesAsync();
             snackBar.Add($"{nameof(ServiceTicket)} (id:{x.Id}) Deleted.", Severity.Success);

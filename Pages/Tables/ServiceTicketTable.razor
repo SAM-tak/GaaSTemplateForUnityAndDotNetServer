@@ -17,7 +17,7 @@
                     <MudSelect T="ServiceTicketKind" @bind-Value="_newItem.Kind" Label="@(TextHelper.LabelFor<ServiceTicket>(i => i.Kind))">
                         @foreach (ServiceTicketKind item in Enum.GetValues(typeof(ServiceTicketKind)))
                         {
-                                <MudSelectItem Value="@item">@item.GetDisplayName()</MudSelectItem>
+                            <MudSelectItem Value="@item">@item.GetDisplayName()</MudSelectItem>
                         }
                     </MudSelect>
                 </MudTd>
@@ -70,7 +70,7 @@
         <PropertyColumn Property="x => x.Description" />
         <PropertyColumn Property="x => x.DetailId" />
         <PropertyColumn Property="x => x.IconBlobId" />
-        <TemplateColumn T="ServiceTicket" Sortable="false" Filterable="false">
+        <TemplateColumn Sortable="false" Filterable="false">
             <CellTemplate>
                 <MudStack Spacing="1" Justify="Justify.FlexEnd" Row="true">
                     <MudIconButton Size="Size.Small" Icon="@Icons.Material.Filled.Delete" OnClick="@(async () => await Delete(@context.Item))" />
@@ -80,7 +80,7 @@
         </TemplateColumn>
     </Columns>
     <PagerContent>
-        <MudDataGridPager T="ServiceTicket" />
+        <MudDataGridPager />
     </PagerContent>
 </MudDataGrid>
 
@@ -130,7 +130,7 @@
         parameters.Add("Color", Color.Error);
 
         var result = await dialogService.Show<ConfirmDialog>("Delete", parameters, new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall }).Result;
-        if (result != null && !result.Canceled) {
+        if(result != null && !result.Canceled) {
             dbContext.ServiceTickets.Remove(x);
             await dbContext.SaveChangesAsync();
             snackBar.Add($"{nameof(ServiceTicket)} (id:{x.Id}) Deleted.", Severity.Success);

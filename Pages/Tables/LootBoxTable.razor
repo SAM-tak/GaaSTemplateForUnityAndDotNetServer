@@ -62,7 +62,7 @@
         </TemplateColumn>
     </Columns>
     <PagerContent>
-        <MudDataGridPager T="LootBox" />
+        <MudDataGridPager />
     </PagerContent>
 </MudDataGrid>
 
@@ -77,20 +77,13 @@
 
     private bool QuickFilter(LootBox x)
     {
-        if (string.IsNullOrWhiteSpace(_searchString)) return true;
-
-        if (x.Name.Contains(_searchString, StringComparison.OrdinalIgnoreCase)) return true;
-
-        if (x.DisplayName.Contains(_searchString, StringComparison.OrdinalIgnoreCase)) return true;
-
-        if (x.Description.Contains(_searchString, StringComparison.OrdinalIgnoreCase)) return true;
-
-        if (x.IconAddress.Contains(_searchString, StringComparison.OrdinalIgnoreCase)) return true;
-
-        if (x.BannerAddress.Contains(_searchString, StringComparison.OrdinalIgnoreCase)) return true;
-
-        if ($"{x.Id}".Contains(_searchString)) return true;
-
+        if(string.IsNullOrWhiteSpace(_searchString)) return true;
+        if(x.Name.Contains(_searchString, StringComparison.OrdinalIgnoreCase)) return true;
+        if(x.DisplayName.Contains(_searchString, StringComparison.OrdinalIgnoreCase)) return true;
+        if(x.Description.Contains(_searchString, StringComparison.OrdinalIgnoreCase)) return true;
+        if(x.IconAddress.Contains(_searchString, StringComparison.OrdinalIgnoreCase)) return true;
+        if(x.BannerAddress.Contains(_searchString, StringComparison.OrdinalIgnoreCase)) return true;
+        if($"{x.Id}".Contains(_searchString)) return true;
         return false;
     }
 
@@ -116,7 +109,7 @@
         parameters.Add("Color", Color.Error);
 
         var result = await dialogService.Show<ConfirmDialog>("Delete", parameters, new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall }).Result;
-        if (result != null && !result.Canceled) {
+        if(result != null && !result.Canceled) {
             dbContext.LootBoxes.Remove(x);
             await dbContext.SaveChangesAsync();
             snackBar.Add($"{nameof(LootBox)} (id:{x.Id}) Deleted.", Severity.Success);

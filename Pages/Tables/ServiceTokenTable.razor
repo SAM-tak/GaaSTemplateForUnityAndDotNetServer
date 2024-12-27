@@ -25,7 +25,7 @@
 </MudExpansionPanel>
 <br />
 <MudDataGrid T="ServiceToken" Items="dbContext.ServiceTokens" Sortable="true" Filterable="true" QuickFilter="QuickFilter" ReadOnly="false"
-CommittedItemChanges="@(async () => await dbContext.SaveChangesAsync())" EditMode="@DataGridEditMode.Form" EditTrigger="@DataGridEditTrigger.Manual">
+    CommittedItemChanges="@(async () => await dbContext.SaveChangesAsync())" EditMode="@DataGridEditMode.Form" EditTrigger="@DataGridEditTrigger.Manual">
     <ToolBarContent>
         <MudText Typo="Typo.h6">@ListPanelText</MudText>
         <MudSpacer />
@@ -38,7 +38,7 @@ CommittedItemChanges="@(async () => await dbContext.SaveChangesAsync())" EditMod
         <PropertyColumn Property="x => x.DisplayName" />
         <PropertyColumn Property="x => x.Description" />
         <PropertyColumn Property="x => x.IconBlobId" />
-        <TemplateColumn T="ServiceToken" Sortable="false" Filterable="false">
+        <TemplateColumn Sortable="false" Filterable="false">
             <CellTemplate>
                 <MudStack Spacing="1" Justify="Justify.FlexEnd" Row="true">
                     <MudIconButton Size="Size.Small" Icon="@Icons.Material.Filled.Delete" OnClick="@(async () => await Delete(@context.Item))" />
@@ -48,7 +48,7 @@ CommittedItemChanges="@(async () => await dbContext.SaveChangesAsync())" EditMod
         </TemplateColumn>
     </Columns>
     <PagerContent>
-        <MudDataGridPager T="ServiceToken" />
+        <MudDataGridPager />
     </PagerContent>
 </MudDataGrid>
 
@@ -98,8 +98,7 @@ CommittedItemChanges="@(async () => await dbContext.SaveChangesAsync())" EditMod
         parameters.Add("Color", Color.Error);
 
         var result = await dialogService.Show<ConfirmDialog>("Delete", parameters, new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall }).Result;
-        if (result != null && !result.Canceled)
-        {
+        if(result != null && !result.Canceled) {
             dbContext.ServiceTokens.Remove(x);
             await dbContext.SaveChangesAsync();
             snackBar.Add($"{nameof(ServiceToken)} (id:{x.Id}) Deleted.", Severity.Success);

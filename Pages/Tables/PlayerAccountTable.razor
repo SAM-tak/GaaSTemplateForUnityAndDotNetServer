@@ -150,12 +150,11 @@ CommittedItemChanges="@(async () => await dbContext.SaveChangesAsync())" EditMod
         </TemplateColumn>
     </Columns>
     <PagerContent>
-        <MudDataGridPager T="PlayerAccount" />
+        <MudDataGridPager />
     </PagerContent>
 </MudDataGrid>
 
 @code {
-
     bool _editPanelExpanded = false;
     string _searchString = "";
     PlayerAccount _newItem = new();
@@ -196,7 +195,7 @@ CommittedItemChanges="@(async () => await dbContext.SaveChangesAsync())" EditMod
         parameters.Add("Color", Color.Error);
 
         var result = await dialogService.Show<ConfirmDialog>("Delete", parameters, new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall }).Result;
-        if (result != null && !result.Canceled) {
+        if(result != null && !result.Canceled) {
             dbContext.PlayerAccounts.Remove(x);
             await dbContext.SaveChangesAsync();
             snackBar.Add($"{nameof(PlayerAccount)} (id:{x.Id}) Deleted.", Severity.Success);

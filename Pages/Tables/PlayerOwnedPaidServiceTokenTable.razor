@@ -130,7 +130,7 @@ CommittedItemChanges="@(async () => await dbContext.SaveChangesAsync())" EditMod
         </TemplateColumn>
     </Columns>
     <PagerContent>
-        <MudDataGridPager T="PlayerOwnedPaidServiceToken" />
+        <MudDataGridPager />
     </PagerContent>
 </MudDataGrid>
 
@@ -163,7 +163,6 @@ CommittedItemChanges="@(async () => await dbContext.SaveChangesAsync())" EditMod
     void Clear()
     {
         _newItem = new();
-
     }
 
     async Task Delete(PlayerOwnedPaidServiceToken x)
@@ -175,7 +174,7 @@ CommittedItemChanges="@(async () => await dbContext.SaveChangesAsync())" EditMod
         parameters.Add("Color", Color.Error);
 
         var result = await dialogService.Show<ConfirmDialog>("Delete", parameters, new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall }).Result;
-        if (result != null && !result.Canceled) {
+        if(result != null && !result.Canceled) {
             dbContext.PlayerOwnedPaidServiceTokens.Remove(x);
             await dbContext.SaveChangesAsync();
             snackBar.Add($"{nameof(PlayerOwnedPaidServiceToken)} (id:{x.Id}) Deleted.", Severity.Success);

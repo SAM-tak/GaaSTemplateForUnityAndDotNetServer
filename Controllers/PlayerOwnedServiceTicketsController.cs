@@ -8,14 +8,9 @@ namespace YourGameServer.Controllers
     [Route("api/[controller]")]
     [ApiAuth]
     [ApiController]
-    public class PlayerOwnedServiceTicketsController : ControllerBase
+    public class PlayerOwnedServiceTicketsController(GameDbContext context) : ControllerBase
     {
-        private readonly GameDbContext _context;
-
-        public PlayerOwnedServiceTicketsController(GameDbContext context)
-        {
-            _context = context;
-        }
+        private readonly GameDbContext _context = context;
 
         // GET: api/PlayerOwnedServiceTickets
         [HttpGet]

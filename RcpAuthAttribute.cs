@@ -4,16 +4,10 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace YourGameServer;
 
-internal class RpcAuthAttribute : MagicOnionFilterAttribute
+internal class RpcAuthAttribute(JwtAuthorizer jwt, IHttpContextAccessor httpContextAccessor) : MagicOnionFilterAttribute
 {
-    readonly JwtAuthorizer _jwt;
-    readonly IHttpContextAccessor _httpContextAccessor;
-
-    public RpcAuthAttribute(JwtAuthorizer jwt, IHttpContextAccessor httpContextAccessor)
-    {
-        _jwt = jwt;
-        _httpContextAccessor = httpContextAccessor;
-    }
+    readonly JwtAuthorizer _jwt = jwt;
+    readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
 
     public override async ValueTask Invoke(ServiceContext context, Func<ServiceContext, ValueTask> next)
     {

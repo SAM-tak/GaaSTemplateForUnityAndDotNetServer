@@ -12,14 +12,9 @@ namespace YourGameServer.Controllers;
 [Route("api/[controller]")]
 [ApiAuth]
 [ApiController]
-public class PlayerDevicesController : ControllerBase
+public class PlayerDevicesController(GameDbContext context) : ControllerBase
 {
-    private readonly GameDbContext _context;
-
-    public PlayerDevicesController(GameDbContext context)
-    {
-        _context = context;
-    }
+    private readonly GameDbContext _context = context;
 
     // GET: api/PlayerDevices
     [HttpGet]

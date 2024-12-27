@@ -9,14 +9,9 @@ namespace YourGameServer.Controllers;
 //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 [ApiAuth]
 [ApiController]
-public class PlayerAccountsController : ControllerBase
+public class PlayerAccountsController(GameDbContext context) : ControllerBase
 {
-    private readonly GameDbContext _context;
-
-    public PlayerAccountsController(GameDbContext context)
-    {
-        _context = context;
-    }
+    private readonly GameDbContext _context = context;
 
     /// <summary>
     /// GET: api/PlayerAccounts?id=111&amp;id=112&amp;id=113

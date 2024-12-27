@@ -8,14 +8,9 @@ namespace YourGameServer.Controllers
     [Route("api/[controller]")]
     [ApiAuth]
     [ApiController]
-    public class PlayerOwnedPaidServiceTokensController : ControllerBase
+    public class PlayerOwnedPaidServiceTokensController(GameDbContext context) : ControllerBase
     {
-        private readonly GameDbContext _context;
-
-        public PlayerOwnedPaidServiceTokensController(GameDbContext context)
-        {
-            _context = context;
-        }
+        private readonly GameDbContext _context = context;
 
         // GET: api/PlayerOwnedPaidServiceTokens
         [HttpGet]
@@ -30,8 +25,7 @@ namespace YourGameServer.Controllers
         {
             var playerOwnedPaidServiceToken = await _context.PlayerOwnedPaidServiceTokens.FindAsync(id);
 
-            if (playerOwnedPaidServiceToken == null)
-            {
+            if(playerOwnedPaidServiceToken == null) {
                 return NotFound();
             }
 
@@ -43,25 +37,20 @@ namespace YourGameServer.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutPlayerOwnedPaidServiceToken(ulong id, PlayerOwnedPaidServiceToken playerOwnedPaidServiceToken)
         {
-            if (id != playerOwnedPaidServiceToken.Id)
-            {
+            if(id != playerOwnedPaidServiceToken.Id) {
                 return BadRequest();
             }
 
             _context.Entry(playerOwnedPaidServiceToken).State = EntityState.Modified;
 
-            try
-            {
+            try {
                 await _context.SaveChangesAsync();
             }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!PlayerOwnedPaidServiceTokenExists(id))
-                {
+            catch(DbUpdateConcurrencyException) {
+                if(!PlayerOwnedPaidServiceTokenExists(id)) {
                     return NotFound();
                 }
-                else
-                {
+                else {
                     throw;
                 }
             }
@@ -85,8 +74,7 @@ namespace YourGameServer.Controllers
         public async Task<IActionResult> DeletePlayerOwnedPaidServiceToken(ulong id)
         {
             var playerOwnedPaidServiceToken = await _context.PlayerOwnedPaidServiceTokens.FindAsync(id);
-            if (playerOwnedPaidServiceToken == null)
-            {
+            if(playerOwnedPaidServiceToken == null) {
                 return NotFound();
             }
 

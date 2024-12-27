@@ -2,10 +2,12 @@ namespace YourGameServer.Extensions;
 
 using System.Text.RegularExpressions;
 
-public static class StringExtensions
+public static partial class StringExtensions
 {
-    static readonly Regex _4 = new(".{4}(?!$)");
-    public static string ToHyphenedPer4(this string src) => _4.Replace(src, "$0-");
+    [GeneratedRegex(@".{4}(?!$)")]
+    private static partial Regex _4();
+
+    public static string ToHyphenedPer4(this string src) => _4().Replace(src, "$0-");
 
     public static string ToHyphened(this string src) => src.Length < 6 ? src
         : (src.Length % 4) switch {

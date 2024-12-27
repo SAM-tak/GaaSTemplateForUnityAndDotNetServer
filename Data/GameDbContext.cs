@@ -1,16 +1,11 @@
 #nullable disable
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Design;
 using YourGameServer.Models;
 
 namespace YourGameServer.Data;
 
-public class GameDbContext : DbContext
+public class GameDbContext(DbContextOptions<GameDbContext> options) : DbContext(options)
 {
-    public GameDbContext(DbContextOptions<GameDbContext> options) : base(options)
-    {
-    }
-
     public DbSet<PlayerAccount> PlayerAccounts { get; init; }
 
     public DbSet<PlayerProfile> PlayerProfiles { get; init; }

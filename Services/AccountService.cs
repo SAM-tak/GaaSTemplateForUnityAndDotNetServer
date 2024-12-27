@@ -13,18 +13,11 @@ namespace YourGameServer.Services;
 
 // Implements RPC service in the server project.
 // The implementation class must inherit `ServiceBase<IMyFirstService>` and `IMyFirstService`
-public class AccountService : ServiceBase<IAccountService>, IAccountService
+public class AccountService(GameDbContext context, JwtAuthorizer jwt, IHttpContextAccessor httpContextAccessor) : ServiceBase<IAccountService>, IAccountService
 {
-    readonly GameDbContext _context;
-    readonly JwtAuthorizer _jwt;
-    readonly IHttpContextAccessor _httpContextAccessor;
-
-    public AccountService(GameDbContext context, JwtAuthorizer jwt, IHttpContextAccessor httpContextAccessor)
-    {
-        _context = context;
-        _jwt = jwt;
-        _httpContextAccessor = httpContextAccessor;
-    }
+    readonly GameDbContext _context = context;
+    readonly JwtAuthorizer _jwt = jwt;
+    readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
 
     /// <summary>
     /// LogIn
@@ -145,14 +138,14 @@ public class AccountService : ServiceBase<IAccountService>, IAccountService
         var curDateTime = DateTime.UtcNow;
         var playerAccount = new PlayerAccount {
             Secret = (ushort)RandomNumberGenerator.GetInt32(0x10000),
-            DeviceList = new() {
+            DeviceList = [
                 new () {
                     DeviceType = accountCreationModel.DeviceType,
                     DeviceId = accountCreationModel.DeviceId,
                     Since = curDateTime,
                     LastUsed = curDateTime,
                 }
-            },
+            ],
             Since = curDateTime,
             LastLogin = curDateTime,
             Profile = new() {

@@ -3,12 +3,8 @@ using Microsoft.EntityFrameworkCore.Design;
 
 namespace YourGameServer.Data;
 
-public class SqliteGameDbContext : GameDbContext
+public class SqliteGameDbContext(DbContextOptions<GameDbContext> options) : GameDbContext(options)
 {
-    public SqliteGameDbContext(DbContextOptions<GameDbContext> options) : base(options)
-    {
-    }
-
     protected override void OnConfiguring(DbContextOptionsBuilder options) => options.UseSqlite("Data Source=game.db");
 }
 

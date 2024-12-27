@@ -18,8 +18,11 @@ public class JwtAuthorizer
     {
         var jwtConfig = builder.Configuration.GetSection("Jwt");
         ExpireMinutes = jwtConfig.GetValue<int>("ExpireMinutes");
-        if(builder.Environment.IsProduction() && ExpireMinutes <= 0) throw new SecurityException("Jwt.ExpireMinute must be over 0 in production.");
-        var issuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration.GetSection(jwtConfig["SecretKeyStore"])["SecretKey"]));
+        if(builder.Environment.IsProduction() && ExpireMinutes <= 0) {
+            throw new SecurityException("Jwt.ExpireMinute must be over 0 in production.");
+        }
+        var key = builder.Configuration.GetSection(jwtConfig["SecretKeyStore"] ?? string.Empty)["SecretKey"] ?? string.Empty;
+        var issuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
         TokenValidationParameters = new TokenValidationParameters {
             ValidateIssuer = true,
             ValidateAudience = true,
@@ -80,21 +83,29 @@ internal static class JwtAuthorizerExtentions
     public static IApplicationBuilder UseJwtAuthorizer(this IApplicationBuilder app)
     {
         var jwtAuthorizer = app.ApplicationServices.GetService<JwtAuthorizer>();
-        if(jwtAuthorizer is not null) jwtAuthorizer.TokenValidationParameters.AudienceValidator = (audiences, securityToken, validationParameters) => {
+        if(jwtAuthorizer is null) {
+            return app;
+        }
+
+        jwtAuthorizer.TokenValidationParameters.AudienceValidator = (audiences, securityToken, validationParameters) => {
             var candidate = audiences.Select(i => i.Split('/')).FirstOrDefault(i => i.Length == 3 && i[0] == validationParameters.ValidAudience);
-            if(candidate is null) return false;
+            if(candidate is null) {
+                return false;
+            }
+
             var playerIdString = candidate[1];
             var deviceIdString = candidate[2];
-            if(!string.IsNullOrEmpty(playerIdString) && !string.IsNullOrEmpty(deviceIdString) && ulong.TryParse(playerIdString, out _) && ulong.TryParse(deviceIdString, out _)) {
+            if(!string.IsNullOrEmpty(playerIdString) && !string.IsNullOrEmpty(deviceIdString)
+                && ulong.TryParse(playerIdString, out _) && ulong.TryParse(deviceIdString, out _)) {
                 var serviceScopeFactory = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>();
                 using var scope = serviceScopeFactory.CreateScope();
                 var httpContextAccessor = scope.ServiceProvider.GetService<IHttpContextAccessor>();
                 var headers = httpContextAccessor?.HttpContext?.Request.Headers;
-                if(headers is null) return false;
-                if(headers.ContainsKey("PlayerId")) headers.Remove("PlayerId");
-                if(headers.ContainsKey("DeviceId")) headers.Remove("DeviceId");
-                headers.Add("PlayerId", playerIdString);
-                headers.Add("DeviceId", deviceIdString);
+                if(headers is null) {
+                    return false;
+                }
+                headers["PlayerId"] = playerIdString;
+                headers["DeviceId"] = deviceIdString;
                 return true;
             }
             return false;

@@ -8,14 +8,9 @@ namespace YourGameServer.Controllers;
 [Route("api/[controller]")]
 [ApiAuth]
 [ApiController]
-public class PlayerProfilesController : ControllerBase
+public class PlayerProfilesController(GameDbContext context) : ControllerBase
 {
-    private readonly GameDbContext _context;
-
-    public PlayerProfilesController(GameDbContext context)
-    {
-        _context = context;
-    }
+    private readonly GameDbContext _context = context;
 
     // GET: api/PlayerProfiles?id=102&id=103&id=104
     [HttpGet]

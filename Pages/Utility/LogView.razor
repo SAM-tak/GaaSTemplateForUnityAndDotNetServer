@@ -21,7 +21,7 @@
 
     protected override void OnInitialized()
     {
-        timer = new Timer((_) => InvokeAsync(async() => await UpdateLogLines()), null, 0, 1000);
+        timer = new Timer(_ => InvokeAsync(async() => await UpdateLogLines()), null, 0, 1000);
     }
 
     public void Dispose() => timer?.Dispose();

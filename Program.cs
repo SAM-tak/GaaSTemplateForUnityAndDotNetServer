@@ -32,17 +32,16 @@ try {
     });
 
     // Setup IDCoder(hashids)
-    IDCoder.Initialize(builder.Configuration.GetSection("IDCoder")["Salt"]);
+    IDCoder.Initialize(builder.Configuration.GetSection("IDCoder")["Salt"] ?? string.Empty);
 
     // https://stackoverflow.com/questions/4804086/is-there-any-connection-string-parser-in-c
-    var connectionString = builder.Configuration.GetConnectionString(builder.Configuration["GameDbConnectionStringKey"]);
+    var connectionString = builder.Configuration.GetConnectionString(builder.Configuration["GameDbConnectionStringKey"] ?? string.Empty);
     var dbcsb = new DbConnectionStringBuilder() { ConnectionString = connectionString };
     if(dbcsb.ContainsKey("Data Source") && Path.GetExtension(dbcsb["Data Source"].ToString()) == ".db") {
         builder.Services.AddDbContext<GameDbContext>(options => options.UseSqlite(connectionString));
     }
     else {
-        // CPomelo.EntityFrameworkCore.MySql.Infrastructure.ServerType.MariaDb // 最新でこの定義の使い所がないがいいのか？
-        builder.Services.AddDbContext<GameDbContext>(options => options.UseMySql(connectionString, new MySqlServerVersion(new Version(10, 6, 5))));
+        builder.Services.AddDbContext<GameDbContext>(options => options.UseMySql(connectionString, new MariaDbServerVersion(new Version(10, 6, 5))));
     }
     // Add services to the container.
     var authentication = builder.Services.AddAuthentication(options => {
@@ -56,8 +55,8 @@ try {
         authentication.AddCookie("OpenIdConnect");
         authentication.AddGoogle(options => {
             IConfigurationSection googleAuthNSection = builder.Configuration.GetSection("Authentication:Google");
-            options.ClientId = googleAuthNSection["ClientId"];
-            options.ClientSecret = googleAuthNSection["ClientSecret"];
+            options.ClientId = googleAuthNSection["ClientId"] ?? string.Empty;
+            options.ClientSecret = googleAuthNSection["ClientSecret"] ?? string.Empty;
             options.SaveTokens = true;
         });
     }
@@ -65,7 +64,7 @@ try {
     //authentication.AddMicrosoftIdentityWebApp(builder.Configuration);
 
     //builder.Services.AddAuthentication().AddScheme<AuthenticationSchemeOptions, ApiAuthHandler>("Api", null);
-    builder.Services.AddAuthorization(options => {
+    _ = builder.Services.AddAuthorization(options => {
         options.FallbackPolicy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
         options.AddPolicy("AllowOtherPlayer", new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build());
     });
@@ -91,9 +90,7 @@ try {
     builder.Services.AddMudServices();
 
     builder.Services.AddGrpc();
-    builder.Services.AddMagicOnion(option => {
-        option.SerializerOptions = option.SerializerOptions.WithCompression(MessagePackCompression.Lz4BlockArray);
-    });
+    builder.Services.AddMagicOnion();
 
     var app = builder.Build();
 

@@ -8,14 +8,9 @@ namespace YourGameServer.Controllers
     [Route("api/[controller]")]
     [ApiAuth]
     [ApiController]
-    public class PlayerOwnedFreeServiceTokensController : ControllerBase
+    public class PlayerOwnedFreeServiceTokensController(GameDbContext context) : ControllerBase
     {
-        private readonly GameDbContext _context;
-
-        public PlayerOwnedFreeServiceTokensController(GameDbContext context)
-        {
-            _context = context;
-        }
+        private readonly GameDbContext _context = context;
 
         // GET: api/PlayerOwnedFreeServiceTokens
         [HttpGet]
@@ -29,9 +24,8 @@ namespace YourGameServer.Controllers
         public async Task<ActionResult<PlayerOwnedFreeServiceToken>> GetPlayerOwnedFreeServiceToken(ulong id)
         {
             var playerOwnedFreeServiceToken = await _context.PlayerOwnedFreeServiceTokens.FindAsync(id);
- 
-            if (playerOwnedFreeServiceToken == null)
-            {
+
+            if(playerOwnedFreeServiceToken == null) {
                 return NotFound();
             }
 
@@ -43,25 +37,20 @@ namespace YourGameServer.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutPlayerOwnedFreeServiceToken(ulong id, PlayerOwnedFreeServiceToken playerOwnedFreeServiceToken)
         {
-            if (id != playerOwnedFreeServiceToken.Id)
-            {
+            if(id != playerOwnedFreeServiceToken.Id) {
                 return BadRequest();
             }
 
             _context.Entry(playerOwnedFreeServiceToken).State = EntityState.Modified;
 
-            try
-            {
+            try {
                 await _context.SaveChangesAsync();
             }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!PlayerOwnedFreeServiceTokenExists(id))
-                {
+            catch(DbUpdateConcurrencyException) {
+                if(!PlayerOwnedFreeServiceTokenExists(id)) {
                     return NotFound();
                 }
-                else
-                {
+                else {
                     throw;
                 }
             }
@@ -85,8 +74,7 @@ namespace YourGameServer.Controllers
         public async Task<IActionResult> DeletePlayerOwnedFreeServiceToken(ulong id)
         {
             var playerOwnedFreeServiceToken = await _context.PlayerOwnedFreeServiceTokens.FindAsync(id);
-            if (playerOwnedFreeServiceToken == null)
-            {
+            if(playerOwnedFreeServiceToken == null) {
                 return NotFound();
             }
 

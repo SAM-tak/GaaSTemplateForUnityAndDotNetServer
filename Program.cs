@@ -26,6 +26,13 @@ try {
 
     builder.Services.AddHttpContextAccessor();
 
+    // Kestrelの設定
+    builder.WebHost.ConfigureKestrel(options => {
+        options.ConfigureHttpsDefaults(config => {
+            config.SslProtocols = System.Security.Authentication.SslProtocols.Tls12;
+        });
+    });
+
     builder.Services.AddApiVersioning(options => {
         options.AssumeDefaultVersionWhenUnspecified = true;
         options.DefaultApiVersion = new ApiVersion(1, 0);

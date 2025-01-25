@@ -5,6 +5,7 @@ using MagicOnion;
 using MagicOnion.Server;
 using MessagePack;
 using Microsoft.EntityFrameworkCore;
+using NuGet.Protocol;
 using YourGameServer.Data;
 using YourGameServer.Interface;
 using YourGameServer.Models;
@@ -13,11 +14,13 @@ namespace YourGameServer.Services;
 
 // Implements RPC service in the server project.
 // The implementation class must inherit `ServiceBase<IMyFirstService>` and `IMyFirstService`
-public class AccountService(GameDbContext context, JwtAuthorizer jwt, IHttpContextAccessor httpContextAccessor) : ServiceBase<IAccountService>, IAccountService
+public class AccountService(GameDbContext context, JwtAuthorizer jwt, IHttpContextAccessor httpContextAccessor, ILogger<AccountService> logger)
+    : ServiceBase<IAccountService>, IAccountService
 {
     readonly GameDbContext _context = context;
     readonly JwtAuthorizer _jwt = jwt;
     readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
+    readonly ILogger<AccountService> _logger = logger;
 
     /// <summary>
     /// LogIn
@@ -26,7 +29,7 @@ public class AccountService(GameDbContext context, JwtAuthorizer jwt, IHttpConte
     /// <returns>response</returns>
     public async UnaryResult<LogInRequestResult> LogIn(LogInRequest param)
     {
-        Console.WriteLine("Login");
+        _logger.LogInformation("Login {Param}", param.ToJson());
         var playerAccount = await _context.PlayerAccounts.Include(i => i.DeviceList).FirstOrDefaultAsync(i => i.Id == param.Id);
         if(playerAccount is not null) {
             var playerDevice = playerAccount.DeviceList.FirstOrDefault(i => i.DeviceType == param.DeviceType && i.DeviceId == param.DeviceId);
@@ -50,6 +53,7 @@ public class AccountService(GameDbContext context, JwtAuthorizer jwt, IHttpConte
                 playerDevice.LastUsed = playerAccount.LastLogin = utcNow;
                 playerAccount.CurrentDeviceId = playerDevice.Id;
                 await _context.SaveChangesAsync();
+                _logger.LogInformation("Login return Code = {PlayerAccountCode}", playerAccount.Code);
                 return new LogInRequestResult {
                     Code = playerAccount.Code,
                     Token = _jwt.CreateToken(playerAccount.Id, playerDevice.Id, out var period),

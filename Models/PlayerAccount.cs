@@ -8,6 +8,18 @@ using KeyAttribute = MessagePack.KeyAttribute;
 
 namespace YourGameServer.Models // Unity cannot accpect 'namespace YourProjectName.Models;' yet
 {
+    public enum PlayerAccountKind
+    {
+        [Display(Name = "Guest")]
+        Guest,
+        [Display(Name = "Special Guest")]
+        SpecialGuest,
+        [Display(Name = "Community Manager")]
+        CommunityManager,
+        [Display(Name = "Staff")]
+        Staff,
+    }
+
     public enum PlayerAccountStatus
     {
         [Display(Name = "Active")]
@@ -27,18 +39,6 @@ namespace YourGameServer.Models // Unity cannot accpect 'namespace YourProjectNa
         public ulong Id { get; init; }
     };
 #else
-    public enum PlayerAccountKind
-    {
-        [Display(Name = "Guest")]
-        Guest,
-        [Display(Name = "Special Guest")]
-        SpecialGuest,
-        [Display(Name = "Community Manager")]
-        CommunityManager,
-        [Display(Name = "Staff")]
-        Staff,
-    }
-
     public record PlayerAccount
     {
         [Display(Name = "ID")]
@@ -65,21 +65,7 @@ namespace YourGameServer.Models // Unity cannot accpect 'namespace YourProjectNa
         [Display(Name = "Profile")]
         public PlayerProfile Profile { get; init; }
 
-        public override int GetHashCode()
-        {
-            var hash = new HashCode();
-            hash.Add(Id);
-            hash.Add(Secret);
-            hash.Add(CurrentDeviceId);
-            hash.Add(Kind);
-            hash.Add(Status);
-            hash.Add(Since);
-            hash.Add(LastLogin);
-            hash.Add(InactivateDate);
-            hash.Add(BanDate);
-            hash.Add(ExpireDate);
-            return hash.ToHashCode();
-        }
+        public override int GetHashCode() => (Id, Secret, CurrentDeviceId, Status, Since, LastLogin, InactivateDate, BanDate, ExpireDate).GetHashCode();
 
         public MaskedPlayerAccount MakeMasked() => new() {
             Id = Id,

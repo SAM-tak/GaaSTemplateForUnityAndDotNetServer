@@ -4,7 +4,7 @@
 @inject MudBlazor.IDialogService dialogService
 @inject MudBlazor.ISnackbar snackBar
 
-<MudExpansionPanel id="@EditPanelId" Text="@EditPanelText" @bind-IsExpanded="_editPanelExpanded">
+<MudExpansionPanel id="@EditPanelId" Text="@EditPanelText" @bind-Expanded="_editPanelExpanded">
     <EditForm Model="@_newItem" OnValidSubmit="OnValidSubmit">
         <DataAnnotationsValidator />
         <MudCard>
@@ -32,7 +32,7 @@
                     </MudSelect>
                 </MudTd>
                 <MudTd>
-                    <MudTextField Format="s" InputType="InputType.DateTimeLocal" Label="@(TextHelper.LabelFor<PlayerAccount>(i => i.Since))" @bind-Value="_newItem.Since" Step="1"/>
+                    <MudTextField Format="s" InputType="InputType.DateTimeLocal" Label="@(TextHelper.LabelFor<PlayerAccount>(i => i.Since))" @bind-Value="_newItem.Since"/>
                     <MudNumericField T="double?" Label="Second" Adornment="Adornment.End" AdornmentText="ms" Min="0.0" Max="59.9999999"
                     Value="_newItem.Since?.GetSecondPart()" ValueChanged="t => _newItem.Since = _newItem.Since?.ReplacedSecondPart(t)" />
                 </MudTd>
@@ -65,7 +65,7 @@
     </EditForm>
 </MudExpansionPanel>
 <br />
-<MudDataGrid T="PlayerAccount" Items="dbContext.PlayerAccounts" Sortable="true" Filterable="true" QuickFilter="QuickFilter" ReadOnly="false"
+<MudDataGrid T="PlayerAccount" Items="dbContext.PlayerAccounts" SortMode="SortMode.Single" Filterable="true" QuickFilter="QuickFilter" ReadOnly="false"
 CommittedItemChanges="@(async () => await dbContext.SaveChangesAsync())" EditMode="@DataGridEditMode.Form" EditTrigger="@DataGridEditTrigger.Manual">
     <ToolBarContent>
         <MudText Typo="Typo.h6">@ListPanelText</MudText>
@@ -73,7 +73,7 @@ CommittedItemChanges="@(async () => await dbContext.SaveChangesAsync())" EditMod
         <MudTextField @bind-Value="_searchString" Placeholder="@PlaceholderText" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" />
     </ToolBarContent>
     <Columns>
-        <PropertyColumn Property="x => x.Id" IsEditable="false" />
+        <PropertyColumn Property="x => x.Id" Editable="false" />
         <PropertyColumn Property="x => x.Secret">
             <CellTemplate>
                 <MudText>@context.Item.Secret</MudText>

@@ -5,7 +5,7 @@
 @inject MudBlazor.IDialogService dialogService
 @inject MudBlazor.ISnackbar snackBar
 
-<MudExpansionPanel id="@EditPanelId" Text="@EditPanelText" @bind-IsExpanded="_editPanelExpanded">
+<MudExpansionPanel id="@EditPanelId" Text="@EditPanelText" @bind-Expanded="_editPanelExpanded">
     <EditForm Model="@_newItem" OnValidSubmit="OnValidSubmit">
         <DataAnnotationsValidator />
         <MudCard>
@@ -43,7 +43,7 @@
     </EditForm>
 </MudExpansionPanel>
 <br />
-<MudDataGrid T="PlayerDevice" Items="dbContext.PlayerDevices" Sortable="true" Filterable="true" QuickFilter="QuickFilter" ReadOnly="false"
+<MudDataGrid T="PlayerDevice" Items="dbContext.PlayerDevices" SortMode="SortMode.Single" Filterable="true" QuickFilter="QuickFilter" ReadOnly="false"
 CommittedItemChanges="@(async () => await dbContext.SaveChangesAsync())" EditMode="@DataGridEditMode.Form" EditTrigger="@DataGridEditTrigger.Manual">
     <ToolBarContent>
         <MudText Typo="Typo.h6">@ListPanelText</MudText>
@@ -51,7 +51,7 @@ CommittedItemChanges="@(async () => await dbContext.SaveChangesAsync())" EditMod
         <MudTextField @bind-Value="_searchString" Placeholder="Search for PlayerDevices..." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" />
     </ToolBarContent>
     <Columns>
-        <PropertyColumn Property="x => x.Id" IsEditable="false" />
+        <PropertyColumn Property="x => x.Id" Editable="false" />
         <PropertyColumn Property="x => x.OwnerId" />
         <PropertyColumn Property="x => x.DeviceType">
             <EditTemplate>

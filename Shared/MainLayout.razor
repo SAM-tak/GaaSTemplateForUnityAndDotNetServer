@@ -39,7 +39,7 @@
     </MudDrawer>
     <MudMainContent>
         <MudHidden Breakpoint="Breakpoint.SmAndDown">
-            @* <MudToolBar DisableGutters="true">
+            @* <MudToolBar Gutters="false">
                 <MudIconButton Icon="@Icons.Material.Outlined.Menu" Color="Color.Inherit" OnClick="DrawerToggle" Class="ml-3" />
                 <MudBreadcrumbs Items="_items" />
                 <MudSpacer />
@@ -49,7 +49,7 @@
             @Body
             <MudGrid Class="docs-footer">
                 <MudItem xs="12">
-                    <MudToolBar DisableGutters="true" Dense="true">
+                    <MudToolBar Gutters="false" Dense="true">
                         <MudText Typo="Typo.body1">GaaS Template For Unity & .NET Copyright © 2021-2022 SAM-tak.</MudText>
                         <MudIconButton Icon="@Icons.Custom.Brands.GitHub" Color="Color.Inherit" Edge="Edge.End" HRef="https://github.com/SAM-tak/GaaSTemplateForUnityAndDotNetServer"/>
                     </MudToolBar>

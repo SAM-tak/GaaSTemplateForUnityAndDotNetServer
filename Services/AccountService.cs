@@ -71,9 +71,9 @@ public class AccountService(GameDbContext context, JwtAuthorizer jwt, IHttpConte
     [FromTypeFilter(typeof(RpcAuthAttribute))]
     public async UnaryResult<RenewTokenRequestResult> RenewToken()
     {
-        Console.WriteLine("RenewToken");
         ulong playerId = ulong.Parse(_httpContextAccessor.HttpContext.Request.Headers["playerid"]);
         ulong deviceId = ulong.Parse(_httpContextAccessor.HttpContext.Request.Headers["deviceid"]);
+        _logger.LogInformation("RenewToken {PlayerId} {DeviceId}", playerId, deviceId);
         var playerAccount = await _context.PlayerAccounts.Include(i => i.DeviceList).FirstOrDefaultAsync(i => i.Id == playerId);
         if(playerAccount is not null) {
             var playerDevice = playerAccount.DeviceList.FirstOrDefault(i => i.Id == deviceId);
@@ -99,9 +99,9 @@ public class AccountService(GameDbContext context, JwtAuthorizer jwt, IHttpConte
     [FromTypeFilter(typeof(RpcAuthAttribute))]
     public async UnaryResult<Nil> LogOut()
     {
-        Console.WriteLine("LogOut");
         ulong playerId = ulong.Parse(_httpContextAccessor.HttpContext.Request.Headers["playerid"]);
         ulong deviceId = ulong.Parse(_httpContextAccessor.HttpContext.Request.Headers["deviceid"]);
+        _logger.LogInformation("LogOut {PlayerId} {DeviceId}", playerId, deviceId);
         var playerAccount = await _context.PlayerAccounts.Include(i => i.DeviceList).FirstOrDefaultAsync(i => i.Id == playerId);
         if(playerAccount is not null) {
             var playerDevice = playerAccount.DeviceList.FirstOrDefault(i => i.Id == deviceId);
@@ -124,7 +124,7 @@ public class AccountService(GameDbContext context, JwtAuthorizer jwt, IHttpConte
     /// <returns></returns>
     public async UnaryResult<SignInRequestResult> SignUp(SignInRequest signup)
     {
-        Console.WriteLine("SignUp");
+        _logger.LogInformation("SignUp {SignUp}", signup.ToJson());
         if(!string.IsNullOrWhiteSpace(signup.DeviceId)) {
             var playerAccount = await CreateAccountAsync(_context, signup);
             return new SignInRequestResult {

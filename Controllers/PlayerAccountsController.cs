@@ -28,7 +28,7 @@ public class PlayerAccountsController(GameDbContext context) : ControllerBase
 #endif
     )
     {
-        //Console.WriteLine($"User = {User.Identity.Name} {User.Identity.IsAuthenticated}");
+        // Console.WriteLine($"User = {User.Identity.Name} {User.Identity.IsAuthenticated}");
         if(!await _context.PlayerAccounts.AnyAsync()) {
             return NotFound();
         }

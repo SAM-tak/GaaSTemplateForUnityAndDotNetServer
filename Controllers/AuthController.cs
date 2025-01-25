@@ -13,7 +13,7 @@ public class AuthController : Controller
     public async Task<IActionResult> LogOut()
     {
         var referer = Request.Headers.TryGetValue("Referer", out var stringValues) ? stringValues.ToString() : null;
-        Console.WriteLine($"Request.Headers['Referer'] = {referer}");
+        // Console.WriteLine($"Request.Headers['Referer'] = {referer}");
         if(referer != null && referer.Contains("Auth/LogOut")) {
             referer = null;
         }
@@ -23,4 +23,3 @@ public class AuthController : Controller
         return Redirect(referer ?? "/");
     }
 }
- 

@@ -27,7 +27,7 @@ public class PlayerDevicesController(GameDbContext context) : ControllerBase
     [HttpGet("{id}")]
     public async Task<ActionResult<PlayerDevice>> GetPlayerDevice([FromHeader] ulong playerId, ulong id)
     {
-        Console.WriteLine($"User = {User.Identity}");
+        // Console.WriteLine($"User = {User.Identity}");
 
         var playerDevice = await _context.PlayerDevices.FindAsync(id);
 

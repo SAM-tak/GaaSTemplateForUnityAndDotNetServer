@@ -44,7 +44,7 @@
 
         for(int i = 0; i < Count; ++i) {
             var faker = fakers[Random.Shared.Next(fakers.Length)];
-            var playerAccount = await AccountService.CreateAccountAsync(context, new SignInRequest {
+            var playerAccount = await AccountService.CreateAccountAsync(context, new() {
                 DeviceType = (DeviceType)Random.Shared.Next(2),
                 DeviceId = faker.System.AndroidId()
             });

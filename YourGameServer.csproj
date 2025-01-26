@@ -9,6 +9,9 @@
     <UserSecretsId>b682ec76-59ef-485d-8611-cd02c9fea2c0</UserSecretsId>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="**\package.json" />
+    <None Remove="**\*.asmdef" />
+    <None Remove="**\*.meta" />
     <PackageReference Include="Bogus" Version="34.0.1" />
     <PackageReference Include="coverlet.collector" Version="3.1.2">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

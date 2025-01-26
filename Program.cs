@@ -99,7 +99,6 @@ try {
     app.UseAuthentication();
     app.UseAuthorization();
     app.UseJwtAuthorizer();
-    app.MapDefaultControllerRoute();
     app.MapMagicOnionService().AllowAnonymous();
     // Configure the HTTP request pipeline.
     if(app.Environment.IsDevelopment()) {

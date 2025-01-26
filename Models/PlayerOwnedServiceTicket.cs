@@ -1,47 +1,26 @@
 #nullable disable
-using System; // Unity needs this
 using System.ComponentModel.DataAnnotations.Schema;
-#if UNITY_5_3_OR_NEWER
-using Newtonsoft.Json;
-#else
-using System.Text.Json.Serialization;
-#endif
-using MessagePack;
+using YourGameServer.Interface;
 
-namespace YourGameServer.Models // Unity cannot accpect 'namespace YourProjectName.Models;' yet
+namespace YourGameServer.Models;
+
+public record PlayerOwnedServiceTicket
 {
-    [MessagePackObject]
-    public record PlayerOwnedServiceTicket
-    {
-        [Key(0)]
-        public ulong Id { get; init; }
-        [Key(1)]
-        public ulong OwnerId { get; set; }
-        [IgnoreMember]
-        [JsonIgnore]
-        [ForeignKey("OwnerId")]
-        public PlayerAccount Owner { get; init; }
-        [IgnoreMember]
-        [JsonIgnore]
-        public ulong ServiceTicketId { get; set; }
-        [Key(2)]
-        [ForeignKey("ServiceTicketId")]
-        public ServiceTicket ServiceTicket { get; init; }
-        [Key(3)]
-        public ConsumableOrigin Origin { get; set; }
-        [Key(4)]
-        public ConsumableStatus Status { get; set; }
-        [Key(5)]
-        public DateTime? Period { get; set; }
-        [Key(6)]
-        public DateTime? UsedDate { get; set; }
-        [Key(7)]
-        public DateTime? InvalidateDate { get; set; }
-        [Key(8)]
-        public DateTime? ExpireDate { get; set; }
+    public ulong Id { get; init; }
+    public ulong OwnerId { get; set; }
+    [ForeignKey("OwnerId")]
+    public PlayerAccount Owner { get; init; }
+    public ulong ServiceTicketId { get; set; }
+    [ForeignKey("ServiceTicketId")]
+    public ServiceTicket ServiceTicket { get; init; }
+    public ConsumableOrigin Origin { get; set; }
+    public ConsumableStatus Status { get; set; }
+    public DateTime? Period { get; set; }
+    public DateTime? UsedDate { get; set; }
+    public DateTime? InvalidateDate { get; set; }
+    public DateTime? ExpireDate { get; set; }
 
-        public override int GetHashCode() => (Id, OwnerId, ServiceTicketId, Origin, Status, Period, UsedDate, InvalidateDate, ExpireDate).GetHashCode();
+    public override int GetHashCode() => (Id, OwnerId, ServiceTicketId, Origin, Status, Period, UsedDate, InvalidateDate, ExpireDate).GetHashCode();
 
-        public override string ToString() => $"{{{nameof(Id)}={Id}, {nameof(OwnerId)}={OwnerId}, {nameof(ServiceTicketId)}={ServiceTicketId}, {nameof(Origin)}={Origin}, {nameof(Status)}={Status}, {nameof(Period)}={Period}, {nameof(UsedDate)}={UsedDate}, {nameof(InvalidateDate)}={InvalidateDate}, {nameof(ExpireDate)}={ExpireDate}}}";
-    }
+    public override string ToString() => $"{{{nameof(Id)}={Id}, {nameof(OwnerId)}={OwnerId}, {nameof(ServiceTicketId)}={ServiceTicketId}, {nameof(Origin)}={Origin}, {nameof(Status)}={Status}, {nameof(Period)}={Period}, {nameof(UsedDate)}={UsedDate}, {nameof(InvalidateDate)}={InvalidateDate}, {nameof(ExpireDate)}={ExpireDate}}}";
 }

@@ -1,0 +1,3 @@
+[submodule "Interface"]
+	path = Interface
+	url = git@github.com:SAM-tak/GaaSTemplateForUnityAndDotNetShared.git

@@ -122,12 +122,12 @@ public class AccountService(GameDbContext context, JwtAuthorizer jwt, IHttpConte
     /// </summary>
     /// <param name="signup"></param>
     /// <returns></returns>
-    public async UnaryResult<SignInRequestResult> SignUp(SignInRequest signup)
+    public async UnaryResult<SignUpRequestResult> SignUp(SignUpRequest signup)
     {
         _logger.LogInformation("SignUp {SignUp}", signup.ToJson());
         if(!string.IsNullOrWhiteSpace(signup.DeviceId)) {
             var playerAccount = await CreateAccountAsync(_context, signup);
-            return new SignInRequestResult {
+            return new SignUpRequestResult {
                 Id = playerAccount.Id,
                 Code = playerAccount.Code,
                 Token = _jwt.CreateToken(playerAccount.Id, playerAccount.CurrentDeviceId, out var period),
@@ -137,7 +137,7 @@ public class AccountService(GameDbContext context, JwtAuthorizer jwt, IHttpConte
         throw new ReturnStatusException(StatusCode.InvalidArgument, "Device Identifier is invalid.");
     }
 
-    public static async Task<PlayerAccount> CreateAccountAsync(GameDbContext context, SignInRequest accountCreationModel)
+    public static async Task<PlayerAccount> CreateAccountAsync(GameDbContext context, SignUpRequest accountCreationModel)
     {
         var curDateTime = DateTime.UtcNow;
         var playerAccount = new PlayerAccount {

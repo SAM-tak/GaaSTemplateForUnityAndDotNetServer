@@ -10,6 +10,7 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\YourGameServer.Shared\YourGameServer.Shared.csproj" />
+    <ProjectReference Include="..\YourGameServer.ServiceDefaults\YourGameServer.ServiceDefaults.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Remove="**\*.meta" />

@@ -15,6 +15,9 @@ logger.Debug("init main");
 try {
     var builder = WebApplication.CreateBuilder(args);
 
+    // Add service defaults & Aspire components.
+    builder.AddServiceDefaults();
+
     // NLog: Setup NLog for Dependency injection
     builder.Logging.ClearProviders();
     builder.Logging.SetMinimumLevel(Microsoft.Extensions.Logging.LogLevel.Trace);

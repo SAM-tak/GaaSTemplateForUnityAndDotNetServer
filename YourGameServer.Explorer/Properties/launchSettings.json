@@ -1,13 +1,13 @@
 {
   "profiles": {
-    "Server": {
+    "https": {
       "commandName": "Project",
       "hotReloadProfile": "aspnetcore",
       "dotnetRunMessages": true,
+      "launchBrowser": true,
+      "applicationUrl": "https://localhost:7142",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development",
-        "DOTNET_ENVIRONMENT": "Development",
-        "DOTNET_DASHBOARD_OTLP_ENDPOINT_URL": "https://localhost:7142"
+        "ASPNETCORE_ENVIRONMENT": "Development"
       }
     }
   }

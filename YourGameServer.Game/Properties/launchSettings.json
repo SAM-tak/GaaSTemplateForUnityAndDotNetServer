@@ -7,9 +7,7 @@
       "launchBrowser": false,
       "applicationUrl": "https://localhost:7143",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development",
-        "DOTNET_ENVIRONMENT": "Development",
-        "DOTNET_RESOURCE_SERVICE_ENDPOINT_URL": "https://localhost:7143"
+        "ASPNETCORE_ENVIRONMENT": "Development"
       }
     }
   }

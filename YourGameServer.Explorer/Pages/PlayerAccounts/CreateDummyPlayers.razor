@@ -41,13 +41,10 @@
         };
 
         for(int i = 0; i < Count; ++i) {
-            @* var faker = fakers[Random.Shared.Next(fakers.Length)];
-            var playerAccount = await AccountService.CreateAccountAsync(context, new() {
-                DeviceType = (DeviceType)Random.Shared.Next(2),
-                DeviceId = faker.System.AndroidId()
-            });
+            var faker = fakers[Random.Shared.Next(fakers.Length)];
+            var playerAccount = await AccountOperation.CreateAccountAsync(context, (DeviceType)Random.Shared.Next(2), faker.System.AndroidId());
             playerAccount.Profile.Name = faker.Name.FullName();
-            playerAccount.Profile.Motto = faker.Lorem.Sentence(8); *@
+            playerAccount.Profile.Motto = faker.Lorem.Sentence(8);
         }
         await context.SaveChangesAsync();
         buttonDisabled = false;

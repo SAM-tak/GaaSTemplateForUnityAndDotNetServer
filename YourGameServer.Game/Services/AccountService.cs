@@ -1,5 +1,4 @@
 #nullable disable
-using System.Security.Cryptography;
 using Grpc.Core;
 using MagicOnion;
 using MagicOnion.Server;
@@ -9,6 +8,7 @@ using NuGet.Protocol;
 using YourGameServer.Game.Interface;
 using YourGameServer.Shared.Data;
 using YourGameServer.Shared.Models;
+using YourGameServer.Shared.Operations;
 using DeviceType = YourGameServer.Shared.Models.DeviceType;
 
 namespace YourGameServer.Game.Services;
@@ -140,27 +140,6 @@ public class AccountService(GameDbContext context, JwtAuthorizer jwt, IHttpConte
 
     public static async Task<PlayerAccount> CreateAccountAsync(GameDbContext context, SignUpRequest accountCreationModel)
     {
-        var curDateTime = DateTime.UtcNow;
-        var playerAccount = new PlayerAccount {
-            Secret = (ushort)RandomNumberGenerator.GetInt32(0x10000),
-            DeviceList = [
-                new () {
-                    DeviceType = (DeviceType)accountCreationModel.DeviceType,
-                    DeviceId = accountCreationModel.DeviceId,
-                    Since = curDateTime,
-                    LastUsed = curDateTime,
-                }
-            ],
-            Since = curDateTime,
-            LastLogin = curDateTime,
-            Profile = new() {
-                LastUpdate = curDateTime,
-            }
-        };
-        await context.AddAsync(playerAccount);
-        await context.SaveChangesAsync();
-        playerAccount.CurrentDeviceId = playerAccount.DeviceList.First().Id;
-        await context.SaveChangesAsync();
-        return playerAccount;
+        return await AccountOperation.CreateAccountAsync(context, (DeviceType)accountCreationModel.DeviceType, accountCreationModel.DeviceId);
     }
 }

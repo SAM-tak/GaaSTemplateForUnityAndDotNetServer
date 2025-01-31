@@ -1,9 +1,6 @@
 using System.Data.Common;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Authentication.Google;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using MagicOnion.Server;
 using NLog;
 using NLog.Web;
 using YourGameServer.Shared;
@@ -36,26 +33,8 @@ try {
         builder.Services.AddDbContext<GameDbContext>(options => options.UseMySql(connectionString, new MariaDbServerVersion(new Version(10, 6, 5))));
     }
     // Add services to the container.
-    var authentication = builder.Services.AddAuthentication(options => {
-        if(builder.Environment.IsDevelopment()) {
-            options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-            options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
-        }
-    });
-    if(builder.Environment.IsDevelopment()) {
-        authentication.AddCookie(); // this is neccesary
-        authentication.AddCookie("OpenIdConnect");
-        authentication.AddGoogle(options => {
-            IConfigurationSection googleAuthNSection = builder.Configuration.GetSection("Authentication:Google");
-            options.ClientId = googleAuthNSection["ClientId"] ?? string.Empty;
-            options.ClientSecret = googleAuthNSection["ClientSecret"] ?? string.Empty;
-            options.SaveTokens = true;
-        });
-    }
+    var authentication = builder.Services.AddAuthentication();
     authentication.AddJwtAuthorizer(builder);
-    //authentication.AddMicrosoftIdentityWebApp(builder.Configuration);
-
-    //builder.Services.AddAuthentication().AddScheme<AuthenticationSchemeOptions, ApiAuthHandler>("Api", null);
     _ = builder.Services.AddAuthorization(options => {
         options.FallbackPolicy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
         options.AddPolicy("AllowOtherPlayer", new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build());
@@ -71,15 +50,6 @@ try {
     app.UseAuthorization();
     app.UseJwtAuthorizer();
     app.MapMagicOnionService().AllowAnonymous();
-    // Configure the HTTP request pipeline.
-    if(app.Environment.IsDevelopment()) {
-        app.UseGrpcWeb();
-        var methodHandlers = app.Services.GetService<MagicOnionServiceDefinition>()?.MethodHandlers;
-        // var url = builder.Configuration.GetSection("Kestrel:Endpoints:Grpc")?.GetValue<string>("Url");
-        // Console.WriteLine($"Kestrel:Endpoints:Grpc = {url}");
-        // app.MapMagicOnionHttpGateway("rpcswagger", methodHandlers!, GrpcChannel.ForAddress("https://localhost/rpc"));
-        app.MapMagicOnionSwagger("rpcswagger", methodHandlers!, "/_/");
-    }
 
     app.Run();
 }

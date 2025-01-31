@@ -1,0 +1,70 @@
+@page "/cheats/createdummyplayers"
+
+@using System.Security.Cryptography
+
+@inject NavigationManager navigationManager
+@inject GameDbContext context
+
+<MudPaper Class="pa-4 mr-16">
+    <MudText Typo="Typo.h6" GutterBottom="true">Create Dummy Players</MudText>
+    <MudGrid Class="pa-8">
+        <MudNumericField Label="Count" Variant="Variant.Text" Min="1" Max="9999" @bind-Value="Count" />
+        <MudButton Class="pl-4 ml-8" Variant="Variant.Filled" Color="Color.Primary" Disabled="@buttonDisabled" @onclick="Execute">Execute</MudButton>
+        <MudButton Class="pl-4 ml-8" Variant="Variant.Filled" Color="Color.Secondary" Disabled="@buttonDisabled" @onclick="DeleteAll">Delete All</MudButton>
+    </MudGrid>
+    <MudOverlay Visible="buttonDisabled" DarkBackground="true">
+        <MudProgressCircular Color="Color.Secondary" Indeterminate="true" />
+    </MudOverlay>
+</MudPaper>
+
+@code {
+    public int Count { get; set; } = 300;
+
+    private bool buttonDisabled;
+
+    private async Task Execute()
+    {
+        buttonDisabled = true;
+        await Task.Delay(1);
+        @* Console.WriteLine($"LocalRootPathComponent {navigationManager.ToLocalBasePathComponent()}"); *@
+
+        var fakers = new Faker[] {
+            new Faker("en"),
+            new Faker("fr"),
+            new Faker("de"),
+            new Faker("it"),
+            new Faker("es"),
+            new Faker("ja"),
+            new Faker("zh_CN"),
+            new Faker("zh_TW"),
+            new Faker("ko"),
+        };
+
+        for(int i = 0; i < Count; ++i) {
+            @* var faker = fakers[Random.Shared.Next(fakers.Length)];
+            var playerAccount = await AccountService.CreateAccountAsync(context, new() {
+                DeviceType = (DeviceType)Random.Shared.Next(2),
+                DeviceId = faker.System.AndroidId()
+            });
+            playerAccount.Profile.Name = faker.Name.FullName();
+            playerAccount.Profile.Motto = faker.Lorem.Sentence(8); *@
+        }
+        await context.SaveChangesAsync();
+        buttonDisabled = false;
+        await Task.Delay(1);
+    }
+
+    private async Task DeleteAll()
+    {
+        buttonDisabled = true;
+
+        await Task.Delay(1);
+
+        context.PlayerAccounts.RemoveRange(context.PlayerAccounts);
+
+        await context.SaveChangesAsync();
+        buttonDisabled = false;
+
+        await Task.Delay(1);
+    }
+}

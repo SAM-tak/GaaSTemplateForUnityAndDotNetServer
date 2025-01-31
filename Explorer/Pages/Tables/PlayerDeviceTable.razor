@@ -1,0 +1,143 @@
+@page "/tables/playerdevice"
+
+@inject YourGameServer.Shared.Data.GameDbContext dbContext
+@inject MudBlazor.IScrollManager scrollManager
+@inject MudBlazor.IDialogService dialogService
+@inject MudBlazor.ISnackbar snackBar
+
+<MudExpansionPanel id="@EditPanelId" Text="@EditPanelText" @bind-Expanded="_editPanelExpanded">
+    <EditForm Model="@_newItem" OnValidSubmit="OnValidSubmit">
+        <DataAnnotationsValidator />
+        <MudCard>
+            <MudCardContent>
+                <MudTd>
+                    <MudNumericField @bind-Value="_newItem.OwnerId" Label="@(TextHelper.LabelFor<PlayerDevice>(i => i.OwnerId))" T="ulong" Min="0" />
+                </MudTd>
+                <MudTd>
+                    <MudSelect @bind-Value="_newItem.DeviceType" Label="@(TextHelper.LabelFor<PlayerDevice>(i => i.DeviceType))">
+                        @foreach (DeviceType item in Enum.GetValues(typeof(DeviceType)))
+                        {
+                            <MudSelectItem Value="@item">@(item.GetDisplayName())</MudSelectItem>
+                        }
+                    </MudSelect>
+                </MudTd>
+                <MudTd>
+                    <MudTextField @bind-Value="_newItem.DeviceId" Label="@(TextHelper.LabelFor<PlayerDevice>(i => i.DeviceId))" />
+                </MudTd>
+                <MudTd>
+                    <MudTextField Format="s" Label="@(TextHelper.LabelFor<PlayerDevice>(i => i.Since))" InputType="InputType.DateTimeLocal" @bind-Value="_newItem.Since"/>
+                    <MudNumericField T="double?" Label="Second" Adornment="Adornment.End" AdornmentText="s" Min="0.0" Max="59.9999999"
+                    Value="_newItem.Since?.GetSecondPart()" ValueChanged="t => _newItem.Since = _newItem.Since?.ReplacedSecondPart(t)" />
+                </MudTd>
+                <MudTd>
+                    <MudTextField Format="s" Label="@(TextHelper.LabelFor<PlayerDevice>(i => i.LastUsed))" InputType="InputType.DateTimeLocal" @bind-Value="_newItem.LastUsed"/>
+                    <MudNumericField T="double?" Label="Second" Adornment="Adornment.End" AdornmentText="s" Min="0.0" Max="59.9999999"
+                    Value="_newItem.LastUsed?.GetSecondPart()" ValueChanged="t => _newItem.LastUsed = _newItem.LastUsed?.ReplacedSecondPart(t)" />
+                </MudTd>
+            </MudCardContent>
+            <MudCardActions>
+                <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Success">Create New</MudButton>
+                <MudButton Class="ml-2" Variant="Variant.Filled" OnClick="Clear">Clear</MudButton>
+            </MudCardActions>
+        </MudCard>
+    </EditForm>
+</MudExpansionPanel>
+<br />
+<MudDataGrid T="PlayerDevice" Items="dbContext.PlayerDevices" SortMode="SortMode.Single" Filterable="true" QuickFilter="QuickFilter" ReadOnly="false"
+CommittedItemChanges="@(async () => await dbContext.SaveChangesAsync())" EditMode="@DataGridEditMode.Form" EditTrigger="@DataGridEditTrigger.Manual">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">@ListPanelText</MudText>
+        <MudSpacer />
+        <MudTextField @bind-Value="_searchString" Placeholder="Search for PlayerDevices..." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" />
+    </ToolBarContent>
+    <Columns>
+        <PropertyColumn Property="x => x.Id" Editable="false" />
+        <PropertyColumn Property="x => x.OwnerId" />
+        <PropertyColumn Property="x => x.DeviceType">
+            <EditTemplate>
+                <MudSelect @bind-Value="context.Item.DeviceType" Label="@(TextHelper.LabelFor<PlayerDevice>(i => i.DeviceType))">
+                    @foreach (DeviceType item in Enum.GetValues(typeof(DeviceType)))
+                    {
+                        <MudSelectItem Value="@item">@(item.GetDisplayName())</MudSelectItem>
+                    }
+                </MudSelect>
+            </EditTemplate>
+        </PropertyColumn>
+        <PropertyColumn Property="x => x.DeviceId" CellStyle="word-break: break-all" />
+        <PropertyColumn Property="x => x.Since">
+            <EditTemplate>
+                <MudTextField Format="s" Label="@(TextHelper.LabelFor<PlayerDevice>(i => i.Since))" InputType="InputType.DateTimeLocal" @bind-Value="context.Item.Since"/>
+                <MudNumericField T="double?" Label="Second" Adornment="Adornment.End" AdornmentText="s" Min="0.0" Max="59.9999999"
+                Value="context.Item.Since?.GetSecondPart()" ValueChanged="t => context.Item.Since = context.Item.Since?.ReplacedSecondPart(t)" />
+            </EditTemplate>
+        </PropertyColumn>
+        <PropertyColumn Property="x => x.LastUsed">
+            <EditTemplate>
+                <MudTextField Format="s" Label="@(TextHelper.LabelFor<PlayerDevice>(i => i.LastUsed))" InputType="InputType.DateTimeLocal" @bind-Value="context.Item.LastUsed"/>
+                <MudNumericField T="double?" Label="Second" Adornment="Adornment.End" AdornmentText="s" Min="0.0" Max="59.9999999"
+                Value="context.Item.LastUsed?.GetSecondPart()" ValueChanged="t => context.Item.LastUsed = context.Item.LastUsed?.ReplacedSecondPart(t)" />
+            </EditTemplate>
+        </PropertyColumn>
+        <TemplateColumn Sortable="false" Filterable="false">
+            <CellTemplate>
+                <MudStack Spacing="1" Justify="Justify.FlexEnd" Row="true">
+                    <MudIconButton Size="Size.Small" Icon="@Icons.Material.Filled.Delete" OnClick="@(async () => await Delete(@context.Item))" />
+                    <MudIconButton Size="Size.Small" Icon="@Icons.Material.Outlined.Edit" OnClick="@context.Actions.StartEditingItemAsync" />
+                </MudStack>
+            </CellTemplate>
+        </TemplateColumn>
+    </Columns>
+    <PagerContent>
+        <MudDataGridPager />
+    </PagerContent>
+</MudDataGrid>
+
+@code {
+    bool _editPanelExpanded = false;
+    string _searchString = "";
+    PlayerDevice _newItem = new();
+
+    static readonly string EditPanelId =  $"{nameof(PlayerDevice).ToLower()}-edit-panel";
+    static readonly string EditPanelText = $"Add {nameof(PlayerDevice)}";
+    static readonly string ListPanelText = nameof(PlayerDevice);
+
+    private bool QuickFilter(PlayerDevice x)
+    {
+        if (string.IsNullOrWhiteSpace(_searchString)) return true;
+
+        if (x.DeviceId.Contains(_searchString, StringComparison.OrdinalIgnoreCase)) return true;
+
+        if ($"{x.Id} {x.OwnerId} {x.Since} {x.LastUsed}".Contains(_searchString)) return true;
+
+        return false;
+    }
+
+    async Task OnValidSubmit(EditContext contex)
+    {
+        dbContext.Add(_newItem);
+        await dbContext.SaveChangesAsync();
+        snackBar.Add($"New {nameof(PlayerDevice)} (id:{_newItem.Id}) Created.", Severity.Success);
+        _newItem = new ();
+    }
+
+    void Clear()
+    {
+        _newItem = new();
+    }
+
+    async Task Delete(PlayerDevice x)
+    {
+        var parameters = new DialogParameters();
+        parameters.Add("ContentText", $"Do you really want to delete this records? This process cannot be undone.");
+        parameters.Add("ContentSubText", $"{x}");
+        parameters.Add("ButtonText", "Delete");
+        parameters.Add("Color", Color.Error);
+
+        var result = await dialogService.Show<ConfirmDialog>("Delete", parameters, new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall }).Result;
+        if(result != null && !result.Canceled) {
+            dbContext.PlayerDevices.Remove(x);
+            await dbContext.SaveChangesAsync();
+            snackBar.Add($"{nameof(PlayerDevice)} (id:{x.Id}) Deleted.", Severity.Success);
+        }
+    }
+}

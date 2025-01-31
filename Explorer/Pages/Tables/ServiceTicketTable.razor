@@ -1,0 +1,140 @@
+@page "/tables/serviceticket"
+
+@using YourGameServer.Explorer.Extensions
+@inject YourGameServer.Shared.Data.GameDbContext dbContext
+@inject MudBlazor.IScrollManager scrollManager
+@inject MudBlazor.IDialogService dialogService
+@inject MudBlazor.ISnackbar snackBar
+
+<MudExpansionPanel id="@EditPanelId" Text="@EditPanelText" @bind-Expanded="_editPanelExpanded">
+    <EditForm Model="@_newItem" OnValidSubmit="OnValidSubmit">
+        <DataAnnotationsValidator />
+        <MudCard>
+            <MudCardContent>
+                <MudTd>
+                    <MudTextField @bind-Value="_newItem.Name" Label="@(TextHelper.LabelFor<ServiceTicket>(i => i.Name))" />
+                </MudTd>
+                <MudTd>
+                    <MudSelect T="ServiceTicketKind" @bind-Value="_newItem.Kind" Label="@(TextHelper.LabelFor<ServiceTicket>(i => i.Kind))">
+                        @foreach (ServiceTicketKind item in Enum.GetValues(typeof(ServiceTicketKind)))
+                        {
+                            <MudSelectItem Value="@item">@item.GetDisplayName()</MudSelectItem>
+                        }
+                    </MudSelect>
+                </MudTd>
+                <MudTd>
+                    <MudTextField @bind-Value="_newItem.ProductName" Label="@(TextHelper.LabelFor<ServiceTicket>(i => i.ProductName))" />
+                </MudTd>
+                <MudTd>
+                    <MudTextField @bind-Value="_newItem.DisplayName" Label="@(TextHelper.LabelFor<ServiceTicket>(i => i.DisplayName))" />
+                </MudTd>
+                <MudTd>
+                    <MudTextField @bind-Value="_newItem.Description" Label="@(TextHelper.LabelFor<ServiceTicket>(i => i.Description))" />
+                </MudTd>
+                <MudTd>
+                    <MudNumericField @bind-Value="_newItem.DetailId" Label="@(TextHelper.LabelFor<ServiceTicket>(i => i.DetailId))" />
+                </MudTd>
+                <MudTd>
+                    <MudNumericField @bind-Value="_newItem.IconBlobId" Label="@(TextHelper.LabelFor<ServiceTicket>(i => i.IconBlobId))" />
+                </MudTd>
+            </MudCardContent>
+            <MudCardActions>
+                <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Success">Create New</MudButton>
+                <MudButton Class="ml-2" Variant="Variant.Filled" OnClick="Clear">Clear</MudButton>
+            </MudCardActions>
+        </MudCard>
+    </EditForm>
+</MudExpansionPanel>
+<br />
+<MudDataGrid T="ServiceTicket" Items="dbContext.ServiceTickets" SortMode="SortMode.Single" Filterable="true" QuickFilter="QuickFilter" ReadOnly="false"
+    CommittedItemChanges="@(async () => await dbContext.SaveChangesAsync())" EditMode="@DataGridEditMode.Form" EditTrigger="@DataGridEditTrigger.Manual">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">@ListPanelText</MudText>
+        <MudSpacer />
+        <MudTextField @bind-Value="_searchString" Placeholder="Search for ServiceTickets..." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" />
+    </ToolBarContent>
+    <Columns>
+        <PropertyColumn Property="x => x.Id" Editable="false" />
+        <PropertyColumn Property="x => x.Name" />
+        <PropertyColumn Property="x => x.Kind">
+            <EditTemplate>
+                <MudSelect T="ServiceTicketKind" @bind-Value="context.Item.Kind" Label="@(TextHelper.LabelFor<ServiceTicket>(i => i.Kind))">
+                    @foreach (ServiceTicketKind item in Enum.GetValues(typeof(ServiceTicketKind)))
+                    {
+                        <MudSelectItem Value="@item">@item.GetDisplayName()</MudSelectItem>
+                    }
+                </MudSelect>
+            </EditTemplate>
+        </PropertyColumn>
+        <PropertyColumn Property="x => x.ProductName" />
+        <PropertyColumn Property="x => x.DisplayName" />
+        <PropertyColumn Property="x => x.Description" />
+        <PropertyColumn Property="x => x.DetailId" />
+        <PropertyColumn Property="x => x.IconBlobId" />
+        <TemplateColumn Sortable="false" Filterable="false">
+            <CellTemplate>
+                <MudStack Spacing="1" Justify="Justify.FlexEnd" Row="true">
+                    <MudIconButton Size="Size.Small" Icon="@Icons.Material.Filled.Delete" OnClick="@(async () => await Delete(@context.Item))" />
+                    <MudIconButton Size="Size.Small" Icon="@Icons.Material.Outlined.Edit" OnClick="@context.Actions.StartEditingItemAsync" />
+                </MudStack>
+            </CellTemplate>
+        </TemplateColumn>
+    </Columns>
+    <PagerContent>
+        <MudDataGridPager />
+    </PagerContent>
+</MudDataGrid>
+
+@code {
+    bool _editPanelExpanded = false;
+    string _searchString = "";
+    ServiceTicket _newItem = new();
+
+    static readonly string EditPanelId =  $"{nameof(ServiceTicket).ToLower()}-edit-panel";
+    static readonly string EditPanelText = $"Add {nameof(ServiceTicket)}";
+    static readonly string ListPanelText = nameof(ServiceTicket);
+
+    private bool QuickFilter(ServiceTicket x)
+    {
+        if (string.IsNullOrWhiteSpace(_searchString)) return true;
+
+        if (x.Name.Contains(_searchString, StringComparison.OrdinalIgnoreCase)) return true;
+
+        if (x.DisplayName.Contains(_searchString, StringComparison.OrdinalIgnoreCase)) return true;
+
+        if (x.Description.Contains(_searchString, StringComparison.OrdinalIgnoreCase)) return true;
+
+        if ($"{x.Id} {x.DetailId} {x.IconBlobId}".Contains(_searchString)) return true;
+
+        return false;
+    }
+
+    async Task OnValidSubmit(EditContext contex)
+    {
+        dbContext.Add(_newItem);
+        await dbContext.SaveChangesAsync();
+        snackBar.Add($"New {nameof(ServiceTicket)} (id:{_newItem.Id}) Created.", Severity.Success);
+        _newItem = new ();
+    }
+
+    void Clear()
+    {
+        _newItem = new();
+    }
+
+    async Task Delete(ServiceTicket x)
+    {
+        var parameters = new DialogParameters();
+        parameters.Add("ContentText", $"Do you really want to delete this records? This process cannot be undone.");
+        parameters.Add("ContentSubText", $"{x}");
+        parameters.Add("ButtonText", "Delete");
+        parameters.Add("Color", Color.Error);
+
+        var result = await dialogService.Show<ConfirmDialog>("Delete", parameters, new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall }).Result;
+        if(result != null && !result.Canceled) {
+            dbContext.ServiceTickets.Remove(x);
+            await dbContext.SaveChangesAsync();
+            snackBar.Add($"{nameof(ServiceTicket)} (id:{x.Id}) Deleted.", Severity.Success);
+        }
+    }
+}

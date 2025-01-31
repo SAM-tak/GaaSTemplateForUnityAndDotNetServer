@@ -4,12 +4,11 @@ using MagicOnion;
 using MagicOnion.Server;
 using Microsoft.EntityFrameworkCore;
 using NuGet.Protocol;
-using YourGameServer.Interface;
-using YourGameServer.Shared;
+using YourGameServer.Game.Interface;
 using YourGameServer.Shared.Data;
-using PlayerAccountStatus = YourGameServer.Interface.PlayerAccountStatus;
+using PlayerAccountStatus = YourGameServer.Game.Interface.PlayerAccountStatus;
 
-namespace YourGameServer.Services;
+namespace YourGameServer.Game.Services;
 
 // Implements RPC service in the server project.
 // The implementation class must inherit `ServiceBase<IMyFirstService>` and `IMyFirstService`

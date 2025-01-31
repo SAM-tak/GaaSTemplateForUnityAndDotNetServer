@@ -1,5 +1,4 @@
 using System.Data.Common;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication.Google;
@@ -22,11 +21,6 @@ try {
     builder.Host.UseNLog();
 
     builder.Services.AddHttpContextAccessor();
-
-    builder.Services.AddApiVersioning(options => {
-        options.AssumeDefaultVersionWhenUnspecified = true;
-        options.DefaultApiVersion = new ApiVersion(1, 0);
-    });
 
     // Setup IDCoder(hashids)
     IDCoder.Initialize(builder.Configuration.GetSection("IDCoder")["Salt"] ?? string.Empty);

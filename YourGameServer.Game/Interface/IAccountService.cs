@@ -2,7 +2,7 @@
 using MagicOnion;
 using MessagePack;
 
-namespace YourGameServer.Interface // Unity cannot accpect 'namespace YourProjectName.Interface;' yet
+namespace YourGameServer.Game.Interface // Unity cannot accpect 'namespace YourProjectName.Interface;' yet
 {
     // Defines .NET interface as a Server/Client IDL.
     // The interface is shared between server and client.

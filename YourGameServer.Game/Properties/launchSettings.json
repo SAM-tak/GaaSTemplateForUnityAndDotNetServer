@@ -1,15 +1,15 @@
 {
   "profiles": {
-    "Server": {
+    "gRPC": {
       "commandName": "Project",
       "hotReloadProfile": "aspnetcore",
       "dotnetRunMessages": true,
-      "launchBrowser": true,
-      "applicationUrl": "https://localhost:7142",
+      "launchBrowser": false,
+      "applicationUrl": "https://localhost:7143",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
         "DOTNET_ENVIRONMENT": "Development",
-        "DOTNET_DASHBOARD_OTLP_ENDPOINT_URL": "https://localhost:7142"
+        "DOTNET_RESOURCE_SERVICE_ENDPOINT_URL": "https://localhost:7143"
       }
     }
   }

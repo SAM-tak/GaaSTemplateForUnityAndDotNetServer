@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace YourGameServer.Game;
 
-internal class RpcAuthAttribute(JwtAuthorizer jwt, IHttpContextAccessor httpContextAccessor) : MagicOnionFilterAttribute
+public class RpcAuthAttribute(JwtAuthorizer jwt, IHttpContextAccessor httpContextAccessor) : MagicOnionFilterAttribute
 {
     readonly JwtAuthorizer _jwt = jwt;
     readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;

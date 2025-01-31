@@ -3,13 +3,12 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using MessagePack;
-using MessagePack.AspNetCoreMvcFormatter;
 using MagicOnion.Server;
 using NLog;
 using NLog.Web;
 using YourGameServer.Shared;
 using YourGameServer.Shared.Data;
+using YourGameServer.Game;
 
 var logger = LogManager.Setup().LoadConfigurationFromAppSettings().GetCurrentClassLogger();
 logger.Debug("init main");
@@ -62,31 +61,11 @@ try {
         options.AddPolicy("AllowOtherPlayer", new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build());
     });
 
-    builder.Services.AddControllers(options => {
-        var msgpackOption = MessagePackSerializerOptions.Standard.WithCompression(MessagePackCompression.Lz4BlockArray);
-        options.OutputFormatters.Add(new MessagePackOutputFormatter(msgpackOption));
-        options.InputFormatters.Add(new MessagePackInputFormatter(msgpackOption));
-        // Mapモードの場合。アノテーションが要らなくなるのはいいが、メッセージが太るのでMessagepack使う意義が薄れると思う
-        // var msgpackOption = MessagePackSerializerOptions.Standard.WithResolver(ContractlessStandardResolver.Instance);
-        // option.OutputFormatters.Add(new MessagePackOutputFormatter(msgpackOption));
-        // option.InputFormatters.Add(new MessagePackInputFormatter(msgpackOption));
-    })
-    //.AddMicrosoftIdentityUI() // 今のところ役に立ってない
-    ;
-    if(builder.Environment.IsDevelopment()) {
-        // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-        builder.Services.AddEndpointsApiExplorer();
-        builder.Services.AddSwaggerGen();
-    }
-    builder.Services.AddRazorPages();
-    builder.Services.AddServerSideBlazor();
-
     builder.Services.AddGrpc();
     builder.Services.AddMagicOnion();
 
     var app = builder.Build();
 
-    app.UseStaticFiles();
     app.UseRouting();
     app.UseAuthentication();
     app.UseAuthorization();
@@ -94,22 +73,12 @@ try {
     app.MapMagicOnionService().AllowAnonymous();
     // Configure the HTTP request pipeline.
     if(app.Environment.IsDevelopment()) {
-        app.MapBlazorHub();
         app.UseGrpcWeb();
-        app.MapFallbackToPage("/_Host");
-        app.UseSwagger();
-        app.UseSwaggerUI();
         var methodHandlers = app.Services.GetService<MagicOnionServiceDefinition>()?.MethodHandlers;
         // var url = builder.Configuration.GetSection("Kestrel:Endpoints:Grpc")?.GetValue<string>("Url");
         // Console.WriteLine($"Kestrel:Endpoints:Grpc = {url}");
         // app.MapMagicOnionHttpGateway("rpcswagger", methodHandlers!, GrpcChannel.ForAddress("https://localhost/rpc"));
         app.MapMagicOnionSwagger("rpcswagger", methodHandlers!, "/_/");
-    }
-    else {
-        app.UseExceptionHandler("/Error");
-        // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-        app.UseHsts();
-        app.UseHttpsRedirection();
     }
 
     app.Run();

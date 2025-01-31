@@ -3,7 +3,7 @@ using System; // Unity needs this
 using MessagePack;
 using YourGameServer.Shared.Models;
 
-namespace YourGameServer.Interface // Unity cannot accpect 'namespace YourProjectName.Interface;' yet
+namespace YourGameServer.Game.Interface // Unity cannot accpect 'namespace YourProjectName.Interface;' yet
 {
     public enum PlayerAccountStatus
     {

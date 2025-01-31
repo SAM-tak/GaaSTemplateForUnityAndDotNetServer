@@ -2,7 +2,7 @@
 using System; // Unity needs this
 using MessagePack;
 
-namespace YourGameServer.Interface // Unity cannot accpect 'namespace YourProjectName.Interface;' yet
+namespace YourGameServer.Game.Interface // Unity cannot accpect 'namespace YourProjectName.Interface;' yet
 {
     [MessagePackObject]
     public record SignUpRequest

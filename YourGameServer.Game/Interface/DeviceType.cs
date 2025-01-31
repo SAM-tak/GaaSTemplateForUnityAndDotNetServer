@@ -1,6 +1,6 @@
 #nullable disable
 
-namespace YourGameServer.Interface // Unity cannot accpect 'namespace YourProjectName.Interface;' yet
+namespace YourGameServer.Game.Interface // Unity cannot accpect 'namespace YourProjectName.Interface;' yet
 {
     public enum DeviceType
     {

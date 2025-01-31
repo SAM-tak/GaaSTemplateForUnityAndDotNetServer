@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Authentication;
 
 namespace YourGameServer.Game;
 
-internal class JwtAuthorizer
+public class JwtAuthorizer
 {
     public TokenValidationParameters TokenValidationParameters { get; init; }
 

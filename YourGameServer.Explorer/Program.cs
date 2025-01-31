@@ -57,7 +57,6 @@ try {
             options.SaveTokens = true;
         });
     }
-    authentication.AddJwtAuthorizer(builder);
     //authentication.AddMicrosoftIdentityWebApp(builder.Configuration);
 
     //builder.Services.AddAuthentication().AddScheme<AuthenticationSchemeOptions, ApiAuthHandler>("Api", null);
@@ -76,7 +75,6 @@ try {
     app.UseRouting();
     app.UseAuthentication();
     app.UseAuthorization();
-    app.UseJwtAuthorizer();
     // Configure the HTTP request pipeline.
     if(app.Environment.IsDevelopment()) {
         app.MapBlazorHub();

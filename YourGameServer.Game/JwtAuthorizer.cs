@@ -3,15 +3,10 @@ using System.Security;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.AspNetCore.Http;
 
-namespace YourGameServer.Shared;
+namespace YourGameServer.Game;
 
-public class JwtAuthorizer
+internal class JwtAuthorizer
 {
     public TokenValidationParameters TokenValidationParameters { get; init; }
 

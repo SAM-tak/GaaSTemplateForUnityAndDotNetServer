@@ -2,7 +2,7 @@ using MagicOnion;
 using MagicOnion.Server;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 
-namespace YourGameServer.Shared;
+namespace YourGameServer.Game;
 
 internal class RpcAuthAttribute(JwtAuthorizer jwt, IHttpContextAccessor httpContextAccessor) : MagicOnionFilterAttribute
 {

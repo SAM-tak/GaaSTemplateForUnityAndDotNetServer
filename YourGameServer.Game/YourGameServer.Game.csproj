@@ -9,7 +9,7 @@
     <UserSecretsId>b682ec76-59ef-485d-8611-cd02c9fea2c0</UserSecretsId>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Shared\Shared.csproj" />
+    <ProjectReference Include="..\YourGameServer.Shared\YourGameServer.Shared.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Remove="**\*.meta" />

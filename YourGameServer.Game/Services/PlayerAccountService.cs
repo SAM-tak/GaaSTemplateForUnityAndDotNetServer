@@ -7,7 +7,7 @@ using NuGet.Protocol;
 using YourGameServer.Interface;
 using YourGameServer.Shared;
 using YourGameServer.Shared.Data;
-using YourGameServer.Shared.Models;
+using PlayerAccountStatus = YourGameServer.Interface.PlayerAccountStatus;
 
 namespace YourGameServer.Services;
 
@@ -40,7 +40,7 @@ public class PlayerAccountService(GameDbContext context, IHttpContextAccessor ht
 
         if(ids != null && ids.Length > 0) {
             return await _context.PlayerAccounts.Include(i => i.Profile)
-                .Where(i => ids.Contains(i.Id) && i.Status < PlayerAccountStatus.Banned).Select(i => MaskedPlayerAccount.FromPlayerAccount(i)).ToListAsync();
+                .Where(i => ids.Contains(i.Id) && (PlayerAccountStatus)i.Status < PlayerAccountStatus.Banned).Select(i => MaskedPlayerAccount.FromPlayerAccount(i)).ToListAsync();
         }
         return null;
     }

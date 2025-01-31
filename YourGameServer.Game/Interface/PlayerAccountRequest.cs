@@ -5,6 +5,14 @@ using YourGameServer.Shared.Models;
 
 namespace YourGameServer.Interface // Unity cannot accpect 'namespace YourProjectName.Interface;' yet
 {
+    public enum PlayerAccountStatus
+    {
+        Active,
+        Inactive,
+        Banned,
+        Expired,
+    }
+
     [MessagePackObject]
     public record MaskedPlayerAccount
     {
@@ -41,7 +49,7 @@ namespace YourGameServer.Interface // Unity cannot accpect 'namespace YourProjec
         public static FormalPlayerAccount FromPlayerAccount(PlayerAccount playerAccount) => new() {
             Id = playerAccount.Id,
             Code = playerAccount.Code,
-            Status = playerAccount.Status,
+            Status = (PlayerAccountStatus)playerAccount.Status,
             Since = playerAccount.Since,
             LastLogin = playerAccount.LastLogin,
             Profile = playerAccount.Profile != null ? FormalPlayerProfile.FromPlayerProfile(playerAccount.Profile) : null

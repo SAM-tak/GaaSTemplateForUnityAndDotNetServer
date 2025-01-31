@@ -1,5 +1,4 @@
 using System.Data.Common;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication.Google;
@@ -25,11 +24,6 @@ try {
     builder.Host.UseNLog();
 
     builder.Services.AddHttpContextAccessor();
-
-    builder.Services.AddApiVersioning(options => {
-        options.AssumeDefaultVersionWhenUnspecified = true;
-        options.DefaultApiVersion = new ApiVersion(1, 0);
-    });
 
     // Setup IDCoder(hashids)
     IDCoder.Initialize(builder.Configuration.GetSection("IDCoder")["Salt"] ?? string.Empty);
@@ -112,6 +106,8 @@ try {
         // Console.WriteLine($"Kestrel:Endpoints:Grpc = {url}");
         // app.MapMagicOnionHttpGateway("rpcswagger", methodHandlers!, GrpcChannel.ForAddress("https://localhost/rpc"));
         app.MapMagicOnionSwagger("rpcswagger", methodHandlers!, "/_/");
+
+        logger.Info($"Development interface 'https://localhost:7142'");
     }
     else {
         app.UseExceptionHandler("/Error");

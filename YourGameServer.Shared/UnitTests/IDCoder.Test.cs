@@ -3,15 +3,14 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace YourGameServer.Shared.UnitTests;
 
 [TestClass]
-public class CodedId_IsSane
+public class IDCoder_IsSane
 {
-
     [TestInitialize]
     public void TestInitialize()
     {
         IDCoder.Initialize("this is my salt");
     }
-    
+
     [TestMethod]
     public void CanDecodeHashidsCorrectly()
     {

@@ -16,5 +16,5 @@ public record PlayerProfile
 
     public override int GetHashCode() => HashCode.Combine(Id, OwnerId, Name, Motto, IconBlobId);
 
-    public override string ToString() => $"{{{nameof(Id)}={Id}, {nameof(OwnerId)}={OwnerId}, {nameof(Name)}={Name}, {nameof(Motto)}={Motto}, {nameof(IconBlobId)}={IconBlobId}}}";
+    public override string ToString() => $"{nameof(Id)}={Id}, {nameof(OwnerId)}={OwnerId}, {nameof(Name)}={Name}, {nameof(Motto)}={Motto}, {nameof(IconBlobId)}={IconBlobId}";
 }

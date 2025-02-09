@@ -22,12 +22,10 @@
                     </MudSelect>
                 </MudTd>
                 <MudTd>
-                    <MudSelect T="ConsumableStatus" @bind-Value="_newItem.Status" Label="@(TextHelper.LabelFor<PlayerOwnedFreeServiceToken>(i => i.Status))">
-                        @foreach (ConsumableStatus item in Enum.GetValues(typeof(ConsumableStatus)))
-                        {
-                            <MudSelectItem Value="@item">@item.GetDisplayName()</MudSelectItem>
-                        }
-                    </MudSelect>
+                    <MudNumericField @bind-Value="_newItem.Quantity" Label="Quantity" T="int" Min="0" />
+                </MudTd>
+                <MudTd>
+                    <MudNumericField @bind-Value="_newItem.Used" Label="Used" T="int" Min="0" />
                 </MudTd>
                 <MudTd>
                     <MudTextField Format="s" Label="@(TextHelper.LabelFor<PlayerOwnedFreeServiceToken>(i => i.Period))" InputType="InputType.DateTimeLocal" @bind-Value="_newItem.Period"/>
@@ -35,9 +33,9 @@
                     Value="_newItem.Period?.GetSecondPart()" ValueChanged="t => _newItem.Period = _newItem.Period?.ReplacedSecondPart(t)" />
                 </MudTd>
                 <MudTd>
-                    <MudTextField Format="s" Label="@(TextHelper.LabelFor<PlayerOwnedFreeServiceToken>(i => i.UsedDate))" InputType="InputType.DateTimeLocal" @bind-Value="_newItem.UsedDate"/>
+                    <MudTextField Format="s" Label="@(TextHelper.LabelFor<PlayerOwnedFreeServiceToken>(i => i.LastUsedDate))" InputType="InputType.DateTimeLocal" @bind-Value="_newItem.LastUsedDate"/>
                     <MudNumericField T="double?" Label="Second" Adornment="Adornment.End" AdornmentText="s" Min="0.0" Max="59.9999999"
-                    Value="_newItem.UsedDate?.GetSecondPart()" ValueChanged="t => _newItem.UsedDate = _newItem.UsedDate?.ReplacedSecondPart(t)" />
+                    Value="_newItem.LastUsedDate?.GetSecondPart()" ValueChanged="t => _newItem.LastUsedDate = _newItem.LastUsedDate?.ReplacedSecondPart(t)" />
                 </MudTd>
                 <MudTd>
                     <MudTextField Format="s" Label="@(TextHelper.LabelFor<PlayerOwnedFreeServiceToken>(i => i.InvalidateDate))" InputType="InputType.DateTimeLocal" @bind-Value="_newItem.InvalidateDate"/>
@@ -78,16 +76,8 @@ CommittedItemChanges="@(async () => await dbContext.SaveChangesAsync())" EditMod
                 </MudSelect>
             </EditTemplate>
         </PropertyColumn>
-        <PropertyColumn Property="x => x.Status">
-            <EditTemplate>
-                <MudSelect T="ConsumableStatus" @bind-Value="context.Item.Status" Label="@(TextHelper.LabelFor<PlayerOwnedFreeServiceToken>(i => i.Status))">
-                    @foreach (ConsumableStatus item in Enum.GetValues(typeof(ConsumableStatus)))
-                    {
-                        <MudSelectItem Value="@item">@item.GetDisplayName()</MudSelectItem>
-                    }
-                </MudSelect>
-            </EditTemplate>
-        </PropertyColumn>
+        <PropertyColumn Property="x => x.Quantity" />
+        <PropertyColumn Property="x => x.Used" />
         <PropertyColumn Property="x => x.Period">
             <EditTemplate>
                 <MudTextField Format="s" Label="@(TextHelper.LabelFor<PlayerOwnedFreeServiceToken>(i => i.Period))" InputType="InputType.DateTimeLocal" @bind-Value="context.Item.Period"/>
@@ -95,11 +85,11 @@ CommittedItemChanges="@(async () => await dbContext.SaveChangesAsync())" EditMod
                 Value="context.Item.Period?.GetSecondPart()" ValueChanged="t => context.Item.Period = context.Item.Period?.ReplacedSecondPart(t)" />
             </EditTemplate>
         </PropertyColumn>
-        <PropertyColumn Property="x => x.UsedDate">
+        <PropertyColumn Property="x => x.LastUsedDate">
             <EditTemplate>
-                <MudTextField Format="s" Label="@(TextHelper.LabelFor<PlayerOwnedFreeServiceToken>(i => i.UsedDate))" InputType="InputType.DateTimeLocal" @bind-Value="context.Item.UsedDate"/>
+                <MudTextField Format="s" Label="@(TextHelper.LabelFor<PlayerOwnedFreeServiceToken>(i => i.LastUsedDate))" InputType="InputType.DateTimeLocal" @bind-Value="context.Item.LastUsedDate"/>
                 <MudNumericField T="double?" Label="Second" Adornment="Adornment.End" AdornmentText="s" Min="0.0" Max="59.9999999"
-                Value="context.Item.UsedDate?.GetSecondPart()" ValueChanged="t => context.Item.UsedDate = context.Item.UsedDate?.ReplacedSecondPart(t)" />
+                Value="context.Item.LastUsedDate?.GetSecondPart()" ValueChanged="t => context.Item.LastUsedDate = context.Item.LastUsedDate?.ReplacedSecondPart(t)" />
             </EditTemplate>
         </PropertyColumn>
         <PropertyColumn Property="x => x.InvalidateDate">
@@ -144,7 +134,7 @@ CommittedItemChanges="@(async () => await dbContext.SaveChangesAsync())" EditMod
     {
         if (string.IsNullOrWhiteSpace(_searchString)) return true;
 
-        if ($"{x.Id} {x.Origin} {x.Status} {x.Period} {x.UsedDate} {x.InvalidateDate} {x.ExpireDate}".Contains(_searchString)) return true;
+        if ($"{x.Id} {x.Origin} {x.Quantity} {x.Used} {x.Period} {x.LastUsedDate} {x.InvalidateDate} {x.ExpireDate}".Contains(_searchString)) return true;
 
         return false;
     }

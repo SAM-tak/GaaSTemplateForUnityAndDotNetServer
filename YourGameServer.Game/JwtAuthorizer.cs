@@ -3,6 +3,7 @@ using System.Security;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication;
+using YourGameServer.Shared.Data;
 
 namespace YourGameServer.Game;
 
@@ -96,9 +97,15 @@ public static class JwtAuthorizerExtentions
             var playerIdString = candidate[1];
             var deviceIdString = candidate[2];
             if(!string.IsNullOrEmpty(playerIdString) && !string.IsNullOrEmpty(deviceIdString)
-                && ulong.TryParse(playerIdString, out _) && ulong.TryParse(deviceIdString, out _)) {
+                && ulong.TryParse(playerIdString, out var playerId) && ulong.TryParse(deviceIdString, out var deviceId)) {
                 var serviceScopeFactory = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>();
                 using var scope = serviceScopeFactory.CreateScope();
+
+                var dbContext = scope.ServiceProvider.GetService<GameDbContext>();
+                if(!dbContext?.PlayerAccounts.Any(x => x.Id == playerId && x.CurrentDeviceId == deviceId) ?? true) {
+                    return false;
+                }
+
                 var httpContextAccessor = scope.ServiceProvider.GetService<IHttpContextAccessor>();
                 var headers = httpContextAccessor?.HttpContext?.Request.Headers;
                 if(headers is null) {

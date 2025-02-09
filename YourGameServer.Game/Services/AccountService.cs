@@ -6,6 +6,7 @@ using MessagePack;
 using Microsoft.EntityFrameworkCore;
 using NuGet.Protocol;
 using YourGameServer.Game.Interface;
+using YourGameServer.Shared;
 using YourGameServer.Shared.Data;
 using YourGameServer.Shared.Models;
 using YourGameServer.Shared.Operations;
@@ -31,14 +32,15 @@ public class AccountService(GameDbContext context, JwtAuthorizer jwt, IHttpConte
     public async UnaryResult<LogInRequestResult> LogIn(LogInRequest param)
     {
         _logger.LogInformation("Login {Param}", param.ToJson());
-        var playerAccount = await _context.PlayerAccounts.Include(i => i.DeviceList).FirstOrDefaultAsync(i => i.Id == param.Id);
+        var idSecret = IDCoder.Decode(param.Code);
+        var playerAccount = await _context.PlayerAccounts.Include(i => i.DeviceList).FirstOrDefaultAsync(i => i.Id == idSecret.Item1 && i.Secret == idSecret.Item2);
         if(playerAccount is not null) {
             var playerDevice = playerAccount.DeviceList.FirstOrDefault(i => i.DeviceType == (DeviceType)param.DeviceType && i.DeviceId == param.DeviceId);
             if(playerDevice is not null) {
                 var utcNow = DateTime.UtcNow;
                 if (playerAccount.CurrentDeviceId > 0 && playerAccount.CurrentDeviceId != playerDevice.Id && utcNow > _jwt.ExpireDate(playerDevice.LastUsed.Value)) {
                     // It will deny that last token not expired yet and login with other device.
-                    throw new ReturnStatusException(StatusCode.AlreadyExists, "already logged in with other device. try later.");
+                    _logger.LogInformation("already logged in with other device. overwrite.");
                 }
                 if(!string.IsNullOrEmpty(param.NewDeviceId) && param.NewDeviceId != param.DeviceId) {
                     playerDevice = new PlayerDevice {
@@ -54,9 +56,8 @@ public class AccountService(GameDbContext context, JwtAuthorizer jwt, IHttpConte
                 playerDevice.LastUsed = playerAccount.LastLogin = utcNow;
                 playerAccount.CurrentDeviceId = playerDevice.Id;
                 await _context.SaveChangesAsync();
-                _logger.LogInformation("Login return Code = {PlayerAccountCode}", playerAccount.Code);
+                _logger.LogInformation("{PlayerId}|Login {DeviceId}", playerAccount.Id, playerDevice.Id);
                 return new LogInRequestResult {
-                    Code = playerAccount.Code,
                     Token = _jwt.CreateToken(playerAccount.Id, playerDevice.Id, out var period),
                     Period = period
                 };
@@ -74,7 +75,7 @@ public class AccountService(GameDbContext context, JwtAuthorizer jwt, IHttpConte
     {
         ulong playerId = ulong.Parse(_httpContextAccessor.HttpContext.Request.Headers["playerid"]);
         ulong deviceId = ulong.Parse(_httpContextAccessor.HttpContext.Request.Headers["deviceid"]);
-        _logger.LogInformation("RenewToken {PlayerId} {DeviceId}", playerId, deviceId);
+        _logger.LogInformation("{PlayerId}|RenewToken {DeviceId}", playerId, deviceId);
         var playerAccount = await _context.PlayerAccounts.Include(i => i.DeviceList).FirstOrDefaultAsync(i => i.Id == playerId);
         if(playerAccount is not null) {
             var playerDevice = playerAccount.DeviceList.FirstOrDefault(i => i.Id == deviceId);
@@ -102,7 +103,7 @@ public class AccountService(GameDbContext context, JwtAuthorizer jwt, IHttpConte
     {
         ulong playerId = ulong.Parse(_httpContextAccessor.HttpContext.Request.Headers["playerid"]);
         ulong deviceId = ulong.Parse(_httpContextAccessor.HttpContext.Request.Headers["deviceid"]);
-        _logger.LogInformation("LogOut {PlayerId} {DeviceId}", playerId, deviceId);
+        _logger.LogInformation("{PlayerId}|LogOut {DeviceId}", playerId, deviceId);
         var playerAccount = await _context.PlayerAccounts.Include(i => i.DeviceList).FirstOrDefaultAsync(i => i.Id == playerId);
         if(playerAccount is not null) {
             var playerDevice = playerAccount.DeviceList.FirstOrDefault(i => i.Id == deviceId);
@@ -129,7 +130,6 @@ public class AccountService(GameDbContext context, JwtAuthorizer jwt, IHttpConte
         if(!string.IsNullOrWhiteSpace(signup.DeviceId)) {
             var playerAccount = await CreateAccountAsync(_context, signup);
             return new SignUpRequestResult {
-                Id = playerAccount.Id,
                 Code = playerAccount.Code,
                 Token = _jwt.CreateToken(playerAccount.Id, playerAccount.CurrentDeviceId, out var period),
                 Period = period

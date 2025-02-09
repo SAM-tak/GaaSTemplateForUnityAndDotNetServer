@@ -5,6 +5,7 @@ using MagicOnion.Server;
 using Microsoft.EntityFrameworkCore;
 using NuGet.Protocol;
 using YourGameServer.Game.Interface;
+using YourGameServer.Shared;
 using YourGameServer.Shared.Data;
 using YourGameServer.Shared.Models;
 using PlayerAccountStatus = YourGameServer.Game.Interface.PlayerAccountStatus;
@@ -30,13 +31,18 @@ public class PlayerAccountService(GameDbContext context, IHttpContextAccessor ht
     }
 
     [FromTypeFilter(typeof(RpcAuthAttribute))]
-    public async UnaryResult<IEnumerable<MaskedPlayerAccount>> GetPlayerAccounts(ulong[] ids)
+    public async UnaryResult<IEnumerable<MaskedPlayerAccount>> GetPlayerAccounts(string[] codes)
     {
         ulong playerId = ulong.Parse(_httpContextAccessor.HttpContext.Request.Headers["playerid"]);
-        _logger.LogInformation("{PlayerId} {Request}", playerId, ids.ToJson());
+        _logger.LogInformation("{PlayerId}|GetPlayerAccounts {Request}", playerId, codes.ToJson());
         if(!await _context.PlayerAccounts.AnyAsync()) {
             throw new ReturnStatusException(StatusCode.NotFound, "correspond account was not found.");
         }
+        if(codes == null) {
+            throw new ReturnStatusException(StatusCode.InvalidArgument, "codes is null.");
+        }
+
+        var ids = codes.Select(x => IDCoder.Decode(x).Item1).ToArray();
 
         if(ids != null && ids.Length > 0) {
             return await _context.PlayerAccounts.Include(i => i.Profile)
@@ -45,16 +51,33 @@ public class PlayerAccountService(GameDbContext context, IHttpContextAccessor ht
         return null;
     }
 
+    [FromTypeFilter(typeof(RpcAuthAttribute))]
+    public async UnaryResult<IEnumerable<MaskedPlayerAccount>> FindPlayerAccounts(int maxCount)
+    {
+        ulong playerId = ulong.Parse(_httpContextAccessor.HttpContext.Request.Headers["playerid"]);
+        _logger.LogInformation("{PlayerId}|FindPlayerAccounts {MaxCount}", playerId, maxCount);
+        if(!await _context.PlayerAccounts.AnyAsync()) {
+            throw new ReturnStatusException(StatusCode.NotFound, "correspond account was not found.");
+        }
+
+        if(maxCount > 0) {
+            return await _context.PlayerAccounts.Include(i => i.Profile)
+                .Where(i => i.Id != playerId && (PlayerAccountStatus)i.Status < PlayerAccountStatus.Banned)
+                .OrderBy(x => EF.Functions.Random()).Take(maxCount)
+                .Select(i => MaskedPlayerAccountFromPlayerAccount(i)).ToListAsync();
+        }
+        return null;
+    }
+
     public static MaskedPlayerAccount MaskedPlayerAccountFromPlayerAccount(PlayerAccount playerAccount) => new()
     {
-        Id = playerAccount.Id,
+        Code = playerAccount.Code,
         LastLogin = playerAccount.LastLogin,
         Profile = playerAccount.Profile != null ? MaskedPlayerProfileFromPlayerProfile(playerAccount.Profile) : null
     };
 
     public static FormalPlayerAccount FormalPlayerAccountFromPlayerAccount(PlayerAccount playerAccount) => new()
     {
-        Id = playerAccount.Id,
         Code = playerAccount.Code,
         Status = (PlayerAccountStatus)playerAccount.Status,
         Since = playerAccount.Since,
@@ -64,8 +87,7 @@ public class PlayerAccountService(GameDbContext context, IHttpContextAccessor ht
 
     public static FormalPlayerProfile FormalPlayerProfileFromPlayerProfile(PlayerProfile playerProfile) => new()
     {
-        Id = playerProfile.Id,
-        OwnerId = playerProfile.OwnerId,
+        OwnerCode = playerProfile.Owner.Code,
         LastUpdate = playerProfile.LastUpdate,
         Name = playerProfile.Name,
         Motto = playerProfile.Motto,

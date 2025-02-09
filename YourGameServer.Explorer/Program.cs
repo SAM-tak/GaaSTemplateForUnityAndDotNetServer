@@ -25,8 +25,8 @@ try {
 
     builder.Services.AddHttpContextAccessor();
 
-    // Setup IDCoder(hashids)
-    IDCoder.Initialize(builder.Configuration.GetSection("IDCoder")["Salt"] ?? string.Empty);
+    // Setup IDCoder(sqids)
+    IDCoder.Initialize();
 
     // https://stackoverflow.com/questions/4804086/is-there-any-connection-string-parser-in-c
     var connectionString = builder.Configuration.GetConnectionString(builder.Configuration["GameDbConnectionStringKey"] ?? string.Empty);

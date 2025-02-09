@@ -8,7 +8,7 @@ public class IDCoder_IsSane
     [TestInitialize]
     public void TestInitialize()
     {
-        IDCoder.Initialize("this is my salt");
+        IDCoder.Initialize();
     }
 
     [TestMethod]

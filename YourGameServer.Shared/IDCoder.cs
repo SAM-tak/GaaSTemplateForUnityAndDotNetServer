@@ -1,22 +1,24 @@
-using System.Globalization;
-using HashidsNet;
+using Sqids;
 
 namespace YourGameServer.Shared;
 
 public static class IDCoder
 {
-    static Hashids? _hashids = null;
+    static SqidsEncoder<ulong>? _sqids = null;
 
-    public static void Initialize(string salt)
+    public static void Initialize(int seed = 234456)
     {
-        _hashids = new(salt, 10, "abcdefghijknpqrstuvxyz23456789", "cfhistu");
+        var alphabets = "abcdefghijknpqrstuvxyz23456789".ToCharArray();
+        new Random(seed).Shuffle(alphabets.AsSpan());
+        // Console.WriteLine($"shuffled {new string(alphabets)}");
+        _sqids = new(new() { MinLength = 10, Alphabet = new string(alphabets) });
     }
 
-    public static string Encode(ulong id, ushort secret) => _hashids?.EncodeHex($"{id:X}{secret:X4}") ?? string.Empty;
+    public static string Encode(ulong id, ushort secret) => _sqids?.Encode(id, secret) ?? string.Empty;
 
     public static (ulong, ushort) Decode(string source)
     {
-        var values = _hashids?.DecodeHex(source);
-        return (ulong.Parse(values.AsSpan()[..^4], NumberStyles.HexNumber), ushort.Parse(values.AsSpan()[^4..], NumberStyles.HexNumber));
+        var values = _sqids?.Decode(source);
+        return values != null ? (values[0], (ushort)values[1]) : (0, 0);
     }
 }

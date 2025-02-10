@@ -39,7 +39,7 @@ public class AccountService(GameDbContext dbContext, JwtAuthorizer jwt, IHttpCon
             var playerDevice = playerAccount.DeviceList.FirstOrDefault(i => i.DeviceType == (DeviceType)param.DeviceType && i.DeviceId == param.DeviceId);
             if(playerDevice is not null) {
                 var utcNow = DateTime.UtcNow;
-                if (playerAccount.CurrentDeviceId > 0 && playerAccount.CurrentDeviceId != playerDevice.Id && utcNow > _jwt.ExpireDate(playerDevice.LastUsed.Value)) {
+                if (playerAccount.CurrentDeviceId > 0 && playerAccount.CurrentDeviceId != playerDevice.Id && utcNow < _jwt.ExpireDate(playerDevice.LastUsed.Value)) {
                     // It will deny that last token not expired yet and login with other device.
                     _logger.LogInformation("already logged in with other device. overwrite.");
                 }

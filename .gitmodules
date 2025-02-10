@@ -1,3 +1,0 @@
-[submodule "Interface"]
-	path = YourGameServer.Game/Interface
-	url = git@github.com:SAM-tak/GaaSTemplateForUnityAndDotNetShared.git

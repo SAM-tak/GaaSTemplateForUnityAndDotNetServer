@@ -8,6 +8,11 @@ using YourGameServer.Shared.Models;
 
 namespace YourGameServer.Game;
 
+/// <summary>
+/// Verify token only
+/// </summary>
+/// <param name="jwt"></param>
+/// <param name="httpContextAccessor"></param>
 public class VerifyToken(JwtAuthorizer jwt, IHttpContextAccessor httpContextAccessor) : MagicOnionFilterAttribute
 {
     readonly JwtAuthorizer _jwt = jwt;
@@ -27,6 +32,13 @@ public class VerifyToken(JwtAuthorizer jwt, IHttpContextAccessor httpContextAcce
     }
 }
 
+/// <summary>
+/// Verify token and player accound validation.
+/// This cause DB access.
+/// </summary>
+/// <param name="jwt"></param>
+/// <param name="httpContextAccessor"></param>
+/// <param name="serviceProvider"></param>
 public class VerifyTokenAndAccount(JwtAuthorizer jwt, IHttpContextAccessor httpContextAccessor, IServiceProvider serviceProvider) : MagicOnionFilterAttribute
 {
     readonly JwtAuthorizer _jwt = jwt;

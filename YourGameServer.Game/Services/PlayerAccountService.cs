@@ -16,17 +16,17 @@ namespace YourGameServer.Game.Services;
 // Implements RPC service in the server project.
 // The implementation class must inherit `ServiceBase<IMyFirstService>` and `IMyFirstService`
 [FromTypeFilter(typeof(VerifyTokenAndAccount))]
-public class PlayerAccountService(GameDbContext context, IHttpContextAccessor httpContextAccessor, ILogger<AccountService> logger)
+public class PlayerAccountService(GameDbContext dbContext, IHttpContextAccessor httpContextAccessor, ILogger<AccountService> logger)
     : ServiceBase<IPlayerAccountService>, IPlayerAccountService
 {
-    readonly GameDbContext _context = context;
+    readonly GameDbContext _dbContext = dbContext;
     readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
     readonly ILogger<AccountService> _logger = logger;
 
     public async UnaryResult<FormalPlayerAccount> GetPlayerAccount()
     {
         var playerId = _httpContextAccessor.HttpContext.GetPlayerId();
-        var playerAccount = await _context.PlayerAccounts.FindAsync(playerId)
+        var playerAccount = await _dbContext.PlayerAccounts.FindAsync(playerId)
             ?? throw new ReturnStatusException(StatusCode.NotFound, "correspond account was not found.");
         return FormalPlayerAccountFromPlayerAccount(playerAccount);
     }
@@ -35,7 +35,7 @@ public class PlayerAccountService(GameDbContext context, IHttpContextAccessor ht
     {
         var playerId = _httpContextAccessor.HttpContext.GetPlayerId();
         _logger.LogInformation("{PlayerId}|GetPlayerAccounts {Request}", playerId, codes.ToJson());
-        if(!await _context.PlayerAccounts.AnyAsync()) {
+        if(!await _dbContext.PlayerAccounts.AnyAsync()) {
             throw new ReturnStatusException(StatusCode.NotFound, "correspond account was not found.");
         }
         if(codes == null) {
@@ -45,7 +45,7 @@ public class PlayerAccountService(GameDbContext context, IHttpContextAccessor ht
         var ids = codes.Select(x => IDCoder.Decode(x).Item1).ToArray();
 
         if(ids != null && ids.Length > 0) {
-            return await _context.PlayerAccounts.Include(i => i.Profile)
+            return await _dbContext.PlayerAccounts.Include(i => i.Profile)
                 .Where(i => ids.Contains(i.Id) && (PlayerAccountStatus)i.Status < PlayerAccountStatus.Banned).Select(i => MaskedPlayerAccountFromPlayerAccount(i)).ToListAsync();
         }
         return null;
@@ -55,12 +55,12 @@ public class PlayerAccountService(GameDbContext context, IHttpContextAccessor ht
     {
         var playerId = _httpContextAccessor.HttpContext.GetPlayerId();
         _logger.LogInformation("{PlayerId}|FindPlayerAccounts {MaxCount}", playerId, maxCount);
-        if(!await _context.PlayerAccounts.AnyAsync()) {
+        if(!await _dbContext.PlayerAccounts.AnyAsync()) {
             throw new ReturnStatusException(StatusCode.NotFound, "correspond account was not found.");
         }
 
         if(maxCount > 0) {
-            return await _context.PlayerAccounts.Include(i => i.Profile)
+            return await _dbContext.PlayerAccounts.Include(i => i.Profile)
                 .Where(i => i.Id != playerId && (PlayerAccountStatus)i.Status < PlayerAccountStatus.Banned)
                 .OrderBy(x => EF.Functions.Random()).Take(maxCount)
                 .Select(i => MaskedPlayerAccountFromPlayerAccount(i)).ToListAsync();

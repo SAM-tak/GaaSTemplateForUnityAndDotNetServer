@@ -11,8 +11,8 @@ namespace YourGameServer.Game;
 /// <summary>
 /// Verify token only
 /// </summary>
-/// <param name="jwt"></param>
-/// <param name="httpContextAccessor"></param>
+/// <param name="jwt">Sets by DI</param>
+/// <param name="httpContextAccessor">Sets by DI</param>
 public class VerifyToken(JwtAuthorizer jwt, IHttpContextAccessor httpContextAccessor) : MagicOnionFilterAttribute
 {
     readonly JwtAuthorizer _jwt = jwt;
@@ -35,8 +35,8 @@ public class VerifyToken(JwtAuthorizer jwt, IHttpContextAccessor httpContextAcce
 /// Verify token and player accound validation.
 /// This cause DB access.
 /// </summary>
-/// <param name="jwt"></param>
-/// <param name="httpContextAccessor"></param>
+/// <param name="jwt">Sets by DI</param>
+/// <param name="httpContextAccessor">Sets by DI</param>
 public class VerifyTokenAndAccount(JwtAuthorizer jwt, IHttpContextAccessor httpContextAccessor) : MagicOnionFilterAttribute
 {
     readonly JwtAuthorizer _jwt = jwt;

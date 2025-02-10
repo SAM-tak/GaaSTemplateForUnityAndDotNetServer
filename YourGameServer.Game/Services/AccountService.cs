@@ -17,10 +17,10 @@ namespace YourGameServer.Game.Services;
 
 // Implements RPC service in the server project.
 // The implementation class must inherit `ServiceBase<IMyFirstService>` and `IMyFirstService`
-public class AccountService(GameDbContext context, JwtAuthorizer jwt, IHttpContextAccessor httpContextAccessor, ILogger<AccountService> logger)
+public class AccountService(GameDbContext dbContext, JwtAuthorizer jwt, IHttpContextAccessor httpContextAccessor, ILogger<AccountService> logger)
     : ServiceBase<IAccountService>, IAccountService
 {
-    readonly GameDbContext _context = context;
+    readonly GameDbContext _dbContext = dbContext;
     readonly JwtAuthorizer _jwt = jwt;
     readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
     readonly ILogger<AccountService> _logger = logger;
@@ -34,7 +34,7 @@ public class AccountService(GameDbContext context, JwtAuthorizer jwt, IHttpConte
     {
         _logger.LogInformation("Login {Param}", param.ToJson());
         var idSecret = IDCoder.Decode(param.Code);
-        var playerAccount = await _context.PlayerAccounts.Include(i => i.DeviceList).FirstOrDefaultAsync(i => i.Id == idSecret.Item1 && i.Secret == idSecret.Item2);
+        var playerAccount = await _dbContext.PlayerAccounts.Include(i => i.DeviceList).FirstOrDefaultAsync(i => i.Id == idSecret.Item1 && i.Secret == idSecret.Item2);
         if(playerAccount is not null) {
             var playerDevice = playerAccount.DeviceList.FirstOrDefault(i => i.DeviceType == (DeviceType)param.DeviceType && i.DeviceId == param.DeviceId);
             if(playerDevice is not null) {
@@ -51,12 +51,12 @@ public class AccountService(GameDbContext context, JwtAuthorizer jwt, IHttpConte
                         Since = utcNow,
                         LastUsed = utcNow,
                     };
-                    await _context.AddAsync(playerDevice);
-                    await _context.SaveChangesAsync();
+                    await _dbContext.AddAsync(playerDevice);
+                    await _dbContext.SaveChangesAsync();
                 }
                 playerDevice.LastUsed = playerAccount.LastLogin = utcNow;
                 playerAccount.CurrentDeviceId = playerDevice.Id;
-                await _context.SaveChangesAsync();
+                await _dbContext.SaveChangesAsync();
                 _logger.LogInformation("{PlayerId}|Login {DeviceId}", playerAccount.Id, playerDevice.Id);
                 return new LogInRequestResult {
                     Token = _jwt.CreateToken(playerAccount.Id, playerDevice.Id, out var period),
@@ -76,7 +76,7 @@ public class AccountService(GameDbContext context, JwtAuthorizer jwt, IHttpConte
     {
         _httpContextAccessor.HttpContext.TryGetPlayerIdAndDeviceId(out var playerId, out var deviceId);
         _logger.LogInformation("{PlayerId}|RenewToken {DeviceId}", playerId, deviceId);
-        var playerAccount = await _context.PlayerAccounts.Include(i => i.DeviceList).FirstOrDefaultAsync(i => i.Id == playerId);
+        var playerAccount = await _dbContext.PlayerAccounts.Include(i => i.DeviceList).FirstOrDefaultAsync(i => i.Id == playerId);
         if(playerAccount is not null) {
             var playerDevice = playerAccount.DeviceList.FirstOrDefault(i => i.Id == deviceId);
             if(playerDevice is not null) {
@@ -84,7 +84,7 @@ public class AccountService(GameDbContext context, JwtAuthorizer jwt, IHttpConte
                     throw new ReturnStatusException(StatusCode.FailedPrecondition, "You are not logged in with current device.");
                 }
                 playerDevice.LastUsed = DateTime.UtcNow;
-                await _context.SaveChangesAsync();
+                await _dbContext.SaveChangesAsync();
                 return new RenewTokenRequestResult {
                     Token = _jwt.CreateToken(playerId, deviceId, out var period),
                     Period = period
@@ -103,7 +103,7 @@ public class AccountService(GameDbContext context, JwtAuthorizer jwt, IHttpConte
     {
         _httpContextAccessor.HttpContext.TryGetPlayerIdAndDeviceId(out var playerId, out var deviceId);
         _logger.LogInformation("{PlayerId}|LogOut {DeviceId}", playerId, deviceId);
-        var playerAccount = await _context.PlayerAccounts.Include(i => i.DeviceList).FirstOrDefaultAsync(i => i.Id == playerId);
+        var playerAccount = await _dbContext.PlayerAccounts.Include(i => i.DeviceList).FirstOrDefaultAsync(i => i.Id == playerId);
         if(playerAccount is not null) {
             var playerDevice = playerAccount.DeviceList.FirstOrDefault(i => i.Id == deviceId);
             if(playerDevice is not null) {
@@ -111,7 +111,7 @@ public class AccountService(GameDbContext context, JwtAuthorizer jwt, IHttpConte
                     throw new ReturnStatusException(StatusCode.FailedPrecondition, "You are not logged in with current device.");
                 }
                 playerAccount.CurrentDeviceId = 0;
-                await _context.SaveChangesAsync();
+                await _dbContext.SaveChangesAsync();
                 return new Nil();
             }
         }
@@ -127,7 +127,7 @@ public class AccountService(GameDbContext context, JwtAuthorizer jwt, IHttpConte
     {
         _logger.LogInformation("SignUp {SignUp}", signup.ToJson());
         if(!string.IsNullOrWhiteSpace(signup.DeviceId)) {
-            var playerAccount = await CreateAccountAsync(_context, signup);
+            var playerAccount = await CreateAccountAsync(_dbContext, signup);
             return new SignUpRequestResult {
                 Code = playerAccount.Code,
                 Token = _jwt.CreateToken(playerAccount.Id, playerAccount.CurrentDeviceId, out var period),

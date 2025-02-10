@@ -38,12 +38,10 @@ public class VerifyToken(JwtAuthorizer jwt, IHttpContextAccessor httpContextAcce
 /// </summary>
 /// <param name="jwt"></param>
 /// <param name="httpContextAccessor"></param>
-/// <param name="serviceProvider"></param>
-public class VerifyTokenAndAccount(JwtAuthorizer jwt, IHttpContextAccessor httpContextAccessor, IServiceProvider serviceProvider) : MagicOnionFilterAttribute
+public class VerifyTokenAndAccount(JwtAuthorizer jwt, IHttpContextAccessor httpContextAccessor) : MagicOnionFilterAttribute
 {
     readonly JwtAuthorizer _jwt = jwt;
     readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
-    readonly IServiceProvider _serviceProvider = serviceProvider;
 
     public override async ValueTask Invoke(ServiceContext context, Func<ServiceContext, ValueTask> next)
     {
@@ -56,7 +54,7 @@ public class VerifyTokenAndAccount(JwtAuthorizer jwt, IHttpContextAccessor httpC
             throw new ReturnStatusException(Grpc.Core.StatusCode.Unauthenticated, "Invalid token.");
         }
 
-        using var scope = _serviceProvider.CreateScope();
+        using var scope = context.ServiceProvider.CreateScope();
         var dbContext = scope.ServiceProvider.GetService<GameDbContext>();
         if(dbContext != null && _httpContextAccessor.HttpContext != null) {
             if(_httpContextAccessor.HttpContext.TryGetPlayerIdAndDeviceId(out var playerId, out var deviceId)) {

@@ -4,6 +4,7 @@ using System.IdentityModel.Tokens.Jwt;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication;
 using YourGameServer.Shared.Data;
+using Microsoft.AspNetCore.Authorization;
 
 namespace YourGameServer.Game;
 
@@ -89,30 +90,15 @@ public static class JwtAuthorizerExtentions
         }
 
         jwtAuthorizer.TokenValidationParameters.AudienceValidator = (audiences, securityToken, validationParameters) => {
-            var candidate = audiences.Select(i => i.Split('/')).FirstOrDefault(i => i.Length == 3 && i[0] == validationParameters.ValidAudience);
-            if(candidate is null) {
+            var strings = audiences.Select(i => i.Split('/')).FirstOrDefault(i => i.Length == 3 && i[0] == validationParameters.ValidAudience);
+            if(strings is null) {
                 return false;
             }
 
-            var playerIdString = candidate[1];
-            var deviceIdString = candidate[2];
+            var playerIdString = strings[1];
+            var deviceIdString = strings[2];
             if(!string.IsNullOrEmpty(playerIdString) && !string.IsNullOrEmpty(deviceIdString)
-                && ulong.TryParse(playerIdString, out var playerId) && ulong.TryParse(deviceIdString, out var deviceId)) {
-                var serviceScopeFactory = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>();
-                using var scope = serviceScopeFactory.CreateScope();
-
-                var dbContext = scope.ServiceProvider.GetService<GameDbContext>();
-                if(!dbContext?.PlayerAccounts.Any(x => x.Id == playerId && x.CurrentDeviceId == deviceId) ?? true) {
-                    return false;
-                }
-
-                var httpContextAccessor = scope.ServiceProvider.GetService<IHttpContextAccessor>();
-                var headers = httpContextAccessor?.HttpContext?.Request.Headers;
-                if(headers is null) {
-                    return false;
-                }
-                headers["PlayerId"] = playerIdString;
-                headers["DeviceId"] = deviceIdString;
+                && ulong.TryParse(playerIdString, out _) && ulong.TryParse(deviceIdString, out _)) {
                 return true;
             }
             return false;

@@ -5,6 +5,7 @@ using MagicOnion.Server;
 using MessagePack;
 using Microsoft.EntityFrameworkCore;
 using NuGet.Protocol;
+using YourGameServer.Game.Extensions;
 using YourGameServer.Game.Interface;
 using YourGameServer.Shared;
 using YourGameServer.Shared.Data;
@@ -70,11 +71,10 @@ public class AccountService(GameDbContext context, JwtAuthorizer jwt, IHttpConte
     /// Request new token
     /// </summary>
     /// <returns>new token</returns>
-    [FromTypeFilter(typeof(RpcAuthAttribute))]
+    [FromTypeFilter(typeof(VerifyTokenAndAccount))]
     public async UnaryResult<RenewTokenRequestResult> RenewToken()
     {
-        ulong playerId = ulong.Parse(_httpContextAccessor.HttpContext.Request.Headers["playerid"]);
-        ulong deviceId = ulong.Parse(_httpContextAccessor.HttpContext.Request.Headers["deviceid"]);
+        _httpContextAccessor.HttpContext.TryGetPlayerIdAndDeviceId(out var playerId, out var deviceId);
         _logger.LogInformation("{PlayerId}|RenewToken {DeviceId}", playerId, deviceId);
         var playerAccount = await _context.PlayerAccounts.Include(i => i.DeviceList).FirstOrDefaultAsync(i => i.Id == playerId);
         if(playerAccount is not null) {
@@ -98,11 +98,10 @@ public class AccountService(GameDbContext context, JwtAuthorizer jwt, IHttpConte
     /// Log out
     /// </summary>
     /// <returns>None</returns>
-    [FromTypeFilter(typeof(RpcAuthAttribute))]
+    [FromTypeFilter(typeof(VerifyTokenAndAccount))]
     public async UnaryResult<Nil> LogOut()
     {
-        ulong playerId = ulong.Parse(_httpContextAccessor.HttpContext.Request.Headers["playerid"]);
-        ulong deviceId = ulong.Parse(_httpContextAccessor.HttpContext.Request.Headers["deviceid"]);
+        _httpContextAccessor.HttpContext.TryGetPlayerIdAndDeviceId(out var playerId, out var deviceId);
         _logger.LogInformation("{PlayerId}|LogOut {DeviceId}", playerId, deviceId);
         var playerAccount = await _context.PlayerAccounts.Include(i => i.DeviceList).FirstOrDefaultAsync(i => i.Id == playerId);
         if(playerAccount is not null) {

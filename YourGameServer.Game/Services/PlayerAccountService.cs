@@ -4,6 +4,7 @@ using MagicOnion;
 using MagicOnion.Server;
 using Microsoft.EntityFrameworkCore;
 using NuGet.Protocol;
+using YourGameServer.Game.Extensions;
 using YourGameServer.Game.Interface;
 using YourGameServer.Shared;
 using YourGameServer.Shared.Data;
@@ -14,6 +15,7 @@ namespace YourGameServer.Game.Services;
 
 // Implements RPC service in the server project.
 // The implementation class must inherit `ServiceBase<IMyFirstService>` and `IMyFirstService`
+[FromTypeFilter(typeof(VerifyTokenAndAccount))]
 public class PlayerAccountService(GameDbContext context, IHttpContextAccessor httpContextAccessor, ILogger<AccountService> logger)
     : ServiceBase<IPlayerAccountService>, IPlayerAccountService
 {
@@ -21,19 +23,17 @@ public class PlayerAccountService(GameDbContext context, IHttpContextAccessor ht
     readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
     readonly ILogger<AccountService> _logger = logger;
 
-    [FromTypeFilter(typeof(RpcAuthAttribute))]
     public async UnaryResult<FormalPlayerAccount> GetPlayerAccount()
     {
-        ulong playerId = ulong.Parse(_httpContextAccessor.HttpContext.Request.Headers["playerid"]);
+        var playerId = _httpContextAccessor.HttpContext.GetPlayerId();
         var playerAccount = await _context.PlayerAccounts.FindAsync(playerId)
             ?? throw new ReturnStatusException(StatusCode.NotFound, "correspond account was not found.");
         return FormalPlayerAccountFromPlayerAccount(playerAccount);
     }
 
-    [FromTypeFilter(typeof(RpcAuthAttribute))]
     public async UnaryResult<IEnumerable<MaskedPlayerAccount>> GetPlayerAccounts(string[] codes)
     {
-        ulong playerId = ulong.Parse(_httpContextAccessor.HttpContext.Request.Headers["playerid"]);
+        var playerId = _httpContextAccessor.HttpContext.GetPlayerId();
         _logger.LogInformation("{PlayerId}|GetPlayerAccounts {Request}", playerId, codes.ToJson());
         if(!await _context.PlayerAccounts.AnyAsync()) {
             throw new ReturnStatusException(StatusCode.NotFound, "correspond account was not found.");
@@ -51,10 +51,9 @@ public class PlayerAccountService(GameDbContext context, IHttpContextAccessor ht
         return null;
     }
 
-    [FromTypeFilter(typeof(RpcAuthAttribute))]
     public async UnaryResult<IEnumerable<MaskedPlayerAccount>> FindPlayerAccounts(int maxCount)
     {
-        ulong playerId = ulong.Parse(_httpContextAccessor.HttpContext.Request.Headers["playerid"]);
+        var playerId = _httpContextAccessor.HttpContext.GetPlayerId();
         _logger.LogInformation("{PlayerId}|FindPlayerAccounts {MaxCount}", playerId, maxCount);
         if(!await _context.PlayerAccounts.AnyAsync()) {
             throw new ReturnStatusException(StatusCode.NotFound, "correspond account was not found.");

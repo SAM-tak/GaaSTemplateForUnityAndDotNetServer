@@ -25,6 +25,14 @@
                     </MudSelect>
                 </MudTd>
                 <MudTd>
+                    <MudSelect T="ConsumableStatus" @bind-Value="_newItem.Status" Label="@(TextHelper.LabelFor<PlayerOwnedServiceTicket>(i => i.Status))">
+                        @foreach (ConsumableStatus item in Enum.GetValues(typeof(ConsumableStatus)))
+                        {
+                            <MudSelectItem Value="@item">@item.GetDisplayName()</MudSelectItem>
+                        }
+                    </MudSelect>
+                </MudTd>
+                <MudTd>
                     <MudNumericField @bind-Value="_newItem.Quantity" Label="Quantity" T="int" Min="0" />
                 </MudTd>
                 <MudTd>
@@ -74,6 +82,16 @@ CommittedItemChanges="@(async () => await dbContext.SaveChangesAsync())" EditMod
             <EditTemplate>
                 <MudSelect T="ConsumableOrigin" @bind-Value="context.Item.Origin" Label="@(TextHelper.LabelFor<PlayerOwnedServiceTicket>(i => i.Origin))">
                     @foreach (ConsumableOrigin item in Enum.GetValues(typeof(ConsumableOrigin)))
+                    {
+                        <MudSelectItem Value="@item">@item.GetDisplayName()</MudSelectItem>
+                    }
+                </MudSelect>
+            </EditTemplate>
+        </PropertyColumn>
+        <PropertyColumn Property="x => x.Status">
+            <EditTemplate>
+                <MudSelect T="ConsumableStatus" @bind-Value="context.Item.Status" Label="@(TextHelper.LabelFor<PlayerOwnedServiceTicket>(i => i.Status))">
+                    @foreach (ConsumableStatus item in Enum.GetValues(typeof(ConsumableStatus)))
                     {
                         <MudSelectItem Value="@item">@item.GetDisplayName()</MudSelectItem>
                     }
@@ -138,7 +156,7 @@ CommittedItemChanges="@(async () => await dbContext.SaveChangesAsync())" EditMod
     {
         if (string.IsNullOrWhiteSpace(_searchString)) return true;
 
-        if ($"{x.Id} {x.Origin} {x.Quantity} {x.Used} {x.Period} {x.LastUsedDate} {x.InvalidateDate} {x.ExpireDate}".Contains(_searchString)) return true;
+        if ($"{x.Id} {x.Origin} {x.Status} {x.Quantity} {x.Used} {x.Period} {x.LastUsedDate} {x.InvalidateDate} {x.ExpireDate}".Contains(_searchString)) return true;
 
         return false;
     }

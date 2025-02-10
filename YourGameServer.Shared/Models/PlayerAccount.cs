@@ -1,5 +1,6 @@
 #nullable disable
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace YourGameServer.Shared.Models;
 
@@ -9,6 +10,7 @@ public record PlayerAccount
     public ulong Id { get; init; }
     [Display(Name = "Secret")]
     public ushort Secret { get; set; }
+    [JsonIgnore]
     public List<PlayerDevice> DeviceList { get; init; }
     [Display(Name = "Current DeviceId")]
     public ulong CurrentDeviceId { get; set; }

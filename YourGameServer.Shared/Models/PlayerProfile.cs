@@ -1,5 +1,6 @@
 #nullable disable
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace YourGameServer.Shared.Models;
 
@@ -7,7 +8,7 @@ public record PlayerProfile
 {
     public ulong Id { get; init; }
     public ulong OwnerId { get; set; }
-    [ForeignKey("OwnerId")]
+    [ForeignKey("OwnerId"), JsonIgnore]
     public PlayerAccount Owner { get; init; }
     public DateTime? LastUpdate { get; set; }
     public string Name { get; set; }

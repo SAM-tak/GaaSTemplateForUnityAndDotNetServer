@@ -24,7 +24,6 @@ public class VerifyToken(JwtAuthorizer jwt, IHttpContextAccessor httpContextAcce
         if(authstr is null || authstr.Length != 2 || !authstr[0].Equals(JwtBearerDefaults.AuthenticationScheme, StringComparison.OrdinalIgnoreCase)) {
             throw new ReturnStatusException(Grpc.Core.StatusCode.Unauthenticated, "Invalid authorization header.");
         }
-
         if(!_jwt.ValidateToken(authstr[1])) {
             throw new ReturnStatusException(Grpc.Core.StatusCode.Unauthenticated, "Invalid token.");
         }
@@ -49,7 +48,6 @@ public class VerifyTokenAndAccount(JwtAuthorizer jwt, IHttpContextAccessor httpC
         if(authstr is null || authstr.Length != 2 || !authstr[0].Equals(JwtBearerDefaults.AuthenticationScheme, StringComparison.OrdinalIgnoreCase)) {
             throw new ReturnStatusException(Grpc.Core.StatusCode.Unauthenticated, "Invalid authorization header.");
         }
-
         if(!_jwt.ValidateToken(authstr[1])) {
             throw new ReturnStatusException(Grpc.Core.StatusCode.Unauthenticated, "Invalid token.");
         }
@@ -68,6 +66,7 @@ public class VerifyTokenAndAccount(JwtAuthorizer jwt, IHttpContextAccessor httpC
                 }
             }
         }
+
         await next(context);
     }
 }

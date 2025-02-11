@@ -25,7 +25,7 @@ public class PlayerAccountService(GameDbContext dbContext, IHttpContextAccessor 
 
     public async UnaryResult<FormalPlayerAccount> GetPlayerAccount()
     {
-        var playerId = _httpContextAccessor.HttpContext.GetPlayerId();
+        var playerId = _httpContextAccessor.GetPlayerId();
         var playerAccount = await _dbContext.PlayerAccounts.FindAsync(playerId)
             ?? throw new ReturnStatusException(StatusCode.NotFound, "correspond account was not found.");
         return FormalPlayerAccountFromPlayerAccount(playerAccount);
@@ -33,7 +33,7 @@ public class PlayerAccountService(GameDbContext dbContext, IHttpContextAccessor 
 
     public async UnaryResult<IEnumerable<MaskedPlayerAccount>> GetPlayerAccounts(string[] codes)
     {
-        var playerId = _httpContextAccessor.HttpContext.GetPlayerId();
+        var playerId = _httpContextAccessor.GetPlayerId();
         _logger.LogInformation("{PlayerId}|GetPlayerAccounts {Request}", playerId, codes.ToJson());
         if(!await _dbContext.PlayerAccounts.AnyAsync()) {
             throw new ReturnStatusException(StatusCode.NotFound, "correspond account was not found.");
@@ -46,14 +46,15 @@ public class PlayerAccountService(GameDbContext dbContext, IHttpContextAccessor 
 
         if(ids != null && ids.Length > 0) {
             return await _dbContext.PlayerAccounts.Include(i => i.Profile)
-                .Where(i => ids.Contains(i.Id) && (PlayerAccountStatus)i.Status < PlayerAccountStatus.Banned).Select(i => MaskedPlayerAccountFromPlayerAccount(i)).ToListAsync();
+                .Where(i => ids.Contains(i.Id) && (PlayerAccountStatus)i.Status < PlayerAccountStatus.Banned)
+                .Select(i => MaskedPlayerAccountFromPlayerAccount(i)).ToListAsync();
         }
         return null;
     }
 
     public async UnaryResult<IEnumerable<MaskedPlayerAccount>> FindPlayerAccounts(int maxCount)
     {
-        var playerId = _httpContextAccessor.HttpContext.GetPlayerId();
+        var playerId = _httpContextAccessor.GetPlayerId();
         _logger.LogInformation("{PlayerId}|FindPlayerAccounts {MaxCount}", playerId, maxCount);
         if(!await _dbContext.PlayerAccounts.AnyAsync()) {
             throw new ReturnStatusException(StatusCode.NotFound, "correspond account was not found.");

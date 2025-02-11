@@ -19,7 +19,7 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Grpc.AspNetCore" Version="2.67.0" />
-    <PackageReference Include="MagicOnion.Server" Version="7.0.1" />
+    <PackageReference Include="MagicOnion.Server" Version="6.1.6" />
     <PackageReference Include="MessagePack" Version="3.1.1" />
     <PackageReference Include="MessagePack.UnityShims" Version="3.1.1" />
     <PackageReference Include="MessagePackAnalyzer" Version="3.1.1">

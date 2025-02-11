@@ -74,7 +74,7 @@ public class AccountService(GameDbContext dbContext, JwtAuthorizer jwt, IHttpCon
     [FromTypeFilter(typeof(VerifyTokenAndAccount))]
     public async UnaryResult<RenewTokenRequestResult> RenewToken()
     {
-        _httpContextAccessor.HttpContext.TryGetPlayerIdAndDeviceId(out var playerId, out var deviceId);
+        _httpContextAccessor.TryGetPlayerIdAndDeviceId(out var playerId, out var deviceId);
         _logger.LogInformation("{PlayerId}|RenewToken {DeviceId}", playerId, deviceId);
         var playerAccount = await _dbContext.PlayerAccounts.Include(i => i.DeviceList).FirstOrDefaultAsync(i => i.Id == playerId);
         if(playerAccount is not null) {
@@ -101,7 +101,7 @@ public class AccountService(GameDbContext dbContext, JwtAuthorizer jwt, IHttpCon
     [FromTypeFilter(typeof(VerifyTokenAndAccount))]
     public async UnaryResult<Nil> LogOut()
     {
-        _httpContextAccessor.HttpContext.TryGetPlayerIdAndDeviceId(out var playerId, out var deviceId);
+        _httpContextAccessor.TryGetPlayerIdAndDeviceId(out var playerId, out var deviceId);
         _logger.LogInformation("{PlayerId}|LogOut {DeviceId}", playerId, deviceId);
         var playerAccount = await _dbContext.PlayerAccounts.Include(i => i.DeviceList).FirstOrDefaultAsync(i => i.Id == playerId);
         if(playerAccount is not null) {

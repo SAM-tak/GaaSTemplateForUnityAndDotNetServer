@@ -15,13 +15,14 @@ public class ChatHub(IHttpContextAccessor httpContextAccessor, ILogger<ChatHub> 
     string _userName = string.Empty;
 
     [FromTypeFilter(typeof(VerifyToken))]
-    public async Task JoinAsync(ChatJoinRequest request)
+    public async Task<Guid> JoinAsync(ChatJoinRequest request)
     {
         _logger.LogInformation("{PlayerId}|JoinAsync {UserName} {RoomName}", _httpContextAccessor.GetPlayerId(), request.UserName, request.RoomName);
         _room = await Group.AddAsync(request.RoomName);
         _userName = request.UserName;
-        Broadcast(_room).OnJoin(request.UserName);
+        Broadcast(_room).OnJoin(new() { UserName = _userName, ContextId = Context.ContextId });
         _logger.LogInformation("{PlayerId}|JoinAsync done {UserName} {RoomName}", _httpContextAccessor.GetPlayerId(), _userName, _room.GroupName);
+        return Context.ContextId;
     }
 
     [FromTypeFilter(typeof(VerifyToken))]
@@ -29,7 +30,7 @@ public class ChatHub(IHttpContextAccessor httpContextAccessor, ILogger<ChatHub> 
     {
         if(_room is not null) {
             await _room.RemoveAsync(Context);
-            Broadcast(_room).OnLeave(_userName);
+            Broadcast(_room).OnLeave(new() { UserName = _userName, ContextId = Context.ContextId });
         }
     }
 
@@ -38,12 +39,18 @@ public class ChatHub(IHttpContextAccessor httpContextAccessor, ILogger<ChatHub> 
     {
         if(_room is not null) {
             if(message.StartsWith("/global ", StringComparison.InvariantCultureIgnoreCase)) {
-                var response = new ChatMessage { UserName = _userName, Message = message["/global ".Length..] };
-                Broadcast(_room).OnSendMessage(response);
+                Broadcast(_room).OnRecievedMessage(new() {
+                    Member = new() { UserName = _userName, ContextId = Context.ContextId },
+                    DateTime = DateTime.UtcNow,
+                    Message = message["/global ".Length..]
+                });
             }
             else {
-                var response = new ChatMessage { UserName = _userName, Message = message };
-                Broadcast(_room).OnSendMessage(response);
+                Broadcast(_room).OnRecievedMessage(new() {
+                    Member = new() { UserName = _userName, ContextId = Context.ContextId },
+                    DateTime = DateTime.UtcNow,
+                    Message = message
+                });
             }
         }
 

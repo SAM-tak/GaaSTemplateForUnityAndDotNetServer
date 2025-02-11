@@ -59,7 +59,7 @@ public class AccountService(GameDbContext dbContext, JwtAuthorizer jwt, IHttpCon
                 await _dbContext.SaveChangesAsync();
                 _logger.LogInformation("{PlayerId}|Login {DeviceId}", playerAccount.Id, playerDevice.Id);
                 return new LogInRequestResult {
-                    Token = _jwt.CreateToken(playerAccount.Id, playerDevice.Id, out var period),
+                    Token = $"Bearer {_jwt.CreateToken(playerAccount.Id, playerDevice.Id, out var period)}",
                     Period = period
                 };
             }
@@ -86,7 +86,7 @@ public class AccountService(GameDbContext dbContext, JwtAuthorizer jwt, IHttpCon
                 playerDevice.LastUsed = DateTime.UtcNow;
                 await _dbContext.SaveChangesAsync();
                 return new RenewTokenRequestResult {
-                    Token = _jwt.CreateToken(playerId, deviceId, out var period),
+                    Token = $"Bearer {_jwt.CreateToken(playerId, deviceId, out var period)}",
                     Period = period
                 };
             }
@@ -130,7 +130,7 @@ public class AccountService(GameDbContext dbContext, JwtAuthorizer jwt, IHttpCon
             var playerAccount = await CreateAccountAsync(_dbContext, signup);
             return new SignUpRequestResult {
                 Code = playerAccount.Code,
-                Token = _jwt.CreateToken(playerAccount.Id, playerAccount.CurrentDeviceId, out var period),
+                Token = $"Bearer {_jwt.CreateToken(playerAccount.Id, playerAccount.CurrentDeviceId, out var period)}",
                 Period = period
             };
         }

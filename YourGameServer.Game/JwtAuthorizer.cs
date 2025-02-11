@@ -3,8 +3,6 @@ using System.Security;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication;
-using YourGameServer.Shared.Data;
-using Microsoft.AspNetCore.Authorization;
 
 namespace YourGameServer.Game;
 

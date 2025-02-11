@@ -55,7 +55,7 @@ public class VerifyTokenAndAccount(JwtAuthorizer jwt, IHttpContextAccessor httpC
         using var scope = context.ServiceProvider.CreateScope();
         var dbContext = scope.ServiceProvider.GetService<GameDbContext>();
         if(dbContext != null && _httpContextAccessor.HttpContext != null) {
-            if(_httpContextAccessor.HttpContext.TryGetPlayerIdAndDeviceId(out var playerId, out var deviceId)) {
+            if(_httpContextAccessor.TryGetPlayerIdAndDeviceId(out var playerId, out var deviceId)) {
                 var playerAccount = await dbContext.PlayerAccounts.FirstOrDefaultAsync(x => x.Id == playerId)
                     ?? throw new ReturnStatusException(Grpc.Core.StatusCode.Unauthenticated, "Player account is not found.");
                 if(playerAccount.CurrentDeviceId != deviceId) {

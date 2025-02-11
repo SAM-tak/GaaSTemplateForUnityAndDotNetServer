@@ -17,6 +17,7 @@ public class ChatHub(GameDbContext dbContext, IHttpContextAccessor httpContextAc
     readonly ILogger<ChatHub> _logger = logger;
     IGroup _room;
 
+    ulong _playerId = 0;
     string _playerCode = string.Empty;
     string _playerName = string.Empty;
 
@@ -32,11 +33,12 @@ public class ChatHub(GameDbContext dbContext, IHttpContextAccessor httpContextAc
         var playerAccount = await _dbContext.PlayerAccounts.Include(i => i.Profile).FirstOrDefaultAsync(i => i.Id == playerId);
         _room = await Group.AddAsync(roomName);
         var i = await _room.GetMemberCountAsync();
+        _playerId = playerAccount.Id;
         _playerCode = playerAccount.Code;
         _playerName = playerAccount.Profile.Name;
         _joinedPlayerId.Add(playerId);
         Broadcast(_room).OnJoin(new() { PlayerName = _playerName, PlayerCode = _playerCode });
-        _logger.LogInformation("{PlayerId}|JoinAsync {PlayerCode} {RoomName}", _httpContextAccessor.GetPlayerId(), _playerCode, _room.GroupName);
+        _logger.LogInformation("{PlayerId}|JoinAsync {PlayerCode} {RoomName}", _playerId, _playerCode, _room.GroupName);
     }
 
     [FromTypeFilter(typeof(VerifyToken))]
@@ -87,7 +89,8 @@ public class ChatHub(GameDbContext dbContext, IHttpContextAccessor httpContextAc
         _logger.LogInformation("{PlayerId}|client disconnected {ContextId}", _httpContextAccessor.GetPlayerId(), Context.ContextId);
         // on disconnecting, if automatically removed this connection from group.
         // _roomForAll.Remove(ConnectionId);
-        _joinedPlayerId.Remove(_httpContextAccessor.GetPlayerId());
+        _joinedPlayerId.Remove(_playerId);
+        _playerId = 0;
         return CompletedTask;
     }
 }

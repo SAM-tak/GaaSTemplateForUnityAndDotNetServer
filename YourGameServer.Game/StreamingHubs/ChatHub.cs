@@ -17,11 +17,10 @@ public class ChatHub(IHttpContextAccessor httpContextAccessor, ILogger<ChatHub> 
     [FromTypeFilter(typeof(VerifyToken))]
     public async Task<Guid> JoinAsync(ChatJoinRequest request)
     {
-        _logger.LogInformation("{PlayerId}|JoinAsync {UserName} {RoomName}", _httpContextAccessor.GetPlayerId(), request.UserName, request.RoomName);
         _room = await Group.AddAsync(request.RoomName);
         _userName = request.UserName;
         Broadcast(_room).OnJoin(new() { UserName = _userName, ContextId = Context.ContextId });
-        _logger.LogInformation("{PlayerId}|JoinAsync done {UserName} {RoomName}", _httpContextAccessor.GetPlayerId(), _userName, _room.GroupName);
+        _logger.LogInformation("{PlayerId}|JoinAsync {UserName} {RoomName}", _httpContextAccessor.GetPlayerId(), _userName, _room.GroupName);
         return Context.ContextId;
     }
 

@@ -4,7 +4,6 @@ using MagicOnion;
 using MagicOnion.Server;
 using MessagePack;
 using Microsoft.EntityFrameworkCore;
-using NuGet.Protocol;
 using YourGameServer.Game.Extensions;
 using YourGameServer.Game.Interface;
 using YourGameServer.Shared;
@@ -32,7 +31,7 @@ public class AccountService(GameDbContext dbContext, JwtAuthorizer jwt, IHttpCon
     /// <returns>response</returns>
     public async UnaryResult<LogInRequestResult> LogIn(LogInRequest param)
     {
-        _logger.LogInformation("Login {Param}", param.ToJson());
+        _logger.LogInformation("Login {Param}", param);
         var idSecret = IDCoder.Decode(param.Code);
         var playerAccount = await _dbContext.PlayerAccounts.Include(i => i.DeviceList).FirstOrDefaultAsync(i => i.Id == idSecret.Item1 && i.Secret == idSecret.Item2);
         if(playerAccount is not null) {
@@ -125,7 +124,7 @@ public class AccountService(GameDbContext dbContext, JwtAuthorizer jwt, IHttpCon
     /// <returns></returns>
     public async UnaryResult<SignUpRequestResult> SignUp(SignUpRequest signup)
     {
-        _logger.LogInformation("SignUp {SignUp}", signup.ToJson());
+        _logger.LogInformation("SignUp {SignUp}", signup);
         if(!string.IsNullOrWhiteSpace(signup.DeviceId)) {
             var playerAccount = await CreateAccountAsync(_dbContext, signup);
             return new SignUpRequestResult {

@@ -1,6 +1,5 @@
 using System.Data.Common;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Authorization;
 using NLog;
 using NLog.Web;
 using YourGameServer.Shared;
@@ -38,10 +37,6 @@ try {
     // Add services to the container.
     var authentication = builder.Services.AddAuthentication();
     authentication.AddJwtAuthorizer(builder);
-    _ = builder.Services.AddAuthorization(options => {
-        options.FallbackPolicy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
-        options.AddPolicy("AllowOtherPlayer", new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build());
-    });
 
     builder.Services.AddGrpc();
     builder.Services.AddMagicOnion();
@@ -50,9 +45,8 @@ try {
 
     app.UseRouting();
     app.UseAuthentication();
-    app.UseAuthorization();
     app.UseJwtAuthorizer();
-    app.MapMagicOnionService().AllowAnonymous();
+    app.MapMagicOnionService();
 
     app.Run();
 }

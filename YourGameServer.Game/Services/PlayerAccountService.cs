@@ -3,7 +3,6 @@ using Grpc.Core;
 using MagicOnion;
 using MagicOnion.Server;
 using Microsoft.EntityFrameworkCore;
-using NuGet.Protocol;
 using YourGameServer.Game.Extensions;
 using YourGameServer.Game.Interface;
 using YourGameServer.Shared;
@@ -34,7 +33,7 @@ public class PlayerAccountService(GameDbContext dbContext, IHttpContextAccessor 
     public async UnaryResult<IEnumerable<MaskedPlayerAccount>> GetPlayerAccounts(string[] codes)
     {
         var playerId = _httpContextAccessor.GetPlayerId();
-        _logger.LogInformation("{PlayerId}|GetPlayerAccounts {Request}", playerId, codes.ToJson());
+        _logger.LogInformation("{PlayerId}|GetPlayerAccounts {Request}", playerId, codes);
         if(!await _dbContext.PlayerAccounts.AnyAsync()) {
             throw new ReturnStatusException(StatusCode.NotFound, "correspond account was not found.");
         }

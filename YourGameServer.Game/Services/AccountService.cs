@@ -32,8 +32,7 @@ public class AccountService(GameDbContext dbContext, JwtAuthorizer jwt, IHttpCon
     public async UnaryResult<LogInRequestResult> LogIn(LogInRequest param)
     {
         _logger.LogInformation("Login {Param}", param);
-        var idSecret = IDCoder.Decode(param.Code);
-        var playerAccount = await _dbContext.PlayerAccounts.Include(i => i.DeviceList).FirstOrDefaultAsync(i => i.Id == idSecret.Item1 && i.Secret == idSecret.Item2);
+        var playerAccount = await _dbContext.PlayerAccounts.Include(i => i.DeviceList).FirstOrDefaultAsync(i => i.Id == param.Id);
         if(playerAccount is not null) {
             var playerDevice = playerAccount.DeviceList.FirstOrDefault(i => i.DeviceType == (DeviceType)param.DeviceType && i.DeviceId == param.DeviceId);
             if(playerDevice is not null) {
@@ -59,7 +58,8 @@ public class AccountService(GameDbContext dbContext, JwtAuthorizer jwt, IHttpCon
                 _logger.LogInformation("{PlayerId}|Login {DeviceId}", playerAccount.Id, playerDevice.Id);
                 return new LogInRequestResult {
                     Token = $"Bearer {_jwt.CreateToken(playerAccount.Id, playerDevice.Id, out var period)}",
-                    Period = period
+                    Period = period,
+                    Code = playerAccount.Code
                 };
             }
         }
@@ -128,9 +128,10 @@ public class AccountService(GameDbContext dbContext, JwtAuthorizer jwt, IHttpCon
         if(!string.IsNullOrWhiteSpace(signup.DeviceId)) {
             var playerAccount = await CreateAccountAsync(_dbContext, signup);
             return new SignUpRequestResult {
-                Code = playerAccount.Code,
                 Token = $"Bearer {_jwt.CreateToken(playerAccount.Id, playerAccount.CurrentDeviceId, out var period)}",
-                Period = period
+                Period = period,
+                Id = playerAccount.Id,
+                Code = playerAccount.Code
             };
         }
         throw new ReturnStatusException(StatusCode.InvalidArgument, "Device Identifier is invalid.");

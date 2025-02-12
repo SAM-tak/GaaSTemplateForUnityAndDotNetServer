@@ -1,7 +1,7 @@
-using MagicOnion;
-using MagicOnion.Server;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using MagicOnion;
+using MagicOnion.Server;
 using YourGameServer.Game.Extensions;
 using YourGameServer.Shared.Data;
 using YourGameServer.Shared.Models;

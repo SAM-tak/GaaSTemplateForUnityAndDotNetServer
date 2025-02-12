@@ -79,9 +79,6 @@ public class AccountService(GameDbContext dbContext, JwtAuthorizer jwt, IHttpCon
         if(playerAccount is not null) {
             var playerDevice = playerAccount.DeviceList.FirstOrDefault(i => i.Id == deviceId);
             if(playerDevice is not null) {
-                if(playerAccount.CurrentDeviceId != deviceId) {
-                    throw new ReturnStatusException(StatusCode.FailedPrecondition, "You are not logged in with current device.");
-                }
                 playerDevice.LastUsed = DateTime.UtcNow;
                 await _dbContext.SaveChangesAsync();
                 return new RenewTokenRequestResult {
@@ -106,9 +103,6 @@ public class AccountService(GameDbContext dbContext, JwtAuthorizer jwt, IHttpCon
         if(playerAccount is not null) {
             var playerDevice = playerAccount.DeviceList.FirstOrDefault(i => i.Id == deviceId);
             if(playerDevice is not null) {
-                if(playerAccount.CurrentDeviceId != deviceId) {
-                    throw new ReturnStatusException(StatusCode.FailedPrecondition, "You are not logged in with current device.");
-                }
                 playerAccount.CurrentDeviceId = 0;
                 await _dbContext.SaveChangesAsync();
                 return new Nil();

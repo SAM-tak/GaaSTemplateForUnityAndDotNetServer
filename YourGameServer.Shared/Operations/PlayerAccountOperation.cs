@@ -14,7 +14,6 @@ public static class AccountOperation
     {
         var curDateTime = DateTime.UtcNow;
         var playerAccount = new PlayerAccount {
-            Secret = (ushort)RandomNumberGenerator.GetInt32(0x10000),
             DeviceList = [
                 new () {
                     DeviceType = deviceType,

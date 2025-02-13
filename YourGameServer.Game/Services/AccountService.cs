@@ -32,7 +32,8 @@ public class AccountService(GameDbContext dbContext, JwtAuthorizer jwt, IHttpCon
     public async UnaryResult<LogInRequestResult> LogIn(LogInRequest param)
     {
         _logger.LogInformation("Login {Param}", param);
-        var playerAccount = await _dbContext.PlayerAccounts.Include(i => i.DeviceList).FirstOrDefaultAsync(i => i.Id == param.Id);
+        var id = IDCoder.DecodeFromLoginKey(param.LoginKey);
+        var playerAccount = await _dbContext.PlayerAccounts.Include(i => i.DeviceList).FirstOrDefaultAsync(i => i.Id == id);
         if(playerAccount is not null) {
             var playerDevice = playerAccount.DeviceList.FirstOrDefault(i => i.DeviceType == (DeviceType)param.DeviceType && i.DeviceId == param.DeviceId);
             if(playerDevice is not null) {
@@ -124,7 +125,7 @@ public class AccountService(GameDbContext dbContext, JwtAuthorizer jwt, IHttpCon
             return new SignUpRequestResult {
                 Token = $"Bearer {_jwt.CreateToken(playerAccount.Id, playerAccount.CurrentDeviceId, out var period)}",
                 Period = period,
-                Id = playerAccount.Id,
+                LoginKey = playerAccount.LoginKey,
                 Code = playerAccount.Code
             };
         }

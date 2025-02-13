@@ -10,9 +10,6 @@
         <MudCard>
             <MudCardContent>
                 <MudTd>
-                    <MudNumericField T="ushort" @bind-Value="@_newItem.Secret" Min="0" Label="@(TextHelper.LabelFor<PlayerAccount>(i => i.Secret))" />
-                </MudTd>
-                <MudTd>
                     <MudNumericField T="ulong" @bind-Value="@_newItem.CurrentDeviceId" Min="0" Label="@(TextHelper.LabelFor<PlayerAccount>(i => i.CurrentDeviceId))" />
                 </MudTd>
                 <MudTd>
@@ -73,13 +70,17 @@ CommittedItemChanges="@(async () => await dbContext.SaveChangesAsync())" EditMod
         <MudTextField @bind-Value="_searchString" Placeholder="@PlaceholderText" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" />
     </ToolBarContent>
     <Columns>
-        <PropertyColumn Property="x => x.Id" Editable="false" />
-        <PropertyColumn Property="x => x.Secret">
+        <PropertyColumn Property="x => x.Id" Editable="false">
             <CellTemplate>
-                <MudText>@context.Item.Secret</MudText>
-                <MudText Typo="Typo.caption" Style="white-space:nowrap">@context.Item.Code.ToHyphened()</MudText>
+                <MudText>@context.Item.Id</MudText>
             </CellTemplate>
         </PropertyColumn>
+        <TemplateColumn Title="Key / Code" Hideable="true" Sortable="false" Filterable="false">
+            <CellTemplate>
+                <MudText Typo="Typo.caption" Style="white-space:nowrap">@context.Item.LoginKey</MudText>
+                <MudText Typo="Typo.caption" Style="white-space:nowrap">@context.Item.Code.ToHyphened()</MudText>
+            </CellTemplate>
+        </TemplateColumn>
         <PropertyColumn Property="x => x.CurrentDeviceId">
             <EditTemplate>
                 <MudNumericField T="ulong" @bind-Value="@context.Item.CurrentDeviceId" Min="0" Label="@(TextHelper.LabelFor<PlayerAccount>(i => i.CurrentDeviceId))" />
@@ -168,7 +169,7 @@ CommittedItemChanges="@(async () => await dbContext.SaveChangesAsync())" EditMod
     {
         if (string.IsNullOrWhiteSpace(_searchString)) return true;
 
-        if ($"{x.Id} {x.Secret} {x.Code} {x.Since} {x.LastLogin}".Contains(_searchString)) return true;
+        if ($"{x.Id} {x.LoginKey} {x.Code} {x.Since} {x.LastLogin}".Contains(_searchString)) return true;
 
         return false;
     }

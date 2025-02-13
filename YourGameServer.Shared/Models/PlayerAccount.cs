@@ -8,8 +8,6 @@ public record PlayerAccount
 {
     [Display(Name = "ID")]
     public ulong Id { get; init; }
-    [Display(Name = "Secret")]
-    public ushort Secret { get; set; }
     [JsonIgnore]
     public List<PlayerDevice> DeviceList { get; init; }
     [Display(Name = "Current DeviceId")]
@@ -31,7 +29,9 @@ public record PlayerAccount
     [Display(Name = "Profile")]
     public PlayerProfile Profile { get; init; }
 
-    public override int GetHashCode() => (Id, Secret, CurrentDeviceId, Status, Since, LastLogin, InactivateDate, BanDate, ExpireDate).GetHashCode();
+    public override int GetHashCode() => (Id, CurrentDeviceId, Status, Since, LastLogin, InactivateDate, BanDate, ExpireDate).GetHashCode();
 
-    public string Code => IDCoder.Encode(Id, Secret);
+    public string LoginKey => IDCoder.EncodeForLoginKey(Id);
+
+    public string Code => IDCoder.Encode(Id);
 }

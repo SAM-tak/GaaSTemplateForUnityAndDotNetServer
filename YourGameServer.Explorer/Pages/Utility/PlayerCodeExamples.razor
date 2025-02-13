@@ -27,24 +27,24 @@
     {
         var codes = new List<CodeExample>();
         for(ulong id = 0; id < 3; ++id) {
-            codes.Add(new() { Id = id, Code = IDCoder.Encode(id, 0).ToHyphened() });
+            codes.Add(new() { Id = id, Code = IDCoder.Encode(id).ToHyphened() });
         }
-        var maxLetter = IDCoder.Encode(ulong.MaxValue, 0).Length;
+        var maxLetter = IDCoder.Encode(ulong.MaxValue).Length;
         ulong lower = 1, upper = 2;
-        for(int i = IDCoder.Encode(1, 0).Length; i < maxLetter; ++i) {
-            while(IDCoder.Encode(upper, 0).Length < i + 1) upper *= 2;
+        for(int i = IDCoder.Encode(1).Length; i < maxLetter; ++i) {
+            while(IDCoder.Encode(upper).Length < i + 1) upper *= 2;
             while(upper - lower > 1) {
                 var mid = lower + (upper - lower) / 2;
-                if(IDCoder.Encode(mid, 0).Length == i) lower = mid;
+                if(IDCoder.Encode(mid).Length == i) lower = mid;
                 else upper = mid;
             }
-            codes.Add(new() { Id = lower, Code = IDCoder.Encode(lower, 0).ToHyphened() });
-            codes.Add(new() { Id = upper, Code = IDCoder.Encode(upper, 0).ToHyphened() });
+            codes.Add(new() { Id = lower, Code = IDCoder.Encode(lower).ToHyphened() });
+            codes.Add(new() { Id = upper, Code = IDCoder.Encode(upper).ToHyphened() });
             lower = upper;
         }
         for(int i = 0; i < 3; ++i) {
             ulong id = ulong.MaxValue - 3 + (ulong)i;
-            codes.Add(new() { Id = id, Code = IDCoder.Encode(id, 0).ToHyphened() });
+            codes.Add(new() { Id = id, Code = IDCoder.Encode(id).ToHyphened() });
         }
         Elements = codes;
         await Task.CompletedTask;

@@ -15,12 +15,21 @@ public class IDCoder_IsSane
     public void CanDecodeHashidsCorrectly()
     {
         ulong oid = 123456;
-        ushort osecret = 123;
-        Assert.IsTrue((osecret | (int)((oid & 0xFF) << 16)) >= 0);
         Assert.IsTrue((int)((oid >> 8) & 0xFFFFFFF) >= 0);
         Assert.IsTrue((int)((oid >> 40) & 0xFFFFFFF) >= 0);
         var hashids = IDCoder.Encode(oid);
         var id = IDCoder.Decode(hashids);
+        Assert.AreEqual(oid, id, $"decoded id should be same with origin. {oid} : {id}, {hashids}");
+    }
+
+    [TestMethod]
+    public void CanDecodeLoginKeyCorrectly()
+    {
+        ulong oid = 301;
+        Assert.IsTrue((int)((oid >> 8) & 0xFFFFFFF) >= 0);
+        Assert.IsTrue((int)((oid >> 40) & 0xFFFFFFF) >= 0);
+        var hashids = IDCoder.EncodeForLoginKey(oid);
+        var id = IDCoder.DecodeFromLoginKey(hashids);
         Assert.AreEqual(oid, id, $"decoded id should be same with origin. {oid} : {id}, {hashids}");
     }
 

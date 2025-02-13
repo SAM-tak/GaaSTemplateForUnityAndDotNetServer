@@ -12,7 +12,9 @@ public static class IDCoder
         var alphabets = "abcdefghijknpqrstuvxyz23456789".ToCharArray();
         new Random(seed).Shuffle(alphabets.AsSpan());
         _sqids = new(new() { MinLength = 10, Alphabet = new string(alphabets) });
-        _sqidsForLoginKey = new();
+        var alphabetsForLoginKey = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".ToCharArray();
+        new Random(seed).Shuffle(alphabetsForLoginKey.AsSpan());
+        _sqidsForLoginKey = new(new() { MinLength = 4, Alphabet = new string(alphabetsForLoginKey) });
     }
 
     public static string Encode(ulong id) => _sqids?.Encode(id) ?? string.Empty;

@@ -32,7 +32,13 @@ public class AccountService(GameDbContext dbContext, JwtAuthorizer jwt, IHttpCon
     public async UnaryResult<LogInRequestResult> LogIn(LogInRequest param)
     {
         _logger.LogInformation("Login {Param}", param);
-        var id = IDCoder.DecodeFromLoginKey(param.LoginKey);
+        ulong id = 0;
+        try {
+            id = IDCoder.DecodeFromLoginKey(param.LoginKey);
+        }
+        catch(Exception) {
+            throw new ReturnStatusException(StatusCode.InvalidArgument, "invalid login key.");
+        }
         var playerAccount = await _dbContext.PlayerAccounts.Include(i => i.DeviceList).FirstOrDefaultAsync(i => i.Id == id);
         if(playerAccount is not null) {
             var playerDevice = playerAccount.DeviceList.FirstOrDefault(i => i.DeviceType == (DeviceType)param.DeviceType && i.DeviceId == param.DeviceId);

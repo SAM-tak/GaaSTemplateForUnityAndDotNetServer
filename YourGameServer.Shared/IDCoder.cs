@@ -11,8 +11,8 @@ public static class IDCoder
     {
         var alphabets = "abcdefghijknpqrstuvxyz23456789".ToCharArray();
         new Random(seed).Shuffle(alphabets.AsSpan());
-        _sqids = new(new() { MinLength = 10, Alphabet = new string(alphabets) });
-        var alphabetsForLoginKey = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".ToCharArray();
+        _sqids = new(new() { MinLength = 8, Alphabet = new string(alphabets) });
+        var alphabetsForLoginKey = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789~!@#$%^&*()-=[];',._+{}|:<>?".ToCharArray();
         new Random(seed).Shuffle(alphabetsForLoginKey.AsSpan());
         _sqidsForLoginKey = new(new() { MinLength = 4, Alphabet = new string(alphabetsForLoginKey) });
     }

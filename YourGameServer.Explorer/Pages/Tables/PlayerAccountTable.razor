@@ -191,6 +191,7 @@
         var updatee = await dbContext.PlayerAccounts.FindAsync(item.Id);
         if(updatee != null) {
             updatee = item;
+            dbContext.Entry(updatee).State = EntityState.Modified;
             await dbContext.SaveChangesAsync();
             snackBar.Add($"{nameof(PlayerAccount)} (Id:{item.Id}) updated.", Severity.Success);
         }
@@ -201,7 +202,7 @@
 
     void Clear()
     {
-        _newItem = new ();
+        _newItem = new();
     }
 
     async Task Delete(PlayerAccount x)

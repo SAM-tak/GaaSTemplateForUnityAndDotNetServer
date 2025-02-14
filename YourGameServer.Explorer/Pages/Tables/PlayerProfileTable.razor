@@ -108,6 +108,7 @@
         var updatee = await dbContext.PlayerProfiles.FindAsync(item.OwnerId);
         if(updatee != null) {
             updatee = item;
+            dbContext.Entry(updatee).State = EntityState.Modified;
             await dbContext.SaveChangesAsync();
             snackBar.Add($"{nameof(PlayerProfile)} (OwnerId:{item.OwnerId}) updated.", Severity.Success);
         }

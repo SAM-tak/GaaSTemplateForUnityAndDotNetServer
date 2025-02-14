@@ -203,6 +203,7 @@
         var updatee = await dbContext.PlayerOwnedPaidServiceTokens.FindAsync(item.OwnerId, item.Idx);
         if(updatee != null) {
             updatee = item;
+            dbContext.Entry(updatee).State = EntityState.Modified;
             await dbContext.SaveChangesAsync();
             snackBar.Add($"{nameof(PlayerOwnedPaidServiceToken)} (OwenrId:{item.OwnerId} Idx:{item.Idx}) updated.", Severity.Success);
         }

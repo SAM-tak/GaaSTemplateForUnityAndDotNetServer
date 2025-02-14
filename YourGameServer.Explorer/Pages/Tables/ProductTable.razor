@@ -92,6 +92,7 @@
         var updatee = await dbContext.Products.FindAsync(item.Id);
         if(updatee != null) {
             updatee = item;
+            dbContext.Entry(updatee).State = EntityState.Modified;
             await dbContext.SaveChangesAsync();
             snackBar.Add($"{nameof(Product)} (Id:{item.Id}) updated.", Severity.Success);
         }

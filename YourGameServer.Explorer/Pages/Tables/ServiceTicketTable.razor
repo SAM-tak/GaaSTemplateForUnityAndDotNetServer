@@ -121,6 +121,7 @@
         var updatee = await dbContext.ServiceTickets.FindAsync(item.Id);
         if(updatee != null) {
             updatee = item;
+            dbContext.Entry(updatee).State = EntityState.Modified;
             await dbContext.SaveChangesAsync();
             snackBar.Add($"{nameof(ServiceTicket)} (Id:{item.Id}) updated.", Severity.Success);
         }

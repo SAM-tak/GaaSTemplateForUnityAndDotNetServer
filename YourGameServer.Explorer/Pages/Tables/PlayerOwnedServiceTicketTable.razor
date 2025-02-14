@@ -195,6 +195,7 @@
         var updatee = await dbContext.PlayerOwnedServiceTickets.FindAsync(item.OwnerId, item.Idx);
         if(updatee != null) {
             updatee = item;
+            dbContext.Entry(updatee).State = EntityState.Modified;
             await dbContext.SaveChangesAsync();
             snackBar.Add($"{nameof(PlayerOwnedServiceTicket)} (OwnerId:{_newItem.OwnerId} Idx:{_newItem.Idx}) updated.", Severity.Success);
         }

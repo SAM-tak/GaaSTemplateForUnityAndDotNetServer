@@ -104,6 +104,7 @@
         var updatee = await dbContext.LootBoxes.FindAsync(item.Id);
         if(updatee != null) {
             updatee = item;
+            dbContext.Entry(updatee).State = EntityState.Modified;
             await dbContext.SaveChangesAsync();
             snackBar.Add($"{nameof(LootBox)} (Id:{item.Id}) updated.", Severity.Success);
         }

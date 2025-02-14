@@ -42,14 +42,14 @@ public class AccountService(GameDbContext dbContext, JwtAuthorizer jwt, IHttpCon
         }
         var playerAccount = await _dbContext.PlayerAccounts.FindAsync(id);
         if(playerAccount is not null) {
-            var playerDevice = _dbContext.PlayerDevices.FirstOrDefault(i => i.OwnerId == id && i.DeviceType == (DeviceType)param.DeviceType && i.DeviceId == param.DeviceId);
+            var playerDevice = _dbContext.PlayerDevices.FirstOrDefault(i => i.OwnerId == id && i.DeviceType == (DeviceType)param.DeviceType && i.DeviceIdentifier == param.DeviceIdentifier);
             if(playerDevice is not null) {
                 var utcNow = DateTime.UtcNow;
                 if (playerAccount.CurrentDeviceIdx > 0 && playerAccount.CurrentDeviceIdx != playerDevice.Idx && utcNow < _jwt.ExpireDate(playerDevice.LastUsed.Value)) {
                     // It will deny that last token not expired yet and login with other device.
                     _logger.LogInformation("already logged in with other device. overwrite.");
                 }
-                if(!string.IsNullOrEmpty(param.NewDeviceId) && param.NewDeviceId != param.DeviceId) {
+                if(!string.IsNullOrEmpty(param.NewDeviceIdentifier) && param.NewDeviceIdentifier != param.DeviceIdentifier) {
                     using var transaction = _dbContext.Database.BeginTransaction(System.Data.IsolationLevel.Serializable);
                     var playerDevices = _dbContext.PlayerDevices.Where(i => i.OwnerId == id);
                     var playerDevicesCount = await playerDevices.CountAsync() + 1;
@@ -64,7 +64,7 @@ public class AccountService(GameDbContext dbContext, JwtAuthorizer jwt, IHttpCon
                         OwnerId = playerAccount.Id,
                         Idx = await playerDevices.MaxAsync(x => x.Idx) + 1,
                         DeviceType = (DeviceType)param.DeviceType,
-                        DeviceId = param.NewDeviceId,
+                        DeviceIdentifier = param.NewDeviceIdentifier,
                         Since = utcNow,
                         LastUsed = utcNow,
                     };
@@ -139,7 +139,7 @@ public class AccountService(GameDbContext dbContext, JwtAuthorizer jwt, IHttpCon
     public async UnaryResult<SignUpRequestResult> SignUp(SignUpRequest signup)
     {
         _logger.LogInformation("SignUp {SignUp}", signup);
-        if(!string.IsNullOrWhiteSpace(signup.DeviceId)) {
+        if(!string.IsNullOrWhiteSpace(signup.DeviceIdentifier)) {
             var playerAccount = await CreateAccountAsync(_dbContext, signup);
             return new SignUpRequestResult {
                 Token = $"Bearer {_jwt.CreateToken(playerAccount.Id, playerAccount.CurrentDeviceIdx, out var period)}",
@@ -153,6 +153,8 @@ public class AccountService(GameDbContext dbContext, JwtAuthorizer jwt, IHttpCon
 
     public static async Task<PlayerAccount> CreateAccountAsync(GameDbContext context, SignUpRequest accountCreationModel)
     {
-        return await AccountOperation.CreateAccountAsync(context, (DeviceType)accountCreationModel.DeviceType, accountCreationModel.DeviceId);
+        var playerAccount = await AccountOperation.CreateAccountAsync(context, (DeviceType)accountCreationModel.DeviceType, accountCreationModel.DeviceIdentifier);
+        await context.SaveChangesAsync();
+        return playerAccount;
     }
 }

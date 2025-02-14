@@ -1,5 +1,4 @@
 #nullable disable
-using System.Security.Cryptography;
 using YourGameServer.Shared.Data;
 using YourGameServer.Shared.Models;
 using DeviceType = YourGameServer.Shared.Models.DeviceType;
@@ -10,7 +9,7 @@ namespace YourGameServer.Shared.Operations;
 // The implementation class must inherit `ServiceBase<IMyFirstService>` and `IMyFirstService`
 public static class AccountOperation
 {
-    public static async Task<PlayerAccount> CreateAccountAsync(GameDbContext context, DeviceType deviceType, string deviceId)
+    public static async Task<PlayerAccount> CreateAccountAsync(GameDbContext context, DeviceType deviceType, string deviceIdentifier)
     {
         var curDateTime = DateTime.UtcNow;
         var playerAccount = new PlayerAccount {
@@ -19,7 +18,7 @@ public static class AccountOperation
                 new () {
                     Idx = 1,
                     DeviceType = deviceType,
-                    DeviceId = deviceId,
+                    DeviceIdentifier = deviceIdentifier,
                     Since = curDateTime,
                     LastUsed = curDateTime,
                 }
@@ -31,7 +30,6 @@ public static class AccountOperation
             }
         };
         await context.AddAsync(playerAccount);
-        await context.SaveChangesAsync();
         return playerAccount;
     }
 }

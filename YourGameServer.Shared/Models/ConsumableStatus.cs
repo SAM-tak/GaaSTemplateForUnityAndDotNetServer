@@ -2,6 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 
 namespace YourGameServer.Shared.Models;
+
 public enum ConsumableStatus
 {
     [Display(Name = "Available")]

@@ -18,7 +18,7 @@ public class GameDbContext(DbContextOptions<GameDbContext> options) : DbContext(
 
     public DbSet<PlayerOwnedServiceTicket> PlayerOwnedServiceTickets { get; init; }
 
-    public DbSet<ServiceToken> ServiceTokens { get; init; }
+    public DbSet<Product> Products { get; init; }
 
     public DbSet<ServiceTicket> ServiceTickets { get; init; }
 

@@ -18,6 +18,7 @@ public record PlayerOwnedFreeServiceToken
     public ConsumableStatus Status { get; set; }
     public int Quantity { get; set; }
     public int Used { get; set; }
+    public DateTime Since { get; set; }
     public DateTime? Period { get; set; }
     public DateTime? LastUsedDate { get; set; }
     public DateTime? InvalidateDate { get; set; }

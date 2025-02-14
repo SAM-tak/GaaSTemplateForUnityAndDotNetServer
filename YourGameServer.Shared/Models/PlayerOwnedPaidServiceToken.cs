@@ -14,19 +14,23 @@ public record PlayerOwnedPaidServiceToken
     [ForeignKey("OwnerId"), JsonIgnore]
     public PlayerAccount Owner { get; init; }
     public int Idx { get; set; }
-    public string ServiceTokenId { get; set; }
-    [ForeignKey("ServiceTokenId"), JsonIgnore]
-    public ServiceToken ServiceToken { get; init; }
+    [Display(Name = "Product Id")]
+    public string ProductId { get; set; }
+    [ForeignKey("ProductId"), JsonIgnore]
+    public Product Product { get; init; }
+    [Display(Name = "Transaction Id (Store Order ID)")]
+    public string TransactionId { get; set; }
     public ConsumableOrigin Origin { get; set; }
     public ConsumableStatus Status { get; set; }
     public int Quantity { get; set; }
     public int Used { get; set; }
+    public DateTime Since { get; set; }
     public DateTime? Period { get; set; }
     public DateTime? LastUsedDate { get; set; }
     public DateTime? InvalidateDate { get; set; }
     public DateTime? ExpireDate { get; set; }
 
-    public override int GetHashCode() => (OwnerId, Idx, Origin, Status, Quantity, Used, Period, LastUsedDate, InvalidateDate, ExpireDate).GetHashCode();
+    public override int GetHashCode() => (OwnerId, Idx, ProductId, TransactionId, Origin, Status, Quantity, Used, Period, LastUsedDate, InvalidateDate, ExpireDate).GetHashCode();
 
-    public override string ToString() => $"{nameof(OwnerId)}={OwnerId}, {nameof(Idx)}={Idx}, {nameof(Origin)}={Origin}, {nameof(Status)}={Status}, {nameof(Quantity)}={Quantity}, {nameof(Used)}={Used}, {nameof(Period)}={Period}, {nameof(LastUsedDate)}={LastUsedDate}, {nameof(InvalidateDate)}={InvalidateDate}, {nameof(ExpireDate)}={ExpireDate}";
+    public override string ToString() => $"{nameof(OwnerId)}={OwnerId}, {nameof(Idx)}={Idx}, {nameof(ProductId)}={ProductId}, {nameof(TransactionId)}={TransactionId}, {nameof(Origin)}={Origin}, {nameof(Status)}={Status}, {nameof(Quantity)}={Quantity}, {nameof(Used)}={Used}, {nameof(Period)}={Period}, {nameof(LastUsedDate)}={LastUsedDate}, {nameof(InvalidateDate)}={InvalidateDate}, {nameof(ExpireDate)}={ExpireDate}";
 }

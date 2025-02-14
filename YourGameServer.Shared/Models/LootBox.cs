@@ -12,4 +12,10 @@ public record LootBox
     public string Description { get; set; }
     public string IconAddress { get; set; }
     public string BannerAddress { get; set; }
+    public DateTime StartAt { get; set; }
+    public DateTime EndAt { get; set; }
+    public string SpecialContent { get; set; }
+    public string RareContent { get; set; }
+    public string UncommonContent { get; set; }
+    public string CommonContent { get; set; }
 }

@@ -23,9 +23,6 @@
                     </MudSelect>
                 </MudTd>
                 <MudTd>
-                    <MudTextField @bind-Value="_newItem.ProductName" Label="@(TextHelper.LabelFor<ServiceTicket>(i => i.ProductName))" />
-                </MudTd>
-                <MudTd>
                     <MudTextField @bind-Value="_newItem.DisplayName" Label="@(TextHelper.LabelFor<ServiceTicket>(i => i.DisplayName))" />
                 </MudTd>
                 <MudTd>
@@ -53,7 +50,7 @@
         <MudTextField @bind-Value="_searchString" Placeholder="Search for ServiceTickets..." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" />
     </ToolBarContent>
     <Columns>
-        <PropertyColumn Property="x => x.Id" />
+        <PropertyColumn Property="x => x.Id" Editable="false" />
         <PropertyColumn Property="x => x.Kind">
             <EditTemplate>
                 <MudSelect T="ServiceTicketKind" @bind-Value="context.Item.Kind" Label="@(TextHelper.LabelFor<ServiceTicket>(i => i.Kind))">
@@ -64,7 +61,6 @@
                 </MudSelect>
             </EditTemplate>
         </PropertyColumn>
-        <PropertyColumn Property="x => x.ProductName" />
         <PropertyColumn Property="x => x.DisplayName" />
         <PropertyColumn Property="x => x.Description" />
         <PropertyColumn Property="x => x.DetailId" />
@@ -109,17 +105,28 @@
 
     async Task OnValidSubmit(EditContext contex)
     {
-        await dbContext.AddAsync(_newItem);
-        await dbContext.SaveChangesAsync();
-        snackBar.Add($"New {nameof(ServiceTicket)} (id:{_newItem.Id}) Created.", Severity.Success);
-        _newItem = new ();
+        try {
+            await dbContext.AddAsync(_newItem);
+            await dbContext.SaveChangesAsync();
+            snackBar.Add($"New {nameof(ServiceTicket)} (Id:{_newItem.Id}) created.", Severity.Success);
+            _newItem = new ();
+        }
+        catch(Exception ex) {
+            snackBar.Add($"Create {nameof(ServiceTicket)} (Id:{_newItem.Id}) failed. {ex}", Severity.Error);
+        }
     }
 
     async Task CommittedItemChanges(ServiceTicket item)
     {
-        dbContext.Update(item);
-        await dbContext.SaveChangesAsync();
-        snackBar.Add($"{nameof(ServiceTicket)} (id:{_newItem.Id}) Updated.", Severity.Success);
+        var updatee = await dbContext.ServiceTickets.FindAsync(item.Id);
+        if(updatee != null) {
+            updatee = item;
+            await dbContext.SaveChangesAsync();
+            snackBar.Add($"{nameof(ServiceTicket)} (Id:{item.Id}) updated.", Severity.Success);
+        }
+        else {
+            snackBar.Add($"{nameof(ServiceTicket)} (Id:{item.Id}) not found.", Severity.Error);
+        }
     }
 
     void Clear()

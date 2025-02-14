@@ -1,4 +1,4 @@
-@page "/tables/servicetoken"
+@page "/tables/product"
 
 @inject YourGameServer.Shared.Data.GameDbContext dbContext
 @inject MudBlazor.IScrollManager scrollManager
@@ -10,11 +10,11 @@
         <DataAnnotationsValidator />
         <MudCard>
             <MudCardContent>
-                <MudTextField @bind-Value="_newItem.Id" Label="@(TextHelper.LabelFor<ServiceToken>(i => i.Id))" />
-                <MudTextField @bind-Value="_newItem.ProductName" Label="@(TextHelper.LabelFor<ServiceToken>(i => i.ProductName))" />
-                <MudTextField @bind-Value="_newItem.DisplayName" Label="@(TextHelper.LabelFor<ServiceToken>(i => i.DisplayName))" />
-                <MudTextField @bind-Value="_newItem.Description" Label="@(TextHelper.LabelFor<ServiceToken>(i => i.Description))" />
-                <MudNumericField @bind-Value="_newItem.IconBlobId" Label="@(TextHelper.LabelFor<ServiceToken>(i => i.IconBlobId))" />
+                <MudTextField @bind-Value="_newItem.Id" Label="@(TextHelper.LabelFor<Product>(i => i.Id))" />
+                <MudTextField @bind-Value="_newItem.ProductName" Label="@(TextHelper.LabelFor<Product>(i => i.ProductName))" />
+                <MudTextField @bind-Value="_newItem.DisplayName" Label="@(TextHelper.LabelFor<Product>(i => i.DisplayName))" />
+                <MudTextField @bind-Value="_newItem.Description" Label="@(TextHelper.LabelFor<Product>(i => i.Description))" />
+                <MudNumericField @bind-Value="_newItem.IconBlobId" Label="@(TextHelper.LabelFor<Product>(i => i.IconBlobId))" />
             </MudCardContent>
             <MudCardActions>
                 <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Success">Create New</MudButton>
@@ -24,14 +24,14 @@
     </EditForm>
 </MudExpansionPanel>
 <br />
-<MudDataGrid T="ServiceToken" Items="dbContext.ServiceTokens" SortMode="SortMode.Single" Filterable="true" QuickFilter="QuickFilter" ReadOnly="false" CommittedItemChanges="@CommittedItemChanges" EditMode="@DataGridEditMode.Form" EditTrigger="@DataGridEditTrigger.Manual">
+<MudDataGrid T="Product" Items="dbContext.Products" SortMode="SortMode.Single" Filterable="true" QuickFilter="QuickFilter" ReadOnly="false" CommittedItemChanges="@CommittedItemChanges" EditMode="@DataGridEditMode.Form" EditTrigger="@DataGridEditTrigger.Manual">
     <ToolBarContent>
         <MudText Typo="Typo.h6">@ListPanelText</MudText>
         <MudSpacer />
-        <MudTextField @bind-Value="_searchString" Placeholder="Search for ServiceTokens..." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" />
+        <MudTextField @bind-Value="_searchString" Placeholder="Search for Products..." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" />
     </ToolBarContent>
     <Columns>
-        <PropertyColumn Property="x => x.Id" />
+        <PropertyColumn Property="x => x.Id" Editable="false" />
         <PropertyColumn Property="x => x.ProductName" />
         <PropertyColumn Property="x => x.DisplayName" />
         <PropertyColumn Property="x => x.Description" />
@@ -53,13 +53,13 @@
 @code {
     bool _editPanelExpanded = false;
     string _searchString = "";
-    ServiceToken _newItem = new();
+    Product _newItem = new();
 
-    static readonly string EditPanelId =  $"{nameof(ServiceToken).ToLower()}-edit-panel";
-    static readonly string EditPanelText = $"Add {nameof(ServiceToken)}";
-    static readonly string ListPanelText = nameof(ServiceToken);
+    static readonly string EditPanelId =  $"{nameof(Product).ToLower()}-edit-panel";
+    static readonly string EditPanelText = $"Add {nameof(Product)}";
+    static readonly string ListPanelText = nameof(Product);
 
-    private bool QuickFilter(ServiceToken x)
+    private bool QuickFilter(Product x)
     {
         if (string.IsNullOrWhiteSpace(_searchString)) return true;
 
@@ -76,17 +76,28 @@
 
     async Task OnValidSubmit(EditContext contex)
     {
-        await dbContext.AddAsync(_newItem);
-        await dbContext.SaveChangesAsync();
-        snackBar.Add($"New {nameof(ServiceToken)} (id:{_newItem.Id}) Created.", Severity.Success);
-        _newItem = new ();
+        try {
+            await dbContext.AddAsync(_newItem);
+            await dbContext.SaveChangesAsync();
+            snackBar.Add($"New {nameof(Product)} (Id:{_newItem.Id}) created.", Severity.Success);
+            _newItem = new ();
+        }
+        catch(Exception ex) {
+            snackBar.Add($"Create {nameof(Product)} (Id:{_newItem.Id}) failed. {ex}", Severity.Error);
+        }
     }
 
-    async Task CommittedItemChanges(ServiceToken item)
+    async Task CommittedItemChanges(Product item)
     {
-        dbContext.Update(item);
-        await dbContext.SaveChangesAsync();
-        snackBar.Add($"{nameof(ServiceToken)} (id:{item.Id}) Updated.", Severity.Success);
+        var updatee = await dbContext.Products.FindAsync(item.Id);
+        if(updatee != null) {
+            updatee = item;
+            await dbContext.SaveChangesAsync();
+            snackBar.Add($"{nameof(Product)} (Id:{item.Id}) updated.", Severity.Success);
+        }
+        else {
+            snackBar.Add($"{nameof(Product)} (Id:{item.Id}) not found.", Severity.Error);
+        }
     }
 
     void Clear()
@@ -94,7 +105,7 @@
         _newItem = new();
     }
 
-    async Task Delete(ServiceToken x)
+    async Task Delete(Product x)
     {
         var parameters = new DialogParameters();
         parameters.Add("ContentText", $"Do you really want to delete this records? This process cannot be undone.");
@@ -104,9 +115,9 @@
 
         var result = await dialogService.Show<ConfirmDialog>("Delete", parameters, new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall }).Result;
         if(result != null && !result.Canceled) {
-            dbContext.ServiceTokens.Remove(x);
+            dbContext.Products.Remove(x);
             await dbContext.SaveChangesAsync();
-            snackBar.Add($"{nameof(ServiceToken)} (id:{x.Id}) Deleted.", Severity.Success);
+            snackBar.Add($"{nameof(Product)} (id:{x.Id}) Deleted.", Severity.Success);
         }
     }
 }

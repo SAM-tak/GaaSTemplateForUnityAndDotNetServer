@@ -92,17 +92,28 @@
 
     async Task OnValidSubmit(EditContext contex)
     {
-        await dbContext.AddAsync(_newItem);
-        await dbContext.SaveChangesAsync();
-        snackBar.Add($"New {nameof(PlayerProfile)} (ownerid:{_newItem.OwnerId}) Created.", Severity.Success);
-        _newItem = new ();
+        try {
+            await dbContext.AddAsync(_newItem);
+            await dbContext.SaveChangesAsync();
+            snackBar.Add($"New {nameof(PlayerProfile)} (OwnerId:{_newItem.OwnerId}) Created.", Severity.Success);
+            _newItem = new ();
+        }
+        catch(Exception ex) {
+            snackBar.Add($"Create {nameof(PlayerProfile)} (OwnerId:{_newItem.OwnerId}) failed. {ex}", Severity.Error);
+        }
     }
 
     async Task CommittedItemChanges(PlayerProfile item)
     {
-        dbContext.Update(item);
-        await dbContext.SaveChangesAsync();
-        snackBar.Add($"{nameof(PlayerProfile)} (ownerid:{_newItem.OwnerId}) Updated.", Severity.Success);
+        var updatee = await dbContext.PlayerProfiles.FindAsync(item.OwnerId);
+        if(updatee != null) {
+            updatee = item;
+            await dbContext.SaveChangesAsync();
+            snackBar.Add($"{nameof(PlayerProfile)} (OwnerId:{item.OwnerId}) updated.", Severity.Success);
+        }
+        else {
+            snackBar.Add($"{nameof(PlayerProfile)} (OwnerId:{item.OwnerId}) not found.", Severity.Error);
+        }
     }
 
     void Clear()

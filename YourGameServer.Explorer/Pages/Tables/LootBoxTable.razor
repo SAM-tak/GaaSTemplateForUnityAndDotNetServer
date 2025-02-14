@@ -88,17 +88,28 @@
 
     async Task OnValidSubmit(EditContext contex)
     {
-        await dbContext.AddAsync(_newItem);
-        await dbContext.SaveChangesAsync();
-        snackBar.Add($"New {nameof(LootBox)} (id:{_newItem.Id}) Created.", Severity.Success);
-        _newItem = new ();
+        try {
+            await dbContext.AddAsync(_newItem);
+            await dbContext.SaveChangesAsync();
+            snackBar.Add($"New {nameof(LootBox)} (Id:{_newItem.Id}) created.", Severity.Success);
+            _newItem = new ();
+        }
+        catch(Exception ex) {
+            snackBar.Add($"Create {nameof(LootBox)} (Id:{_newItem.Id}) failed. {ex}", Severity.Error);
+        }
     }
 
     async Task CommittedItemChanges(LootBox item)
     {
-        dbContext.Update(item);
-        await dbContext.SaveChangesAsync();
-        snackBar.Add($"{nameof(LootBox)} (id:{_newItem.Id}) Updated.", Severity.Success);
+        var updatee = await dbContext.LootBoxes.FindAsync(item.Id);
+        if(updatee != null) {
+            updatee = item;
+            await dbContext.SaveChangesAsync();
+            snackBar.Add($"{nameof(LootBox)} (Id:{item.Id}) updated.", Severity.Success);
+        }
+        else {
+            snackBar.Add($"{nameof(LootBox)} (Id:{item.Id}) not found.", Severity.Error);
+        }
     }
 
     void Clear()

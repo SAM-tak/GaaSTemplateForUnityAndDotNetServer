@@ -22,7 +22,7 @@
                     </MudSelect>
                 </MudTd>
                 <MudTd>
-                    <MudTextField @bind-Value="_newItem.DeviceId" Label="@(TextHelper.LabelFor<PlayerDevice>(i => i.DeviceId))" />
+                    <MudTextField @bind-Value="_newItem.DeviceIdentifier" Label="@(TextHelper.LabelFor<PlayerDevice>(i => i.DeviceIdentifier))" />
                 </MudTd>
                 <MudTd>
                     <MudTextField Format="s" Label="@(TextHelper.LabelFor<PlayerDevice>(i => i.Since))" InputType="InputType.DateTimeLocal" @bind-Value="_newItem.Since"/>
@@ -62,7 +62,7 @@
                 </MudSelect>
             </EditTemplate>
         </PropertyColumn>
-        <PropertyColumn Property="x => x.DeviceId" CellStyle="word-break: break-all" />
+        <PropertyColumn Property="x => x.DeviceIdentifier" CellStyle="word-break: break-all" />
         <PropertyColumn Property="x => x.Since">
             <EditTemplate>
                 <MudTextField Format="s" Label="@(TextHelper.LabelFor<PlayerDevice>(i => i.Since))" InputType="InputType.DateTimeLocal" @bind-Value="context.Item.Since"/>
@@ -92,6 +92,9 @@
 </MudDataGrid>
 
 @code {
+
+
+
     bool _editPanelExpanded = false;
     string _searchString = "";
     PlayerDevice _newItem = new();
@@ -102,31 +105,39 @@
 
     private bool QuickFilter(PlayerDevice x)
     {
-        if (string.IsNullOrWhiteSpace(_searchString)) return true;
-
-        if (x.DeviceId.Contains(_searchString, StringComparison.OrdinalIgnoreCase)) return true;
-
-        if ($"{x.OwnerId} {x.Idx} {x.Since} {x.LastUsed}".Contains(_searchString)) return true;
-
+        if(string.IsNullOrWhiteSpace(_searchString)) return true;
+        if(x.DeviceIdentifier.Contains(_searchString, StringComparison.OrdinalIgnoreCase)) return true;
+        if($"{x.OwnerId} {x.Idx} {x.Since} {x.LastUsed}".Contains(_searchString)) return true;
         return false;
     }
 
     async Task OnValidSubmit(EditContext contex)
     {
-        using var transaction = dbContext.Database.BeginTransaction(System.Data.IsolationLevel.Serializable);
-        _newItem.Idx = (await dbContext.PlayerDevices.Where(i => i.OwnerId == _newItem.OwnerId).MaxAsync(x => (int?)x.Idx) ?? 0) + 1;
-        await dbContext.AddAsync(_newItem);
-        await dbContext.SaveChangesAsync();
-        await transaction.CommitAsync();
-        snackBar.Add($"New {nameof(PlayerDevice)} (OwnerId:{_newItem.OwnerId} Idx:{_newItem.Idx}) Created.", Severity.Success);
-        _newItem = new ();
+        try {
+            using var transaction = dbContext.Database.BeginTransaction(System.Data.IsolationLevel.Serializable);
+            _newItem.Idx = (await dbContext.PlayerDevices.Where(i => i.OwnerId == _newItem.OwnerId).MaxAsync(x => (int?)x.Idx) ?? 0) + 1;
+            await dbContext.AddAsync(_newItem);
+            await dbContext.SaveChangesAsync();
+            await transaction.CommitAsync();
+            snackBar.Add($"New {nameof(PlayerDevice)} (OwnerId:{_newItem.OwnerId} Idx:{_newItem.Idx}) created.", Severity.Success);
+            _newItem = new ();
+        }
+        catch(Exception ex) {
+            snackBar.Add($"Create {nameof(PlayerDevice)} (OwnerId:{_newItem.OwnerId} Idx:{_newItem.Idx}) failed. {ex}", Severity.Error);
+        }
     }
 
     async Task CommittedItemChanges(PlayerDevice item)
     {
-        dbContext.Update(item);
-        await dbContext.SaveChangesAsync();
-        snackBar.Add($"{nameof(PlayerDevice)} (OwnerId:{item.OwnerId} Idx:{item.Idx}) Updated.", Severity.Success);
+        var updatee = await dbContext.PlayerDevices.FindAsync(item.OwnerId, item.Idx);
+        if(updatee != null) {
+            updatee = item;
+            await dbContext.SaveChangesAsync();
+            snackBar.Add($"{nameof(PlayerDevice)} (OwnerId:{item.OwnerId} Idx:{item.Idx}) updated.", Severity.Success);
+        }
+        else {
+            snackBar.Add($"{nameof(PlayerDevice)} (OwnerId:{item.OwnerId} Idx:{item.Idx}) not found.", Severity.Error);
+        }
     }
 
     void Clear()

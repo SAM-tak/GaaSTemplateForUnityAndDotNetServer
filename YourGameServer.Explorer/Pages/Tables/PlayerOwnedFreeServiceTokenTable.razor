@@ -164,20 +164,31 @@
 
     async Task OnValidSubmit(EditContext contex)
     {
-        using var transaction = dbContext.Database.BeginTransaction(System.Data.IsolationLevel.Serializable);
-        _newItem.Idx = (await dbContext.PlayerOwnedFreeServiceTokens.Where(i => i.OwnerId == _newItem.OwnerId).MaxAsync(x => (int?)x.Idx) ?? 0) + 1;
-        await dbContext.AddAsync(_newItem);
-        await dbContext.SaveChangesAsync();
-        await transaction.CommitAsync();
-        snackBar.Add($"New {nameof(PlayerOwnedFreeServiceToken)} (OwnerId:{_newItem.OwnerId} Idx:{_newItem.Idx}) Created.", Severity.Success);
-        _newItem = new ();
+        try {
+            using var transaction = dbContext.Database.BeginTransaction(System.Data.IsolationLevel.Serializable);
+            _newItem.Idx = (await dbContext.PlayerOwnedFreeServiceTokens.Where(i => i.OwnerId == _newItem.OwnerId).MaxAsync(x => (int?)x.Idx) ?? 0) + 1;
+            await dbContext.AddAsync(_newItem);
+            await dbContext.SaveChangesAsync();
+            await transaction.CommitAsync();
+            snackBar.Add($"New {nameof(PlayerOwnedFreeServiceToken)} (OwnerId:{_newItem.OwnerId} Idx:{_newItem.Idx}) created.", Severity.Success);
+            _newItem = new ();
+        }
+        catch(Exception ex) {
+            snackBar.Add($"Create {nameof(PlayerOwnedFreeServiceToken)} (OwnerId:{_newItem.OwnerId} Idx:{_newItem.Idx}) failed. {ex}", Severity.Error);
+        }
     }
 
     async Task CommittedItemChanges(PlayerOwnedFreeServiceToken item)
     {
-        dbContext.Update(item);
-        await dbContext.SaveChangesAsync();
-        snackBar.Add($"{nameof(PlayerOwnedFreeServiceToken)} (OwnerId:{item.OwnerId} Idx:{item.Idx}) Updated.", Severity.Success);
+        var updatee = await dbContext.PlayerOwnedFreeServiceTokens.FindAsync(item.OwnerId, item.Idx);
+        if(updatee != null) {
+            updatee = item;
+            await dbContext.SaveChangesAsync();
+            snackBar.Add($"{nameof(PlayerOwnedFreeServiceToken)} (OwnerId:{item.OwnerId} Idx:{item.Idx}) updated.", Severity.Success);
+        }
+        else {
+            snackBar.Add($"{nameof(PlayerOwnedFreeServiceToken)} (OwnerId:{item.OwnerId} Idx:{item.Idx}) not found.", Severity.Error);
+        }
     }
 
     void Clear()

@@ -55,8 +55,8 @@ public class AccountService(GameDbContext dbContext, JwtAuthorizer jwt, IHttpCon
                     var playerDevicesCount = await playerDevices.CountAsync() + 1;
                     // remove old devices if over capacity.
                     var maxDeviceCountPerPlayer = _config.GetSection("YourGameServer")?.GetValue<int>("MaxDeviceCountPerPlayer") ?? 3;
+                    if(maxDeviceCountPerPlayer > 0 && maxDeviceCountPerPlayer < 3) maxDeviceCountPerPlayer = 3;
                     if(maxDeviceCountPerPlayer > 0 && playerDevicesCount > maxDeviceCountPerPlayer) {
-                        if(maxDeviceCountPerPlayer < 3) maxDeviceCountPerPlayer = 3;
                         _dbContext.PlayerDevices.RemoveRange(playerDevices.OrderBy(x => x.LastUsed).Take(playerDevicesCount - maxDeviceCountPerPlayer));
                     }
                     // add new device.

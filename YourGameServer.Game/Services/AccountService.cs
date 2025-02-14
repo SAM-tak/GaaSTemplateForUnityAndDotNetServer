@@ -16,10 +16,11 @@ namespace YourGameServer.Game.Services;
 
 // Implements RPC service in the server project.
 // The implementation class must inherit `ServiceBase<IMyFirstService>` and `IMyFirstService`
-public class AccountService(GameDbContext dbContext, JwtAuthorizer jwt, IHttpContextAccessor httpContextAccessor, ILogger<AccountService> logger)
+public class AccountService(GameDbContext dbContext, JwtAuthorizer jwt, IHttpContextAccessor httpContextAccessor, IConfiguration config, ILogger<AccountService> logger)
     : ServiceBase<IAccountService>, IAccountService
 {
     readonly GameDbContext _dbContext = dbContext;
+    readonly IConfiguration _config = config;
     readonly JwtAuthorizer _jwt = jwt;
     readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
     readonly ILogger<AccountService> _logger = logger;
@@ -50,9 +51,18 @@ public class AccountService(GameDbContext dbContext, JwtAuthorizer jwt, IHttpCon
                 }
                 if(!string.IsNullOrEmpty(param.NewDeviceId) && param.NewDeviceId != param.DeviceId) {
                     using var transaction = _dbContext.Database.BeginTransaction(System.Data.IsolationLevel.Serializable);
+                    var playerDevices = _dbContext.PlayerDevices.Where(i => i.OwnerId == id);
+                    var playerDevicesCount = await playerDevices.CountAsync() + 1;
+                    // remove old devices if over capacity.
+                    var maxDeviceCountPerPlayer = _config.GetSection("YourGameServer")?.GetValue<int>("MaxDeviceCountPerPlayer") ?? 3;
+                    if(maxDeviceCountPerPlayer > 0 && playerDevicesCount > maxDeviceCountPerPlayer) {
+                        if(maxDeviceCountPerPlayer < 3) maxDeviceCountPerPlayer = 3;
+                        _dbContext.PlayerDevices.RemoveRange(playerDevices.OrderBy(x => x.LastUsed).Take(playerDevicesCount - maxDeviceCountPerPlayer));
+                    }
+                    // add new device.
                     playerDevice = new PlayerDevice {
                         OwnerId = playerAccount.Id,
-                        Idx = await _dbContext.PlayerDevices.Where(i => i.OwnerId == id).MaxAsync(x => x.Idx) + 1,
+                        Idx = await playerDevices.MaxAsync(x => x.Idx) + 1,
                         DeviceType = (DeviceType)param.DeviceType,
                         DeviceId = param.NewDeviceId,
                         Since = utcNow,

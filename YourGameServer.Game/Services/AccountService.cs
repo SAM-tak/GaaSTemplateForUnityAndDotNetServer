@@ -39,18 +39,20 @@ public class AccountService(GameDbContext dbContext, JwtAuthorizer jwt, IHttpCon
         catch(Exception) {
             throw new ReturnStatusException(StatusCode.InvalidArgument, "invalid login key.");
         }
-        var playerAccount = await _dbContext.PlayerAccounts.Include(i => i.DeviceList).FirstOrDefaultAsync(i => i.Id == id);
+        var playerAccount = await _dbContext.PlayerAccounts.FindAsync(id);
         if(playerAccount is not null) {
-            var playerDevice = playerAccount.DeviceList.FirstOrDefault(i => i.DeviceType == (DeviceType)param.DeviceType && i.DeviceId == param.DeviceId);
+            var playerDevice = _dbContext.PlayerDevices.FirstOrDefault(i => i.OwnerId == id && i.DeviceType == (DeviceType)param.DeviceType && i.DeviceId == param.DeviceId);
             if(playerDevice is not null) {
                 var utcNow = DateTime.UtcNow;
-                if (playerAccount.CurrentDeviceId > 0 && playerAccount.CurrentDeviceId != playerDevice.Id && utcNow < _jwt.ExpireDate(playerDevice.LastUsed.Value)) {
+                if (playerAccount.CurrentDeviceIdx > 0 && playerAccount.CurrentDeviceIdx != playerDevice.Idx && utcNow < _jwt.ExpireDate(playerDevice.LastUsed.Value)) {
                     // It will deny that last token not expired yet and login with other device.
                     _logger.LogInformation("already logged in with other device. overwrite.");
                 }
                 if(!string.IsNullOrEmpty(param.NewDeviceId) && param.NewDeviceId != param.DeviceId) {
+                    using var transaction = _dbContext.Database.BeginTransaction(System.Data.IsolationLevel.Serializable);
                     playerDevice = new PlayerDevice {
                         OwnerId = playerAccount.Id,
+                        Idx = await _dbContext.PlayerDevices.Where(i => i.OwnerId == id).MaxAsync(x => x.Idx) + 1,
                         DeviceType = (DeviceType)param.DeviceType,
                         DeviceId = param.NewDeviceId,
                         Since = utcNow,
@@ -58,13 +60,14 @@ public class AccountService(GameDbContext dbContext, JwtAuthorizer jwt, IHttpCon
                     };
                     await _dbContext.AddAsync(playerDevice);
                     await _dbContext.SaveChangesAsync();
+                    await transaction.CommitAsync();
                 }
                 playerDevice.LastUsed = playerAccount.LastLogin = utcNow;
-                playerAccount.CurrentDeviceId = playerDevice.Id;
+                playerAccount.CurrentDeviceIdx = playerDevice.Idx;
                 await _dbContext.SaveChangesAsync();
-                _logger.LogInformation("{PlayerId}|Login {DeviceId}", playerAccount.Id, playerDevice.Id);
+                _logger.LogInformation("{PlayerId}|Login {DeviceIdx}", playerAccount.Id, playerDevice.Idx);
                 return new LogInRequestResult {
-                    Token = $"Bearer {_jwt.CreateToken(playerAccount.Id, playerDevice.Id, out var period)}",
+                    Token = $"Bearer {_jwt.CreateToken(playerAccount.Id, playerDevice.Idx, out var period)}",
                     Period = period,
                     Code = playerAccount.Code
                 };
@@ -80,16 +83,16 @@ public class AccountService(GameDbContext dbContext, JwtAuthorizer jwt, IHttpCon
     [FromTypeFilter(typeof(VerifyTokenAndAccount))]
     public async UnaryResult<RenewTokenRequestResult> RenewToken()
     {
-        _httpContextAccessor.TryGetPlayerIdAndDeviceId(out var playerId, out var deviceId);
-        _logger.LogInformation("{PlayerId}|RenewToken {DeviceId}", playerId, deviceId);
+        _httpContextAccessor.TryGetPlayerIdAndDeviceIdx(out var playerId, out var deviceIdx);
+        _logger.LogInformation("{PlayerId}|RenewToken {DeviceId}", playerId, deviceIdx);
         var playerAccount = await _dbContext.PlayerAccounts.Include(i => i.DeviceList).FirstOrDefaultAsync(i => i.Id == playerId);
         if(playerAccount is not null) {
-            var playerDevice = playerAccount.DeviceList.FirstOrDefault(i => i.Id == deviceId);
+            var playerDevice = playerAccount.DeviceList.FirstOrDefault(i => i.Idx == deviceIdx);
             if(playerDevice is not null) {
                 playerDevice.LastUsed = DateTime.UtcNow;
                 await _dbContext.SaveChangesAsync();
                 return new RenewTokenRequestResult {
-                    Token = $"Bearer {_jwt.CreateToken(playerId, deviceId, out var period)}",
+                    Token = $"Bearer {_jwt.CreateToken(playerId, deviceIdx, out var period)}",
                     Period = period
                 };
             }
@@ -104,13 +107,13 @@ public class AccountService(GameDbContext dbContext, JwtAuthorizer jwt, IHttpCon
     [FromTypeFilter(typeof(VerifyTokenAndAccount))]
     public async UnaryResult<Nil> LogOut()
     {
-        _httpContextAccessor.TryGetPlayerIdAndDeviceId(out var playerId, out var deviceId);
-        _logger.LogInformation("{PlayerId}|LogOut {DeviceId}", playerId, deviceId);
+        _httpContextAccessor.TryGetPlayerIdAndDeviceIdx(out var playerId, out var deviceIdx);
+        _logger.LogInformation("{PlayerId}|LogOut {DeviceIdx}", playerId, deviceIdx);
         var playerAccount = await _dbContext.PlayerAccounts.Include(i => i.DeviceList).FirstOrDefaultAsync(i => i.Id == playerId);
         if(playerAccount is not null) {
-            var playerDevice = playerAccount.DeviceList.FirstOrDefault(i => i.Id == deviceId);
+            var playerDevice = playerAccount.DeviceList.FirstOrDefault(i => i.Idx == deviceIdx);
             if(playerDevice is not null) {
-                playerAccount.CurrentDeviceId = 0;
+                playerAccount.CurrentDeviceIdx = 0;
                 await _dbContext.SaveChangesAsync();
                 return new Nil();
             }
@@ -129,7 +132,7 @@ public class AccountService(GameDbContext dbContext, JwtAuthorizer jwt, IHttpCon
         if(!string.IsNullOrWhiteSpace(signup.DeviceId)) {
             var playerAccount = await CreateAccountAsync(_dbContext, signup);
             return new SignUpRequestResult {
-                Token = $"Bearer {_jwt.CreateToken(playerAccount.Id, playerAccount.CurrentDeviceId, out var period)}",
+                Token = $"Bearer {_jwt.CreateToken(playerAccount.Id, playerAccount.CurrentDeviceIdx, out var period)}",
                 Period = period,
                 LoginKey = playerAccount.LoginKey,
                 Code = playerAccount.Code

@@ -29,8 +29,20 @@ public enum ConsumableOrigin
     AppStore,
     [Display(Name = "Google Play")]
     GooglePlay,
-    [Display(Name = "DMM")]
-    DMM,
+    [Display(Name = "Microsoft Store")]
+    MicrosoftStore,
+    [Display(Name = "PS Store")]
+    PSStore,
+    [Display(Name = "Nintendo Store")]
+    NintendoStore,
     [Display(Name = "Steam")]
     Steam,
+    [Display(Name = "Epic Store")]
+    EpicStore,
+    [Display(Name = "EA Origin")]
+    EAOrigin,
+    [Display(Name = "UPlay")]
+    UPlay,
+    [Display(Name = "DMM")]
+    DMM,
 }

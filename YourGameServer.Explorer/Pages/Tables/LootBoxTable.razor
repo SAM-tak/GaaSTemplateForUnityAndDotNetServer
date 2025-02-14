@@ -11,7 +11,7 @@
         <MudCard>
             <MudCardContent>
                 <MudTd>
-                    <MudTextField @bind-Value="_newItem.Name" Label="@(TextHelper.LabelFor<LootBox>(i => i.Name))" />
+                    <MudTextField @bind-Value="_newItem.Id" Label="@(TextHelper.LabelFor<LootBox>(i => i.Id))" />
                 </MudTd>
                 <MudTd>
                     <MudTextField @bind-Value="_newItem.ProductName" Label="@(TextHelper.LabelFor<LootBox>(i => i.ProductName))" />
@@ -37,8 +37,9 @@
     </EditForm>
 </MudExpansionPanel>
 <br />
-<MudDataGrid T="LootBox" Items="dbContext.LootBoxes" SortMode="SortMode.Single" Filterable="true" QuickFilter="QuickFilter" ReadOnly="false"
-    CommittedItemChanges="@(async () => await dbContext.SaveChangesAsync())" EditMode="@DataGridEditMode.Form" EditTrigger="@DataGridEditTrigger.Manual">
+<MudDataGrid T="LootBox" Items="dbContext.LootBoxes" SortMode="SortMode.Single" Filterable="true"
+    QuickFilter="QuickFilter" ReadOnly="false" CommittedItemChanges="@CommittedItemChanges"
+    EditMode="@DataGridEditMode.Form" EditTrigger="@DataGridEditTrigger.Manual">
     <ToolBarContent>
         <MudText Typo="Typo.h6">@ListPanelText</MudText>
         <MudSpacer />
@@ -46,7 +47,6 @@
     </ToolBarContent>
     <Columns>
         <PropertyColumn Property="x => x.Id" Editable="false" />
-        <PropertyColumn Property="x => x.Name" />
         <PropertyColumn Property="x => x.ProductName" />
         <PropertyColumn Property="x => x.DisplayName" />
         <PropertyColumn Property="x => x.Description" />
@@ -78,21 +78,27 @@
     private bool QuickFilter(LootBox x)
     {
         if(string.IsNullOrWhiteSpace(_searchString)) return true;
-        if(x.Name.Contains(_searchString, StringComparison.OrdinalIgnoreCase)) return true;
+        if(x.Id.Contains(_searchString, StringComparison.OrdinalIgnoreCase)) return true;
         if(x.DisplayName.Contains(_searchString, StringComparison.OrdinalIgnoreCase)) return true;
         if(x.Description.Contains(_searchString, StringComparison.OrdinalIgnoreCase)) return true;
         if(x.IconAddress.Contains(_searchString, StringComparison.OrdinalIgnoreCase)) return true;
         if(x.BannerAddress.Contains(_searchString, StringComparison.OrdinalIgnoreCase)) return true;
-        if($"{x.Id}".Contains(_searchString)) return true;
         return false;
     }
 
     async Task OnValidSubmit(EditContext contex)
     {
-        dbContext.Add(_newItem);
+        await dbContext.AddAsync(_newItem);
         await dbContext.SaveChangesAsync();
         snackBar.Add($"New {nameof(LootBox)} (id:{_newItem.Id}) Created.", Severity.Success);
         _newItem = new ();
+    }
+
+    async Task CommittedItemChanges(LootBox item)
+    {
+        dbContext.Update(item);
+        await dbContext.SaveChangesAsync();
+        snackBar.Add($"{nameof(LootBox)} (id:{_newItem.Id}) Updated.", Severity.Success);
     }
 
     void Clear()

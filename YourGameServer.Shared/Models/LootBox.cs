@@ -6,8 +6,7 @@ namespace YourGameServer.Shared.Models;
 [Table("LootBoxes")]
 public record LootBox
 {
-    public ulong Id { get; set; }
-    public string Name { get; set; }
+    public string Id { get; set; }
     public string ProductName { get; set; }
     public string DisplayName { get; set; }
     public string Description { get; set; }

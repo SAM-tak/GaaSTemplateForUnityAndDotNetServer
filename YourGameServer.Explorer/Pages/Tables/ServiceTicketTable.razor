@@ -12,7 +12,7 @@
         <MudCard>
             <MudCardContent>
                 <MudTd>
-                    <MudTextField @bind-Value="_newItem.Name" Label="@(TextHelper.LabelFor<ServiceTicket>(i => i.Name))" />
+                    <MudTextField @bind-Value="_newItem.Id" Label="@(TextHelper.LabelFor<ServiceTicket>(i => i.Id))" />
                 </MudTd>
                 <MudTd>
                     <MudSelect T="ServiceTicketKind" @bind-Value="_newItem.Kind" Label="@(TextHelper.LabelFor<ServiceTicket>(i => i.Kind))">
@@ -46,16 +46,14 @@
     </EditForm>
 </MudExpansionPanel>
 <br />
-<MudDataGrid T="ServiceTicket" Items="dbContext.ServiceTickets" SortMode="SortMode.Single" Filterable="true" QuickFilter="QuickFilter" ReadOnly="false"
-    CommittedItemChanges="@(async () => await dbContext.SaveChangesAsync())" EditMode="@DataGridEditMode.Form" EditTrigger="@DataGridEditTrigger.Manual">
+<MudDataGrid T="ServiceTicket" Items="dbContext.ServiceTickets" SortMode="SortMode.Single" Filterable="true" QuickFilter="QuickFilter" ReadOnly="false" CommittedItemChanges="@CommittedItemChanges" EditMode="@DataGridEditMode.Form" EditTrigger="@DataGridEditTrigger.Manual">
     <ToolBarContent>
         <MudText Typo="Typo.h6">@ListPanelText</MudText>
         <MudSpacer />
         <MudTextField @bind-Value="_searchString" Placeholder="Search for ServiceTickets..." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" />
     </ToolBarContent>
     <Columns>
-        <PropertyColumn Property="x => x.Id" Editable="false" />
-        <PropertyColumn Property="x => x.Name" />
+        <PropertyColumn Property="x => x.Id" />
         <PropertyColumn Property="x => x.Kind">
             <EditTemplate>
                 <MudSelect T="ServiceTicketKind" @bind-Value="context.Item.Kind" Label="@(TextHelper.LabelFor<ServiceTicket>(i => i.Kind))">
@@ -98,23 +96,30 @@
     {
         if (string.IsNullOrWhiteSpace(_searchString)) return true;
 
-        if (x.Name.Contains(_searchString, StringComparison.OrdinalIgnoreCase)) return true;
+        if (x.Id.Contains(_searchString, StringComparison.OrdinalIgnoreCase)) return true;
 
         if (x.DisplayName.Contains(_searchString, StringComparison.OrdinalIgnoreCase)) return true;
 
         if (x.Description.Contains(_searchString, StringComparison.OrdinalIgnoreCase)) return true;
 
-        if ($"{x.Id} {x.DetailId} {x.IconBlobId}".Contains(_searchString)) return true;
+        if ($"{x.DetailId} {x.IconBlobId}".Contains(_searchString)) return true;
 
         return false;
     }
 
     async Task OnValidSubmit(EditContext contex)
     {
-        dbContext.Add(_newItem);
+        await dbContext.AddAsync(_newItem);
         await dbContext.SaveChangesAsync();
         snackBar.Add($"New {nameof(ServiceTicket)} (id:{_newItem.Id}) Created.", Severity.Success);
         _newItem = new ();
+    }
+
+    async Task CommittedItemChanges(ServiceTicket item)
+    {
+        dbContext.Update(item);
+        await dbContext.SaveChangesAsync();
+        snackBar.Add($"{nameof(ServiceTicket)} (id:{_newItem.Id}) Updated.", Severity.Success);
     }
 
     void Clear()

@@ -10,7 +10,7 @@
         <MudCard>
             <MudCardContent>
                 <MudTd>
-                    <MudNumericField T="ulong" @bind-Value="@_newItem.CurrentDeviceId" Min="0" Label="@(TextHelper.LabelFor<PlayerAccount>(i => i.CurrentDeviceId))" />
+                    <MudNumericField T="int" @bind-Value="@_newItem.CurrentDeviceIdx" Min="0" Label="@(TextHelper.LabelFor<PlayerAccount>(i => i.CurrentDeviceIdx))" />
                 </MudTd>
                 <MudTd>
                     <MudSelect T="PlayerAccountKind" @bind-Value="_newItem.Kind" Label="@(TextHelper.LabelFor<PlayerAccount>(i => i.Kind))">
@@ -62,8 +62,7 @@
     </EditForm>
 </MudExpansionPanel>
 <br />
-<MudDataGrid T="PlayerAccount" Items="dbContext.PlayerAccounts" SortMode="SortMode.Single" Filterable="true" QuickFilter="QuickFilter" ReadOnly="false"
-CommittedItemChanges="@(async () => await dbContext.SaveChangesAsync())" EditMode="@DataGridEditMode.Form" EditTrigger="@DataGridEditTrigger.Manual">
+<MudDataGrid T="PlayerAccount" Items="dbContext.PlayerAccounts" SortMode="SortMode.Single" Filterable="true" QuickFilter="QuickFilter" ReadOnly="false" CommittedItemChanges="@CommittedItemChanges" EditMode="@DataGridEditMode.Form" EditTrigger="@DataGridEditTrigger.Manual">
     <ToolBarContent>
         <MudText Typo="Typo.h6">@ListPanelText</MudText>
         <MudSpacer />
@@ -81,9 +80,9 @@ CommittedItemChanges="@(async () => await dbContext.SaveChangesAsync())" EditMod
                 <MudText Typo="Typo.caption" Style="white-space:nowrap">@context.Item.Code.ToHyphened()</MudText>
             </CellTemplate>
         </TemplateColumn>
-        <PropertyColumn Property="x => x.CurrentDeviceId">
+        <PropertyColumn Property="x => x.CurrentDeviceIdx">
             <EditTemplate>
-                <MudNumericField T="ulong" @bind-Value="@context.Item.CurrentDeviceId" Min="0" Label="@(TextHelper.LabelFor<PlayerAccount>(i => i.CurrentDeviceId))" />
+                <MudNumericField T="int" @bind-Value="@context.Item.CurrentDeviceIdx" Min="0" Label="@(TextHelper.LabelFor<PlayerAccount>(i => i.CurrentDeviceIdx))" />
             </EditTemplate>
         </PropertyColumn>
         <PropertyColumn Property="x => x.Kind">
@@ -176,10 +175,17 @@ CommittedItemChanges="@(async () => await dbContext.SaveChangesAsync())" EditMod
 
     async Task OnValidSubmit(EditContext contex)
     {
-        dbContext.Add(_newItem);
+        await dbContext.AddAsync(_newItem);
         await dbContext.SaveChangesAsync();
         snackBar.Add($"New {nameof(PlayerAccount)} (id:{_newItem.Id}) Created.", Severity.Success);
         _newItem = new ();
+    }
+
+    async Task CommittedItemChanges(PlayerAccount item)
+    {
+        dbContext.Update(item);
+        await dbContext.SaveChangesAsync();
+        snackBar.Add($"{nameof(PlayerAccount)} (id:{item.Id}) Updated.", Severity.Success);
     }
 
     void Clear()

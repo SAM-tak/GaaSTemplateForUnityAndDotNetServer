@@ -36,16 +36,14 @@
     </EditForm>
 </MudExpansionPanel>
 <br />
-<MudDataGrid T="PlayerProfile" Items="dbContext.PlayerProfiles" SortMode="SortMode.Single" Filterable="true" QuickFilter="QuickFilter" ReadOnly="false"
-    CommittedItemChanges="@(async () => await dbContext.SaveChangesAsync())" EditMode="@DataGridEditMode.Form" EditTrigger="@DataGridEditTrigger.Manual">
+<MudDataGrid T="PlayerProfile" Items="dbContext.PlayerProfiles" SortMode="SortMode.Single" Filterable="true" QuickFilter="QuickFilter" ReadOnly="false" CommittedItemChanges="@CommittedItemChanges" EditMode="@DataGridEditMode.Form" EditTrigger="@DataGridEditTrigger.Manual">
     <ToolBarContent>
         <MudText Typo="Typo.h6">@ListPanelText</MudText>
         <MudSpacer />
         <MudTextField @bind-Value="_searchString" Placeholder="Search for PlayerProfiles..." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" />
     </ToolBarContent>
     <Columns>
-        <PropertyColumn Property="x => x.Id" Editable="false" />
-        <PropertyColumn Property="x => x.OwnerId" />
+        <PropertyColumn Property="x => x.OwnerId" Editable="false" />
         <PropertyColumn Property="x => x.LastUpdate">
             <EditTemplate>
                 <MudTextField Format="s" Label="@(TextHelper.LabelFor<PlayerProfile>(i => i.LastUpdate))" InputType="InputType.DateTimeLocal" @bind-Value="context.Item.LastUpdate"/>
@@ -87,17 +85,24 @@
 
         if (x.Motto is not null && x.Motto.Contains(_searchString, StringComparison.OrdinalIgnoreCase)) return true;
 
-        if ($"{x.Id} {x.IconBlobId}".Contains(_searchString)) return true;
+        if ($"{x.OwnerId} {x.IconBlobId}".Contains(_searchString)) return true;
 
         return false;
     }
 
     async Task OnValidSubmit(EditContext contex)
     {
-        dbContext.Add(_newItem);
+        await dbContext.AddAsync(_newItem);
         await dbContext.SaveChangesAsync();
-        snackBar.Add($"New {nameof(PlayerProfile)} (id:{_newItem.Id}) Created.", Severity.Success);
+        snackBar.Add($"New {nameof(PlayerProfile)} (ownerid:{_newItem.OwnerId}) Created.", Severity.Success);
         _newItem = new ();
+    }
+
+    async Task CommittedItemChanges(PlayerProfile item)
+    {
+        dbContext.Update(item);
+        await dbContext.SaveChangesAsync();
+        snackBar.Add($"{nameof(PlayerProfile)} (ownerid:{_newItem.OwnerId}) Updated.", Severity.Success);
     }
 
     void Clear()
@@ -117,7 +122,7 @@
         if(result != null && !result.Canceled) {
             dbContext.PlayerProfiles.Remove(x);
             await dbContext.SaveChangesAsync();
-            snackBar.Add($"{nameof(PlayerProfile)} (id:{x.Id}) Deleted.", Severity.Success);
+            snackBar.Add($"{nameof(PlayerProfile)} (ownerid:{x.OwnerId}) Deleted.", Severity.Success);
         }
     }
 }

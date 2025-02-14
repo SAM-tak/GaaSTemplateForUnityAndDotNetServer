@@ -14,8 +14,10 @@ public static class AccountOperation
     {
         var curDateTime = DateTime.UtcNow;
         var playerAccount = new PlayerAccount {
+            CurrentDeviceIdx = 1,
             DeviceList = [
                 new () {
+                    Idx = 1,
                     DeviceType = deviceType,
                     DeviceId = deviceId,
                     Since = curDateTime,
@@ -29,8 +31,6 @@ public static class AccountOperation
             }
         };
         await context.AddAsync(playerAccount);
-        await context.SaveChangesAsync();
-        playerAccount.CurrentDeviceId = playerAccount.DeviceList.First().Id;
         await context.SaveChangesAsync();
         return playerAccount;
     }

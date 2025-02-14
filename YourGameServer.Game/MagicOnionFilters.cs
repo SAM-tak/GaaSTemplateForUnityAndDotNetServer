@@ -55,10 +55,10 @@ public class VerifyTokenAndAccount(JwtAuthorizer jwt, IHttpContextAccessor httpC
         using var scope = context.ServiceProvider.CreateScope();
         var dbContext = scope.ServiceProvider.GetService<GameDbContext>();
         if(dbContext != null && _httpContextAccessor.HttpContext != null) {
-            if(_httpContextAccessor.TryGetPlayerIdAndDeviceId(out var playerId, out var deviceId)) {
+            if(_httpContextAccessor.TryGetPlayerIdAndDeviceIdx(out var playerId, out var deviceIdx)) {
                 var playerAccount = await dbContext.PlayerAccounts.FirstOrDefaultAsync(x => x.Id == playerId)
                     ?? throw new ReturnStatusException(Grpc.Core.StatusCode.Unauthenticated, "Player account is not found.");
-                if(playerAccount.CurrentDeviceId != deviceId) {
+                if(playerAccount.CurrentDeviceIdx != deviceIdx) {
                     throw new ReturnStatusException(Grpc.Core.StatusCode.Unauthenticated, "Logged in by other device.");
                 }
                 if(playerAccount.Status >= PlayerAccountStatus.Banned) {

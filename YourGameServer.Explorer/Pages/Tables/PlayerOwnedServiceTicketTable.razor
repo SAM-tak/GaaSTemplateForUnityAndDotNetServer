@@ -14,7 +14,12 @@
                     <MudNumericField @bind-Value="_newItem.OwnerId" Label="@(TextHelper.LabelFor<PlayerOwnedServiceTicket>(i => i.OwnerId))" T="ulong" Min="0" />
                 </MudTd>
                 <MudTd>
-                    <MudNumericField @bind-Value="_newItem.ServiceTicketId" Label="ServiceTicketId" T="ulong" Min="0" />
+                    <MudSelect T="string" @bind-Value="_newItem.ServiceTicketId" Label="@(TextHelper.LabelFor<PlayerOwnedServiceTicket>(i => i.ServiceTicketId))">
+                        @foreach (var id in dbContext.ServiceTickets.Select(x => x.Id))
+                        {
+                            <MudSelectItem Value="@id">@id</MudSelectItem>
+                        }
+                    </MudSelect>
                 </MudTd>
                 <MudTd>
                     <MudSelect T="ConsumableOrigin" @bind-Value="_newItem.Origin" Label="@(TextHelper.LabelFor<PlayerOwnedServiceTicket>(i => i.Origin))">
@@ -67,17 +72,25 @@
     </EditForm>
 </MudExpansionPanel>
 <br />
-<MudDataGrid T="PlayerOwnedServiceTicket" Items="dbContext.PlayerOwnedServiceTickets" SortMode="SortMode.Single" Filterable="true" QuickFilter="QuickFilter" ReadOnly="false"
-CommittedItemChanges="@(async () => await dbContext.SaveChangesAsync())" EditMode="@DataGridEditMode.Form" EditTrigger="@DataGridEditTrigger.Manual">
+<MudDataGrid T="PlayerOwnedServiceTicket" Items="dbContext.PlayerOwnedServiceTickets" SortMode="SortMode.Single" Filterable="true" QuickFilter="QuickFilter" ReadOnly="false" CommittedItemChanges="@CommittedItemChanges" EditMode="@DataGridEditMode.Form" EditTrigger="@DataGridEditTrigger.Manual">
     <ToolBarContent>
         <MudText Typo="Typo.h6">@ListPanelText</MudText>
         <MudSpacer />
         <MudTextField @bind-Value="_searchString" Placeholder="Search for PlayerProfiles..." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" />
     </ToolBarContent>
     <Columns>
-        <PropertyColumn Property="x => x.Id" Editable="false" />
-        <PropertyColumn Property="x => x.OwnerId" />
-        <PropertyColumn Property="x => x.ServiceTicketId" />
+        <PropertyColumn Property="x => x.OwnerId" Editable="false" />
+        <PropertyColumn Property="x => x.Idx" Editable="false" />
+        <PropertyColumn Property="x => x.ServiceTicketId">
+            <EditTemplate>
+                <MudSelect T="string" @bind-Value="context.Item.ServiceTicketId" Label="@(TextHelper.LabelFor<PlayerOwnedServiceTicket>(i => i.Origin))">
+                    @foreach (ConsumableOrigin item in Enum.GetValues(typeof(ConsumableOrigin)))
+                    {
+                        <MudSelectItem Value="@item">@item.GetDisplayName()</MudSelectItem>
+                    }
+                </MudSelect>
+            </EditTemplate>
+        </PropertyColumn>
         <PropertyColumn Property="x => x.Origin">
             <EditTemplate>
                 <MudSelect T="ConsumableOrigin" @bind-Value="context.Item.Origin" Label="@(TextHelper.LabelFor<PlayerOwnedServiceTicket>(i => i.Origin))">
@@ -156,23 +169,32 @@ CommittedItemChanges="@(async () => await dbContext.SaveChangesAsync())" EditMod
     {
         if (string.IsNullOrWhiteSpace(_searchString)) return true;
 
-        if ($"{x.Id} {x.Origin} {x.Status} {x.Quantity} {x.Used} {x.Period} {x.LastUsedDate} {x.InvalidateDate} {x.ExpireDate}".Contains(_searchString)) return true;
+        if ($"{x.OwnerId} {x.Origin} {x.Status} {x.Quantity} {x.Used} {x.Period} {x.LastUsedDate} {x.InvalidateDate} {x.ExpireDate}".Contains(_searchString)) return true;
 
         return false;
     }
 
     async Task OnValidSubmit(EditContext contex)
     {
-        dbContext.Add(_newItem);
+        using var transaction = dbContext.Database.BeginTransaction(System.Data.IsolationLevel.Serializable);
+        _newItem.Idx = (await dbContext.PlayerOwnedServiceTickets.Where(i => i.OwnerId == _newItem.OwnerId).MaxAsync(x => (int?)x.Idx) ?? 0) + 1;
+        await dbContext.AddAsync(_newItem);
         await dbContext.SaveChangesAsync();
-        snackBar.Add($"New {nameof(PlayerOwnedServiceTicket)} (id:{_newItem.Id}) Created.", Severity.Success);
+        await transaction.CommitAsync();
+        snackBar.Add($"New {nameof(PlayerOwnedServiceTicket)} (OwnerId:{_newItem.OwnerId} Idx:{_newItem.Idx}) Created.", Severity.Success);
         _newItem = new ();
+    }
+
+    async Task CommittedItemChanges(PlayerOwnedServiceTicket item)
+    {
+        dbContext.Update(item);
+        await dbContext.SaveChangesAsync();
+        snackBar.Add($"{nameof(PlayerOwnedServiceTicket)} (OwnerId:{_newItem.OwnerId} Idx:{_newItem.Idx}) Updated.", Severity.Success);
     }
 
     void Clear()
     {
         _newItem = new();
-
     }
 
     async Task Delete(PlayerOwnedServiceTicket x)
@@ -187,7 +209,7 @@ CommittedItemChanges="@(async () => await dbContext.SaveChangesAsync())" EditMod
         if(result != null && !result.Canceled) {
             dbContext.PlayerOwnedServiceTickets.Remove(x);
             await dbContext.SaveChangesAsync();
-            snackBar.Add($"{nameof(PlayerOwnedServiceTicket)} (id:{x.Id}) Deleted.", Severity.Success);
+            snackBar.Add($"{nameof(PlayerOwnedServiceTicket)} (OwnerId:{x.OwnerId} Idx:{_newItem.Idx}) Deleted.", Severity.Success);
         }
     }
 }

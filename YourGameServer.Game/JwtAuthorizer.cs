@@ -46,15 +46,15 @@ public class JwtAuthorizer
     /// Create SecurityToken By Symmetry Key
     /// </summary>
     /// <param name="playerId">Player Account Table index id</param>
-    /// <param name="deviceId">Device Id</param>
+    /// <param name="deviceIdx">Device Id</param>
     /// <param name="period">expire date</param>
     /// <returns>Token string</returns>
-    public string CreateToken(ulong playerId, ulong deviceId, out DateTime period)
+    public string CreateToken(ulong playerId, int deviceIdx, out DateTime period)
     {
         period = ExpireMinutes > 0 ? DateTime.UtcNow.AddMinutes(ExpireMinutes) : DateTime.MaxValue;
         return new JwtSecurityTokenHandler().WriteToken(new JwtSecurityToken(
             issuer: TokenValidationParameters?.ValidIssuer,
-            audience: $"{TokenValidationParameters?.ValidAudience}/{playerId}/{deviceId}",
+            audience: $"{TokenValidationParameters?.ValidAudience}/{playerId}/{deviceIdx}",
             expires: ExpireMinutes > 0 ? period : null,
             signingCredentials: SigningCredentials
         ));

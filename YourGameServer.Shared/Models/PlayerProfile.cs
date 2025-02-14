@@ -1,4 +1,5 @@
 #nullable disable
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
@@ -6,7 +7,7 @@ namespace YourGameServer.Shared.Models;
 
 public record PlayerProfile
 {
-    public ulong Id { get; init; }
+    [Key, Display(Name = "Owner Id")]
     public ulong OwnerId { get; set; }
     [ForeignKey("OwnerId"), JsonIgnore]
     public PlayerAccount Owner { get; init; }
@@ -15,7 +16,7 @@ public record PlayerProfile
     public string Motto { get; set; }
     public ulong IconBlobId { get; set; }
 
-    public override int GetHashCode() => HashCode.Combine(Id, OwnerId, Name, Motto, IconBlobId);
+    public override int GetHashCode() => HashCode.Combine(OwnerId, Name, Motto, IconBlobId);
 
-    public override string ToString() => $"{nameof(Id)}={Id}, {nameof(OwnerId)}={OwnerId}, {nameof(Name)}={Name}, {nameof(Motto)}={Motto}, {nameof(IconBlobId)}={IconBlobId}";
+    public override string ToString() => $"{nameof(OwnerId)}={OwnerId}, {nameof(Name)}={Name}, {nameof(Motto)}={Motto}, {nameof(IconBlobId)}={IconBlobId}";
 }

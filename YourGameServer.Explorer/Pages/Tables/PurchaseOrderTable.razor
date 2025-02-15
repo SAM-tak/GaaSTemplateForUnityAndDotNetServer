@@ -201,7 +201,7 @@
         parameters.Add("Color", Color.Error);
 
         var dialog = await dialogService.ShowAsync<ConfirmDialog>("Delete", parameters, new() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall });
-        if(!(dialog?.Result?.Result?.Canceled ?? false))
+        if(!(dialog?.Result?.Result?.Canceled ?? false)) {
             dbContext.PurchaseOrders.Remove(x);
             await dbContext.SaveChangesAsync();
             snackBar.Add($"{nameof(PurchaseOrder)} (TransactionId:{x.TransactionId}) Deleted.", Severity.Success);

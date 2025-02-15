@@ -62,7 +62,8 @@ try {
             options.SaveTokens = true;
         });
     }
-    //authentication.AddMicrosoftIdentityWebApp(builder.Configuration);
+
+    builder.Services.AddAuthorization();
 
     _ = builder.Services.AddAuthorization(options => {
         options.FallbackPolicy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
@@ -100,6 +101,7 @@ try {
         app.UseHsts();
     }
 
+    app.UseRouting();
     app.UseHttpsRedirection();
 
     app.UseAntiforgery();

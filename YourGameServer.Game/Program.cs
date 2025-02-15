@@ -26,9 +26,11 @@ try {
     IDCoder.Initialize();
 
     // https://stackoverflow.com/questions/4804086/is-there-any-connection-string-parser-in-c
-    var connectionString = builder.Configuration.GetConnectionString(builder.Configuration["GameDbConnectionStringKey"] ?? string.Empty);
+    var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+        ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
     var dbcsb = new DbConnectionStringBuilder() { ConnectionString = connectionString };
-    if(dbcsb.ContainsKey("Data Source") && Path.GetExtension(dbcsb["Data Source"].ToString()) == ".db") {
+    if((dbcsb.ContainsKey("DataSource") && Path.GetExtension(dbcsb["DataSource"].ToString()) == ".db")
+     || (dbcsb.ContainsKey("Data Source") && Path.GetExtension(dbcsb["Data Source"].ToString()) == ".db")) {
         builder.Services.AddDbContext<GameDbContext>(options => options.UseSqlite(connectionString));
     }
     else {

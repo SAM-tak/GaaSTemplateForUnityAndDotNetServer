@@ -9,6 +9,7 @@ using NLog.Web;
 using YourGameServer.Shared;
 using YourGameServer.Shared.Data;
 using YourGameServer.Explorer.Components;
+using YourGameServer.Explorer.Services;
 
 var logger = LogManager.Setup().LoadConfigurationFromAppSettings().GetCurrentClassLogger();
 logger.Debug("init main");
@@ -23,6 +24,9 @@ try {
     builder.Logging.ClearProviders();
     builder.Logging.SetMinimumLevel(Microsoft.Extensions.Logging.LogLevel.Trace);
     builder.Host.UseNLog();
+
+    // Set up for log view component
+    builder.Services.AddSingleton<ILogMonitorService, LogMonitorService>();
 
     builder.Services.AddHttpContextAccessor();
 

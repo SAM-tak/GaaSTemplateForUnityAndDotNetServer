@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 
-namespace YourGameServer.Controllers;
+namespace YourGameServer.Explorer.Controllers;
 
 /// <summary>
 /// Controller used in web apps to manage accounts.

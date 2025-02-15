@@ -66,6 +66,8 @@ try {
         options.FallbackPolicy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
     });
 
+    builder.Services.AddCascadingAuthenticationState();
+
     builder.Services.AddRazorPages();
     builder.Services.AddServerSideBlazor();
     builder.Services.AddMudServices();
@@ -77,8 +79,12 @@ try {
     app.UseRouting();
     app.UseAuthentication();
     app.UseAuthorization();
-    // Configure the HTTP request pipeline.
+
+    app.MapDefaultControllerRoute();
+
     app.MapBlazorHub();
+
+    // Configure the HTTP request pipeline.
     app.MapFallbackToPage("/_Host");
     if(!app.Environment.IsDevelopment()) {
         app.UseExceptionHandler("/Error");

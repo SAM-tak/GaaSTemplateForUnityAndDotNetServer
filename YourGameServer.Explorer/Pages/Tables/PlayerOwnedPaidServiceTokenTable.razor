@@ -79,9 +79,9 @@
         <MudTextField @bind-Value="_searchString" Placeholder="Search for PlayerProfiles..." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" />
     </ToolBarContent>
     <Columns>
-        <PropertyColumn Property="x => x.OwnerId" Editable="false" />
+        <PropertyColumn Title="Owner Id" Property="x => x.OwnerId" Editable="false" />
         <PropertyColumn Property="x => x.Idx" Editable="false" />
-        <PropertyColumn Property="x => x.ProductId">
+        <PropertyColumn Title="Product Id" Property="x => x.ProductId">
             <EditTemplate>
                 <MudSelect T="string" @bind-Value="context.Item.ProductId" Label="@(TextHelper.LabelFor<PlayerOwnedPaidServiceToken>(i => i.ProductId))">
                     @foreach (var id in dbContext.Products.Select(x => x.Id))
@@ -127,21 +127,21 @@
                 Value="context.Item.Period?.GetSecondPart()" ValueChanged="t => context.Item.Period = context.Item.Period?.ReplacedSecondPart(t)" />
             </EditTemplate>
         </PropertyColumn>
-        <PropertyColumn Property="x => x.LastUsedDate">
+        <PropertyColumn Title="Last Used Date" Property="x => x.LastUsedDate">
             <EditTemplate>
                 <MudTextField Format="s" Label="@(TextHelper.LabelFor<PlayerOwnedPaidServiceToken>(i => i.LastUsedDate))" InputType="InputType.DateTimeLocal" @bind-Value="context.Item.LastUsedDate"/>
                 <MudNumericField T="double?" Label="Second" Adornment="Adornment.End" AdornmentText="s" Min="0.0" Max="59.9999999"
                 Value="context.Item.LastUsedDate?.GetSecondPart()" ValueChanged="t => context.Item.LastUsedDate = context.Item.LastUsedDate?.ReplacedSecondPart(t)" />
             </EditTemplate>
         </PropertyColumn>
-        <PropertyColumn Property="x => x.InvalidateDate">
+        <PropertyColumn Title="Invalidate Date" Property="x => x.InvalidateDate">
             <EditTemplate>
                 <MudTextField Format="s" Label="@(TextHelper.LabelFor<PlayerOwnedPaidServiceToken>(i => i.InvalidateDate))" InputType="InputType.DateTimeLocal" @bind-Value="context.Item.InvalidateDate"/>
                 <MudNumericField T="double?" Label="Second" Adornment="Adornment.End" AdornmentText="s" Min="0.0" Max="59.9999999"
                 Value="context.Item.InvalidateDate?.GetSecondPart()" ValueChanged="t => context.Item.InvalidateDate = context.Item.InvalidateDate?.ReplacedSecondPart(t)" />
             </EditTemplate>
         </PropertyColumn>
-        <PropertyColumn Property="x => x.ExpireDate">
+        <PropertyColumn Title="Expire Date" Property="x => x.ExpireDate">
             <EditTemplate>
                 <MudTextField Format="s" Label="@(TextHelper.LabelFor<PlayerOwnedPaidServiceToken>(i => i.ExpireDate))" InputType="InputType.DateTimeLocal" @bind-Value="context.Item.ExpireDate"/>
                 <MudNumericField T="double?" Label="Second" Adornment="Adornment.End" AdornmentText="s" Min="0.0" Max="59.9999999"

@@ -26,8 +26,8 @@
                 </MudTd>
                 <MudTd>
                     <MudTextField Format="s" Label="@(TextHelper.LabelFor<PlayerDevice>(i => i.Since))" InputType="InputType.DateTimeLocal" @bind-Value="_newItem.Since"/>
-                    <MudNumericField T="double?" Label="Second" Adornment="Adornment.End" AdornmentText="s" Min="0.0" Max="59.9999999"
-                    Value="_newItem.Since?.GetSecondPart()" ValueChanged="t => _newItem.Since = _newItem.Since?.ReplacedSecondPart(t)" />
+                    <MudNumericField T="double" Label="Second" Adornment="Adornment.End" AdornmentText="s" Min="0.0" Max="59.9999999"
+                    Value="_newItem.Since.GetSecondPart()" ValueChanged="t => _newItem.Since = _newItem.Since.ReplacedSecondPart(t)" />
                 </MudTd>
                 <MudTd>
                     <MudTextField Format="s" Label="@(TextHelper.LabelFor<PlayerDevice>(i => i.LastUsed))" InputType="InputType.DateTimeLocal" @bind-Value="_newItem.LastUsed"/>
@@ -50,9 +50,9 @@
         <MudTextField @bind-Value="_searchString" Placeholder="Search for PlayerDevices..." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" />
     </ToolBarContent>
     <Columns>
-        <PropertyColumn Property="x => x.OwnerId" Editable="false" />
-        <PropertyColumn Property="x => x.Idx" Editable="false" />
-        <PropertyColumn Property="x => x.DeviceType">
+        <PropertyColumn Title="@(TextHelper.LabelFor<PlayerDevice>(i => i.OwnerId))" Property="x => x.OwnerId" Editable="false" />
+        <PropertyColumn Title="@(TextHelper.LabelFor<PlayerDevice>(i => i.Idx))" Property="x => x.Idx" Editable="false" />
+        <PropertyColumn Title="@(TextHelper.LabelFor<PlayerDevice>(i => i.DeviceType))" Property="x => x.DeviceType">
             <EditTemplate>
                 <MudSelect @bind-Value="context.Item.DeviceType" Label="@(TextHelper.LabelFor<PlayerDevice>(i => i.DeviceType))">
                     @foreach (DeviceType item in Enum.GetValues(typeof(DeviceType)))
@@ -62,15 +62,15 @@
                 </MudSelect>
             </EditTemplate>
         </PropertyColumn>
-        <PropertyColumn Property="x => x.DeviceIdentifier" CellStyle="word-break: break-all" />
-        <PropertyColumn Property="x => x.Since">
+        <PropertyColumn Title="@(TextHelper.LabelFor<PlayerDevice>(i => i.DeviceIdentifier))" Property="x => x.DeviceIdentifier" CellStyle="word-break: break-all" />
+        <PropertyColumn Title="@(TextHelper.LabelFor<PlayerDevice>(i => i.Since))" Property="x => x.Since">
             <EditTemplate>
                 <MudTextField Format="s" Label="@(TextHelper.LabelFor<PlayerDevice>(i => i.Since))" InputType="InputType.DateTimeLocal" @bind-Value="context.Item.Since"/>
-                <MudNumericField T="double?" Label="Second" Adornment="Adornment.End" AdornmentText="s" Min="0.0" Max="59.9999999"
-                Value="context.Item.Since?.GetSecondPart()" ValueChanged="t => context.Item.Since = context.Item.Since?.ReplacedSecondPart(t)" />
+                <MudNumericField T="double" Label="Second" Adornment="Adornment.End" AdornmentText="s" Min="0.0" Max="59.9999999"
+                Value="context.Item.Since.GetSecondPart()" ValueChanged="t => context.Item.Since = context.Item.Since.ReplacedSecondPart(t)" />
             </EditTemplate>
         </PropertyColumn>
-        <PropertyColumn Property="x => x.LastUsed">
+        <PropertyColumn Title="@(TextHelper.LabelFor<PlayerDevice>(i => i.LastUsed))" Property="x => x.LastUsed">
             <EditTemplate>
                 <MudTextField Format="s" Label="@(TextHelper.LabelFor<PlayerDevice>(i => i.LastUsed))" InputType="InputType.DateTimeLocal" @bind-Value="context.Item.LastUsed"/>
                 <MudNumericField T="double?" Label="Second" Adornment="Adornment.End" AdornmentText="s" Min="0.0" Max="59.9999999"

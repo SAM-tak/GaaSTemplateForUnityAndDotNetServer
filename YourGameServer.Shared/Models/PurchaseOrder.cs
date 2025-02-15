@@ -21,11 +21,11 @@ public record PurchaseOrder
     public Product Product { get; init; }
     public string Payload { get; set; }
     public PurchasingStatus Status { get; set; }
-    public DateTime? CreatedAt { get; set; }
-    public DateTime? UpdatedAt { get; set; }
+    public DateTime Since { get; set; }
+    public DateTime? LastUpdate { get; set; }
     public DateTime? ConsumedAt { get; set; }
 
-    public override int GetHashCode() => (TransactionId, Store, OwnerId, ProductId, Status, CreatedAt, UpdatedAt).GetHashCode();
+    public override int GetHashCode() => (TransactionId, Store, OwnerId, ProductId, Status, Since, LastUpdate).GetHashCode();
 
-    public override string ToString() => $"{nameof(TransactionId)}={TransactionId}, {nameof(Store)}={Store}, {nameof(OwnerId)}={OwnerId}, {nameof(ProductId)}={ProductId}, {nameof(Status)}={Status}, {nameof(CreatedAt)}={CreatedAt}, {nameof(UpdatedAt)}={UpdatedAt}, {nameof(ConsumedAt)}={ConsumedAt}";
+    public override string ToString() => $"{nameof(TransactionId)}={TransactionId}, {nameof(Store)}={Store}, {nameof(OwnerId)}={OwnerId}, {nameof(ProductId)}={ProductId}, {nameof(Status)}={Status}, {nameof(Since)}={Since}, {nameof(LastUpdate)}={LastUpdate}, {nameof(ConsumedAt)}={ConsumedAt}";
 }

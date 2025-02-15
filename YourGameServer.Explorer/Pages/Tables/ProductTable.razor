@@ -35,7 +35,11 @@
         <PropertyColumn Property="x => x.ProductName" />
         <PropertyColumn Property="x => x.DisplayName" />
         <PropertyColumn Property="x => x.Description" />
-        <PropertyColumn Property="x => x.IconBlobId" />
+        <PropertyColumn Property="x => x.IconBlobId">
+            <EditTemplate>
+                <MudNumericField T="ulong" @bind-Value="@context.Item.IconBlobId" Min="0" Label="@(TextHelper.LabelFor<Product>(i => i.IconBlobId))" />
+            </EditTemplate>
+        </PropertyColumn>
         <TemplateColumn Sortable="false" Filterable="false">
             <CellTemplate>
                 <MudStack Spacing="1" Justify="Justify.FlexEnd" Row="true">
@@ -118,7 +122,7 @@
         if(result != null && !result.Canceled) {
             dbContext.Products.Remove(x);
             await dbContext.SaveChangesAsync();
-            snackBar.Add($"{nameof(Product)} (id:{x.Id}) Deleted.", Severity.Success);
+            snackBar.Add($"{nameof(Product)} (Id:{x.Id}) Deleted.", Severity.Success);
         }
     }
 }

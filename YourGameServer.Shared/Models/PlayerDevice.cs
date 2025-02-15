@@ -16,10 +16,10 @@ public record PlayerDevice
     public int Idx { get; set; }
     [Display(Name = "Device Type")]
     public DeviceType DeviceType { get; set; }
-    [Display(Name = "Device ID")]
+    [Display(Name = "Device Identifier")]
     public string DeviceIdentifier { get; set; }
     [Display(Name = "Since")]
-    public DateTime? Since { get; set; }
+    public DateTime Since { get; set; }
     [Display(Name = "Last Used Date & Time")]
     public DateTime? LastUsed { get; set; }
 

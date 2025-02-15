@@ -10,14 +10,14 @@ public record PlayerAccount
     public ulong Id { get; init; }
     [JsonIgnore]
     public List<PlayerDevice> DeviceList { get; init; }
-    [Display(Name = "Current DeviceId")]
+    [Display(Name = "Current Device Idx")]
     public int CurrentDeviceIdx { get; set; }
     [Display(Name = "Kind")]
     public PlayerAccountKind Kind { get; set; }
     [Display(Name = "Status")]
     public PlayerAccountStatus Status { get; set; }
     [Display(Name = "Since")]
-    public DateTime? Since { get; set; }
+    public DateTime Since { get; set; }
     [Display(Name = "Last Login Time")]
     public DateTime? LastLogin { get; set; }
     [Display(Name = "Inactivate Date")]

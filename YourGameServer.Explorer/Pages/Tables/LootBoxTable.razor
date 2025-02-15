@@ -47,11 +47,11 @@
     </ToolBarContent>
     <Columns>
         <PropertyColumn Property="x => x.Id" Editable="false" />
-        <PropertyColumn Property="x => x.ProductName" />
-        <PropertyColumn Property="x => x.DisplayName" />
+        <PropertyColumn Title="Product Name" Property="x => x.ProductName" />
+        <PropertyColumn Title="Display Name" Property="x => x.DisplayName" />
         <PropertyColumn Property="x => x.Description" />
-        <PropertyColumn Property="x => x.IconAddress" />
-        <PropertyColumn Property="x => x.BannerAddress" />
+        <PropertyColumn Title="Icon Address" Property="x => x.IconAddress" />
+        <PropertyColumn Title="Banner Address" Property="x => x.BannerAddress" />
         <TemplateColumn Sortable="false" Filterable="false">
             <CellTemplate>
                 <MudStack Spacing="1" Justify="Justify.FlexEnd" Row="true">

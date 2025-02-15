@@ -23,4 +23,6 @@ public class GameDbContext(DbContextOptions<GameDbContext> options) : DbContext(
     public DbSet<ServiceTicket> ServiceTickets { get; init; }
 
     public DbSet<LootBox> LootBoxes { get; init; }
+
+    public DbSet<PurchaseOrder> PurchaseOrders { get; init; }
 }

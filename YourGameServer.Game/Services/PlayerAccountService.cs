@@ -41,7 +41,13 @@ public class PlayerAccountService(GameDbContext dbContext, IHttpContextAccessor 
             throw new ReturnStatusException(StatusCode.InvalidArgument, "codes is null.");
         }
 
-        var ids = codes.Select(IDCoder.Decode).ToArray();
+        ulong[] ids;
+        try {
+            ids = [.. codes.Select(IDCoder.Decode)];
+        }
+        catch(Exception) {
+            throw new ReturnStatusException(StatusCode.InvalidArgument, "invalid player codes included.");
+        }
 
         if(ids != null && ids.Length > 0) {
             return await _dbContext.PlayerAccounts.Include(i => i.Profile)

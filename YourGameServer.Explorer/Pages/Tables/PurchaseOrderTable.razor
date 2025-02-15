@@ -1,0 +1,210 @@
+@page "/tables/purchaseorder"
+
+@inject YourGameServer.Shared.Data.GameDbContext dbContext
+@inject MudBlazor.IScrollManager scrollManager
+@inject MudBlazor.IDialogService dialogService
+@inject MudBlazor.ISnackbar snackBar
+
+<MudExpansionPanel id="@EditPanelId" Text="@EditPanelText" @bind-Expanded="_editPanelExpanded">
+    <EditForm Model="@_newItem" OnValidSubmit="OnValidSubmit">
+        <DataAnnotationsValidator />
+        <MudCard>
+            <MudCardContent>
+                <MudTd>
+                    <MudTextField @bind-Value="_newItem.TransactionId" Label="@(TextHelper.LabelFor<PurchaseOrder>(i => i.TransactionId))" />
+                    <MudSelect T="Store" @bind-Value="_newItem.Store" Label="@(TextHelper.LabelFor<PurchaseOrder>(i => i.Store))">
+                        @foreach (Store item in Enum.GetValues(typeof(Store)))
+                        {
+                            <MudSelectItem Value="@item">@item.GetDisplayName()</MudSelectItem>
+                        }
+                    </MudSelect>
+                    <MudTextField @bind-Value="_newItem.Payload" Label="@(TextHelper.LabelFor<PurchaseOrder>(i => i.Payload))" />
+                </MudTd>
+                <MudTd>
+                    <MudSelect T="string" @bind-Value="_newItem.ProductId" Label="@(TextHelper.LabelFor<PurchaseOrder>(i => i.ProductId))">
+                        @foreach (var id in dbContext.Products.Select(x => x.Id))
+                        {
+                            <MudSelectItem Value="@id">@id</MudSelectItem>
+                        }
+                    </MudSelect>
+                    <MudSelect T="PurchasingStatus" @bind-Value="_newItem.Status" Label="@(TextHelper.LabelFor<PurchaseOrder>(i => i.Status))">
+                        @foreach (PurchasingStatus item in Enum.GetValues(typeof(PurchasingStatus)))
+                        {
+                            <MudSelectItem Value="@item">@item.GetDisplayName()</MudSelectItem>
+                        }
+                    </MudSelect>
+                </MudTd>
+                <MudTd>
+                    <MudTextField @bind-Value="_newItem.OwnerId" Label="@(TextHelper.LabelFor<PurchaseOrder>(i => i.OwnerId))" />
+                </MudTd>
+                <MudTd>
+                    <MudTextField Format="s" Label="@(TextHelper.LabelFor<PurchaseOrder>(i => i.Since))" InputType="InputType.DateTimeLocal" @bind-Value="_newItem.Since"/>
+                    <MudNumericField T="double" Label="Second" Adornment="Adornment.End" AdornmentText="s" Min="0.0" Max="59.9999999"
+                    Value="_newItem.Since.GetSecondPart()" ValueChanged="t => _newItem.Since = _newItem.Since.ReplacedSecondPart(t)" />
+                </MudTd>
+                <MudTd>
+                    <MudTextField Format="s" Label="@(TextHelper.LabelFor<PurchaseOrder>(i => i.LastUpdate))" InputType="InputType.DateTimeLocal" @bind-Value="_newItem.LastUpdate"/>
+                    <MudNumericField T="double?" Label="Second" Adornment="Adornment.End" AdornmentText="s" Min="0.0" Max="59.9999999"
+                    Value="_newItem.LastUpdate?.GetSecondPart()" ValueChanged="t => _newItem.LastUpdate = _newItem.LastUpdate?.ReplacedSecondPart(t)" />
+                </MudTd>
+                <MudTd>
+                    <MudTextField Format="s" Label="@(TextHelper.LabelFor<PurchaseOrder>(i => i.ConsumedAt))" InputType="InputType.DateTimeLocal" @bind-Value="_newItem.ConsumedAt"/>
+                    <MudNumericField T="double?" Label="Second" Adornment="Adornment.End" AdornmentText="s" Min="0.0" Max="59.9999999"
+                    Value="_newItem.ConsumedAt?.GetSecondPart()" ValueChanged="t => _newItem.ConsumedAt = _newItem.ConsumedAt?.ReplacedSecondPart(t)" />
+                </MudTd>
+            </MudCardContent>
+            <MudCardActions>
+                <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Success">Create New</MudButton>
+                <MudButton Class="ml-2" Variant="Variant.Filled" OnClick="Clear">Clear</MudButton>
+            </MudCardActions>
+        </MudCard>
+    </EditForm>
+</MudExpansionPanel>
+<br />
+<MudDataGrid T="PurchaseOrder" Items="dbContext.PurchaseOrders" SortMode="SortMode.Single" Filterable="true" QuickFilter="QuickFilter" ReadOnly="false" CommittedItemChanges="@CommittedItemChanges" EditMode="@DataGridEditMode.Form" EditTrigger="@DataGridEditTrigger.Manual">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">@ListPanelText</MudText>
+        <MudSpacer />
+        <MudTextField @bind-Value="_searchString" Placeholder="Search for PurchaseOrders..." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" />
+    </ToolBarContent>
+    <Columns>
+        <PropertyColumn Title="Transaction Id" Property="x => x.TransactionId" Editable="false" />
+        <PropertyColumn Property="x => x.Store">
+            <EditTemplate>
+                <MudSelect T="Store" @bind-Value="context.Item.Store" Label="@(TextHelper.LabelFor<PurchaseOrder>(i => i.Store))">
+                    @foreach (Store item in Enum.GetValues(typeof(Store)))
+                    {
+                        <MudSelectItem Value="@item">@item.GetDisplayName()</MudSelectItem>
+                    }
+                </MudSelect>
+            </EditTemplate>
+        </PropertyColumn>
+        <PropertyColumn Title="Owner Id" Property="x => x.OwnerId" />
+        <PropertyColumn Title="Product Id" Property="x => x.ProductId">
+            <EditTemplate>
+                <MudSelect T="string" @bind-Value="context.Item.ProductId" Label="@(TextHelper.LabelFor<PurchaseOrder>(i => i.ProductId))">
+                    @foreach (var id in dbContext.Products.Select(x => x.Id))
+                    {
+                        <MudSelectItem Value="@id">@id</MudSelectItem>
+                    }
+                </MudSelect>
+            </EditTemplate>
+        </PropertyColumn>
+        <PropertyColumn Property="x => x.Payload" />
+        <PropertyColumn Property="x => x.Status">
+            <EditTemplate>
+                <MudSelect T="PurchasingStatus" @bind-Value="context.Item.Status" Label="@(TextHelper.LabelFor<PurchaseOrder>(i => i.Status))">
+                    @foreach (PurchasingStatus item in Enum.GetValues(typeof(PurchasingStatus)))
+                    {
+                        <MudSelectItem Value="@item">@item.GetDisplayName()</MudSelectItem>
+                    }
+                </MudSelect>
+            </EditTemplate>
+        </PropertyColumn>
+        <PropertyColumn Property="x => x.Since">
+            <EditTemplate>
+                <MudTextField Format="s" Label="@(TextHelper.LabelFor<PurchaseOrder>(i => i.Since))" InputType="InputType.DateTimeLocal" @bind-Value="context.Item.Since"/>
+                <MudNumericField T="double" Label="Second" Adornment="Adornment.End" AdornmentText="s" Min="0.0" Max="59.9999999"
+                Value="context.Item.Since.GetSecondPart()" ValueChanged="t => context.Item.Since = context.Item.Since.ReplacedSecondPart(t)" />
+            </EditTemplate>
+        </PropertyColumn>
+        <PropertyColumn Title="Last Update" Property="x => x.LastUpdate">
+            <EditTemplate>
+                <MudTextField Format="s" Label="@(TextHelper.LabelFor<PurchaseOrder>(i => i.LastUpdate))" InputType="InputType.DateTimeLocal" @bind-Value="context.Item.LastUpdate"/>
+                <MudNumericField T="double?" Label="Second" Adornment="Adornment.End" AdornmentText="s" Min="0.0" Max="59.9999999"
+                Value="context.Item.LastUpdate?.GetSecondPart()" ValueChanged="t => context.Item.LastUpdate = context.Item.LastUpdate?.ReplacedSecondPart(t)" />
+            </EditTemplate>
+        </PropertyColumn>
+        <PropertyColumn Title="Consumed At" Property="x => x.ConsumedAt">
+            <EditTemplate>
+                <MudTextField Format="s" Label="@(TextHelper.LabelFor<PurchaseOrder>(i => i.ConsumedAt))" InputType="InputType.DateTimeLocal" @bind-Value="context.Item.ConsumedAt"/>
+                <MudNumericField T="double?" Label="Second" Adornment="Adornment.End" AdornmentText="s" Min="0.0" Max="59.9999999"
+                Value="context.Item.ConsumedAt?.GetSecondPart()" ValueChanged="t => context.Item.ConsumedAt = context.Item.ConsumedAt?.ReplacedSecondPart(t)" />
+            </EditTemplate>
+        </PropertyColumn>
+        <TemplateColumn Sortable="false" Filterable="false">
+            <CellTemplate>
+                <MudStack Spacing="1" Justify="Justify.FlexEnd" Row="true">
+                    <MudIconButton Size="Size.Small" Icon="@Icons.Material.Filled.Delete" OnClick="@(async () => await Delete(@context.Item))" />
+                    <MudIconButton Size="Size.Small" Icon="@Icons.Material.Outlined.Edit" OnClick="@context.Actions.StartEditingItemAsync" />
+                </MudStack>
+            </CellTemplate>
+        </TemplateColumn>
+    </Columns>
+    <PagerContent>
+        <MudDataGridPager />
+    </PagerContent>
+</MudDataGrid>
+
+@code {
+    bool _editPanelExpanded = false;
+    string _searchString = "";
+    PurchaseOrder _newItem = new();
+
+    static readonly string EditPanelId =  $"{nameof(PurchaseOrder).ToLower()}-edit-panel";
+    static readonly string EditPanelText = $"Add {nameof(PurchaseOrder)}";
+    static readonly string ListPanelText = nameof(PurchaseOrder);
+
+    private bool QuickFilter(PurchaseOrder x)
+    {
+        if(string.IsNullOrWhiteSpace(_searchString)) return true;
+
+        if(x.TransactionId.Contains(_searchString, StringComparison.OrdinalIgnoreCase)) return true;
+
+        if(x.ProductId.Contains(_searchString, StringComparison.OrdinalIgnoreCase)) return true;
+
+        if(x.Payload.Contains(_searchString, StringComparison.OrdinalIgnoreCase)) return true;
+
+        if($"{x.Store} {x.OwnerId} {x.Status}".Contains(_searchString)) return true;
+
+        return false;
+    }
+
+    async Task OnValidSubmit(EditContext contex)
+    {
+        try {
+            await dbContext.AddAsync(_newItem);
+            await dbContext.SaveChangesAsync();
+            snackBar.Add($"New {nameof(PurchaseOrder)} (TransactionId:{_newItem.TransactionId}) created.", Severity.Success);
+            _newItem = new ();
+        }
+        catch(Exception ex) {
+            snackBar.Add($"Create {nameof(PurchaseOrder)} (TransactionId:{_newItem.TransactionId}) failed. {ex}", Severity.Error);
+        }
+    }
+
+    async Task CommittedItemChanges(PurchaseOrder item)
+    {
+        var updatee = await dbContext.PurchaseOrders.FindAsync(item.TransactionId);
+        if(updatee != null) {
+            updatee = item;
+            dbContext.Entry(updatee).State = EntityState.Modified;
+            await dbContext.SaveChangesAsync();
+            snackBar.Add($"{nameof(PurchaseOrder)} (TransactionId:{item.TransactionId}) updated.", Severity.Success);
+        }
+        else {
+            snackBar.Add($"{nameof(PurchaseOrder)} (TransactionId:{item.TransactionId}) not found.", Severity.Error);
+        }
+    }
+
+    void Clear()
+    {
+        _newItem = new();
+    }
+
+    async Task Delete(PurchaseOrder x)
+    {
+        var parameters = new DialogParameters();
+        parameters.Add("ContentText", $"Do you really want to delete this records? This process cannot be undone.");
+        parameters.Add("ContentSubText", $"{x}");
+        parameters.Add("ButtonText", "Delete");
+        parameters.Add("Color", Color.Error);
+
+        var result = await dialogService.Show<ConfirmDialog>("Delete", parameters, new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall }).Result;
+        if(result != null && !result.Canceled) {
+            dbContext.PurchaseOrders.Remove(x);
+            await dbContext.SaveChangesAsync();
+            snackBar.Add($"{nameof(PurchaseOrder)} (TransactionId:{x.TransactionId}) Deleted.", Severity.Success);
+        }
+    }
+}

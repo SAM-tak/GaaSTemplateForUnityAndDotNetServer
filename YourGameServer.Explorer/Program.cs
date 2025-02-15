@@ -8,6 +8,7 @@ using NLog;
 using NLog.Web;
 using YourGameServer.Shared;
 using YourGameServer.Shared.Data;
+using YourGameServer.Explorer.Components;
 
 var logger = LogManager.Setup().LoadConfigurationFromAppSettings().GetCurrentClassLogger();
 logger.Debug("init main");
@@ -39,6 +40,7 @@ try {
     else {
         builder.Services.AddDbContext<GameDbContext>(options => options.UseMySql(connectionString, new MariaDbServerVersion(new Version(10, 6, 5))));
     }
+
     // Add services to the container.
     var authentication = builder.Services
         .AddAuthentication(options => {
@@ -70,7 +72,13 @@ try {
 
     builder.Services.AddRazorPages();
     builder.Services.AddServerSideBlazor();
+
+    // Add MudBlazor services
     builder.Services.AddMudServices();
+
+    // Add services to the container.
+    builder.Services.AddRazorComponents()
+        .AddInteractiveServerComponents();
 
     var app = builder.Build();
 
@@ -91,7 +99,14 @@ try {
         // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
         app.UseHsts();
     }
+
     app.UseHttpsRedirection();
+
+    app.UseAntiforgery();
+
+    app.MapStaticAssets();
+    app.MapRazorComponents<App>()
+        .AddInteractiveServerRenderMode();
 
     app.Run();
 }

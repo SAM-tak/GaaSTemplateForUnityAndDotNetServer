@@ -1,7 +1,6 @@
 ﻿@page "/"
-@page "/dashboard"
 
-<MudText Typo="Typo.h5" Color="Color.Primary" Class="mb-4">Dashboard</MudText>
+<PageTitle>Home</PageTitle>
 
 <MudGrid>
     <MudItem xs="12" sm="6" md="3">
@@ -42,7 +41,7 @@
     </MudItem>
     <MudItem xs="12" sm="8">
         <MudPaper Class="pa-4" Style="height:300px;overflow: scroll" id="logview">
-            <YourGameServer.Explorer.Pages.Utility.LogView Id="logview" MaxLength="1024" />
+            <YourGameServer.Explorer.Components.Pages.Utility.LogView Id="logview" MaxLength="1024" />
         </MudPaper>
     </MudItem>
     <MudItem xs="12" sm="4">

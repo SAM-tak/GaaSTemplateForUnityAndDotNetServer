@@ -71,9 +71,6 @@ try {
 
     builder.Services.AddCascadingAuthenticationState();
 
-    builder.Services.AddRazorPages();
-    builder.Services.AddServerSideBlazor();
-
     // Add MudBlazor services
     builder.Services.AddMudServices();
 
@@ -81,17 +78,16 @@ try {
     builder.Services.AddRazorComponents()
         .AddInteractiveServerComponents();
 
+    builder.Services.AddControllers();
+
     var app = builder.Build();
 
     app.UseStaticFiles();
     app.UseCookiePolicy();
-    app.UseRouting();
     app.UseAuthentication();
     app.UseAuthorization();
 
     app.MapDefaultControllerRoute();
-
-    app.MapBlazorHub();
 
     // Configure the HTTP request pipeline.
     if(!app.Environment.IsDevelopment()) {
@@ -100,12 +96,10 @@ try {
         app.UseHsts();
     }
 
-    app.UseRouting();
     app.UseHttpsRedirection();
 
     app.UseAntiforgery();
 
-    app.MapStaticAssets();
     app.MapRazorComponents<App>()
         .AddInteractiveServerRenderMode();
 

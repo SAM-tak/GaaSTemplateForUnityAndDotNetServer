@@ -149,8 +149,6 @@ try {
         options.FallbackPolicy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
     });
 
-    builder.Services.AddCascadingAuthenticationState();
-
     // Add MudBlazor services
     builder.Services.AddMudServices();
 
@@ -170,6 +168,7 @@ try {
     // Configure the HTTP request pipeline.
     app.UseHttpsRedirection();
     app.UseAntiforgery();
+    app.MapStaticAssets();
     app.MapRazorComponents<App>()
         .AddInteractiveServerRenderMode();
     app.MapDefaultControllerRoute();

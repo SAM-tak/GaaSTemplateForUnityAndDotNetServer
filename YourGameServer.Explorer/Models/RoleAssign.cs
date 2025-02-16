@@ -10,7 +10,7 @@ public record RoleAssign
 {
     [Display(Name = "ID")]
     public string NameIdentifier { get; set; } = string.Empty;
-    public ExplorerUserRole Role { get; set; }
+    public UserRole Role { get; set; }
     [ForeignKey("NameIdentifier"), JsonIgnore]
-    public ExplorerUser? Owner { get; init; }
+    public User? Owner { get; init; }
 }

@@ -5,6 +5,6 @@ namespace YourGameServer.Explorer.Data;
 
 public class ExplorerDbContext(DbContextOptions<ExplorerDbContext> options) : DbContext(options)
 {
-    public DbSet<ExplorerUser> ExplorerUsers { get; init; }
+    public DbSet<User> Users { get; init; }
     public DbSet<RoleAssign> RoleAssigns { get; init; }
 }

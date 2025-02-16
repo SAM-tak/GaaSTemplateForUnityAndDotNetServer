@@ -20,7 +20,7 @@
         <MudNavLink Href="/tables/purchaseorder" Icon="@Icons.Material.Outlined.PeopleAlt">Purchase Orders</MudNavLink>
     </MudNavGroup>
 
-    <AuthorizeView Roles=@nameof(ExplorerUserRole.Developer)>
+    <AuthorizeView Roles=@nameof(UserRole.Developer)>
         <MudText Typo="Typo.subtitle2" Color="Color.Inherit" Class="ml-4 my-3">Cheats</MudText>
         <MudNavGroup Title="Player Accounts" Icon="@Icons.Material.Filled.TableRows" HideExpandIcon="true">
             <MudNavLink Href="/cheats/createdummyplayers" Icon="@Icons.Material.Outlined.PeopleAlt">Create Dummy Players</MudNavLink>
@@ -33,7 +33,7 @@
         <MudNavLink Href="/utility/playercodeexamples" Icon="@Icons.Material.Outlined.PeopleAlt">Player Code Examples</MudNavLink>
     </AuthorizeView>
 
-    <AuthorizeView Roles=@nameof(ExplorerUserRole.Admin)>
+    <AuthorizeView Roles=@nameof(UserRole.Admin)>
         <MudText Typo="Typo.subtitle2" Color="Color.Inherit" Class="ml-4 my-3">Admin</MudText>
         <MudNavGroup Title="User Accounts" Icon="@Icons.Material.Filled.TableRows" HideExpandIcon="true">
             <MudNavLink Href="/tables/exploreruser" Icon="@Icons.Material.Outlined.PeopleAlt">Explorer Users</MudNavLink>

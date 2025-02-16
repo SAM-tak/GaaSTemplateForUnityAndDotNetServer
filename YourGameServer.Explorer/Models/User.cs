@@ -1,11 +1,10 @@
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
 namespace YourGameServer.Explorer.Models;
 
 // Add profile data for application users by adding properties to the ApplicationUser class
-public record ExplorerUser
+public record User
 {
     [Key, Display(Name = "ID")]
     public string NameIdentifier { get; set; } = string.Empty;

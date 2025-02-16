@@ -106,15 +106,15 @@ try {
                     // Example: Add a new user to the database
                     var nameIdentifier = context.Principal?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
                     if(nameIdentifier != null) {
-                        var user = await dbContext.ExplorerUsers.Include(x => x.RoleAssigns).FirstOrDefaultAsync(x => x.NameIdentifier == nameIdentifier);
+                        var user = await dbContext.Users.Include(x => x.RoleAssigns).FirstOrDefaultAsync(x => x.NameIdentifier == nameIdentifier);
                         if(user == null) {
-                            bool isFirst = !await dbContext.ExplorerUsers.AnyAsync();
-                            user = new ExplorerUser {
+                            bool isFirst = !await dbContext.Users.AnyAsync();
+                            user = new User {
                                 NameIdentifier = nameIdentifier,
                                 RoleAssigns = [
                                     new() {
                                         NameIdentifier = nameIdentifier,
-                                        Role = isFirst ? ExplorerUserRole.Admin : ExplorerUserRole.Guest,
+                                        Role = isFirst ? UserRole.Admin : UserRole.Guest,
                                     }
                                 ],
                                 Name = identity.Name!,
@@ -122,7 +122,7 @@ try {
                                 Since = DateTime.UtcNow,
                                 LastLogin = DateTime.UtcNow,
                             };
-                            await dbContext.ExplorerUsers.AddAsync(user);
+                            await dbContext.Users.AddAsync(user);
                             await dbContext.SaveChangesAsync();
                         }
                         else {

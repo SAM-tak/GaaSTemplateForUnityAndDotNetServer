@@ -17,8 +17,8 @@
                     <MudTextField @bind-Value="_newItem.NameIdentifier" Label="@(TextHelper.LabelFor<RoleAssign>(i => i.NameIdentifier))" />
                 </MudTd>
                 <MudTd>
-                    <MudSelect T="ExplorerUserRole" @bind-Value="_newItem.Role" Label="@(TextHelper.LabelFor<RoleAssign>(i => i.Role))">
-                        @foreach(ExplorerUserRole item in Enum.GetValues(typeof(ExplorerUserRole))) {
+                    <MudSelect T="UserRole" @bind-Value="_newItem.Role" Label="@(TextHelper.LabelFor<RoleAssign>(i => i.Role))">
+                        @foreach(UserRole item in Enum.GetValues(typeof(UserRole))) {
                             <MudSelectItem Value="@item">@item.GetDisplayName()</MudSelectItem>
                         }
                     </MudSelect>

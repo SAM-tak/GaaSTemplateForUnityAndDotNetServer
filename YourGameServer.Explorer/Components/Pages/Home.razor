@@ -46,7 +46,9 @@
     </MudItem>
     <MudItem xs="12" sm="4">
         <MudPaper Class="pa-4" Style="height:300px;">
-            Charts comming soon ish...
+            <MudChart ChartType="ChartType.Donut" LegendPosition="Position.End" Width="280px" Height="280px"
+                InputData="@data" InputLabels="@labels">
+            </MudChart>
         </MudPaper>
     </MudItem>
     <MudItem xs="12" sm="12" md="6">
@@ -156,4 +158,7 @@
         new () { Name = "Mikes-gh", Title = "Developer", Avatar = "https://avatars.githubusercontent.com/u/16208742?s=120&v=4", Salary = "$19.12K", Severity = Color.Secondary, SeverityTitle = "Medium"},
         new () { Name = "Garderoben", Title = "CSS Magician", Avatar = "https://avatars2.githubusercontent.com/u/10367109?s=460&amp;u=2abf95f9e01132e8e2915def42895ffe99c5d2c6&amp;v=4", Salary = "$1337", Severity = Color.Primary, SeverityTitle = "High"},
     };
+
+    public double[] data = { 25, 77, 28, 5 };
+    public string[] labels = { "Oil", "Coal", "Gas", "Biomass" };
 }

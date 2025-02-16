@@ -12,8 +12,6 @@
             <MudCardContent>
                 <MudTd>
                     <MudNumericField @bind-Value="_newItem.OwnerId" Label="@(TextHelper.LabelFor<PlayerOwnedPaidServiceToken>(i => i.OwnerId))" T="ulong" Min="0" />
-                </MudTd>
-                <MudTd>
                     <MudSelect T="string" @bind-Value="_newItem.ProductId" Label="@(TextHelper.LabelFor<PlayerOwnedPaidServiceToken>(i => i.ProductId))">
                         @foreach (var id in dbContext.Products.Select(x => x.Id))
                         {
@@ -28,8 +26,6 @@
                             <MudSelectItem Value="@item">@item.GetDisplayName()</MudSelectItem>
                         }
                     </MudSelect>
-                </MudTd>
-                <MudTd>
                     <MudSelect T="ConsumableStatus" @bind-Value="_newItem.Status" Label="@(TextHelper.LabelFor<PlayerOwnedPaidServiceToken>(i => i.Status))">
                         @foreach (ConsumableStatus item in Enum.GetValues(typeof(ConsumableStatus)))
                         {
@@ -39,8 +35,6 @@
                 </MudTd>
                 <MudTd>
                     <MudNumericField @bind-Value="_newItem.Quantity" Label="Quantity" T="int" Min="0" />
-                </MudTd>
-                <MudTd>
                     <MudNumericField @bind-Value="_newItem.Used" Label="Used" T="int" Min="0" />
                 </MudTd>
                 <MudTd>

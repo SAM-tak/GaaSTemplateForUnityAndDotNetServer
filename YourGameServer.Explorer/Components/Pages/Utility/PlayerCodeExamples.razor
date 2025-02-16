@@ -5,11 +5,11 @@
     <MudTable Items="@Elements" Hover="true" Breakpoint="Breakpoint.Sm" LoadingProgressColor="Color.Info">
         <HeaderContent>
             <MudTh>Id</MudTh>
-            <MudTh>Hashids</MudTh>
+            <MudTh>Player Code</MudTh>
         </HeaderContent>
         <RowTemplate>
             <MudTd DataLabel="Id">@context.Id.ToString("#,0")</MudTd>
-            <MudTd DataLabel="Code string">@context.Code</MudTd>
+            <MudTd DataLabel="Player Code">@context.Code</MudTd>
         </RowTemplate>
     </MudTable>
 </MudPaper>
@@ -27,6 +27,12 @@
     {
         var codes = new List<CodeExample>();
         for(ulong id = 0; id < 3; ++id) {
+            codes.Add(new() { Id = id, Code = IDCoder.Encode(id).ToHyphened() });
+        }
+        for (ulong id = 9999; id < 10002; ++id) {
+            codes.Add(new() { Id = id, Code = IDCoder.Encode(id).ToHyphened() });
+        }
+        for (ulong id = 499999; id < 500002; ++id) {
             codes.Add(new() { Id = id, Code = IDCoder.Encode(id).ToHyphened() });
         }
         var maxLetter = IDCoder.Encode(ulong.MaxValue).Length;

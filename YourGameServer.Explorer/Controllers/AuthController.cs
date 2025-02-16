@@ -8,12 +8,15 @@ namespace YourGameServer.Explorer.Controllers;
 /// <summary>
 /// Controller used in web apps to manage accounts.
 /// </summary>
-public class AuthController : Controller
+public class AuthController(IHttpContextAccessor httpContextAccessor, ILogger<AuthController> logger) : Controller
 {
+    readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
+    readonly ILogger<AuthController> _logger = logger;
+
     public async Task<IActionResult> LogOut()
     {
         var referer = Request.Headers.TryGetValue("Referer", out var stringValues) ? stringValues.ToString() : null;
-        // Console.WriteLine($"Request.Headers['Referer'] = {referer}");
+        _logger.LogInformation("User: {User} Referer: {Referer}", _httpContextAccessor.HttpContext?.User?.Identity?.Name, referer);
         if(referer != null && referer.Contains("Auth/LogOut")) {
             referer = null;
         }

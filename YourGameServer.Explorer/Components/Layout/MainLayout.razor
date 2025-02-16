@@ -1,7 +1,7 @@
 ﻿@inherits LayoutComponentBase
 
-@inject IHttpContextAccessor HttpContextAccessor
-@inject NavigationManager NavigationManager
+@inject IHttpContextAccessor _httpContextAccessor
+@inject NavigationManager _navigationManager
 
 <MudThemeProvider Theme="@_theme" IsDarkMode="_isDarkMode" />
 <MudPopoverProvider />
@@ -17,7 +17,7 @@
         @* <MudIconButton Icon="@Icons.Material.Filled.MoreVert" Color="Color.Inherit" Edge="Edge.End" /> *@
         <MudMenu AnchorOrigin="Origin.TopRight" TransformOrigin="Origin.TopRight" Dense="true" Class="mt-1 ml-4">
             <ActivatorContent>
-                <MudText>@HttpContextAccessor.HttpContext?.User?.Identity?.Name</MudText>
+                <MudText>@_httpContextAccessor.HttpContext?.User?.Identity?.Name</MudText>
             </ActivatorContent>
             <ChildContent>
                 @* Dont use Href="/Auth/LogOut", use NavigateTo instead. 'cos Href NavLink make wrong referer *@
@@ -133,6 +133,6 @@
     // just for correct referer
     void LogOut()
     {
-        NavigationManager.NavigateTo("/Auth/LogOut", true);
+        _navigationManager.NavigateTo("/Auth/LogOut", true);
     }
 }

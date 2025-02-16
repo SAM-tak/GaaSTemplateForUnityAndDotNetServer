@@ -12,6 +12,7 @@
         <MudNavLink Href="/tables/playerownedpaidservicetoken" Icon="@Icons.Material.Outlined.PeopleAlt">Player Owned Paid Service Tokens</MudNavLink>
         <MudNavLink Href="/tables/playerownedserviceticket" Icon="@Icons.Material.Outlined.PeopleAlt">Player Owned Service Tickets</MudNavLink>
     </MudNavGroup>
+
     <MudNavGroup Title="Products" Icon="@Icons.Material.Filled.TableRows" HideExpandIcon="true">
         <MudNavLink Href="/tables/product" Icon="@Icons.Material.Outlined.PeopleAlt">Products</MudNavLink>
         <MudNavLink Href="/tables/serviceticket" Icon="@Icons.Material.Outlined.PeopleAlt">Service Tickets</MudNavLink>
@@ -19,19 +20,30 @@
         <MudNavLink Href="/tables/purchaseorder" Icon="@Icons.Material.Outlined.PeopleAlt">Purchase Orders</MudNavLink>
     </MudNavGroup>
 
-    <MudText Typo="Typo.subtitle2" Color="Color.Inherit" Class="ml-4 my-3">Cheats</MudText>
-    <MudNavGroup Title="Player Accounts" Icon="@Icons.Material.Filled.TableRows" HideExpandIcon="true">
-        <MudNavLink Href="/cheats/createdummyplayers" Icon="@Icons.Material.Outlined.PeopleAlt">Create Dummy Players</MudNavLink>
-    </MudNavGroup>
-    <MudNavGroup Title="Products" Icon="@Icons.Material.Filled.TableRows" HideExpandIcon="true">
-        <MudNavLink Href="/cheats/createdummyproducts" Icon="@Icons.Material.Outlined.InsertDriveFile">Create Dummy Products</MudNavLink>
-    </MudNavGroup>
+    <AuthorizeView Roles=@nameof(ExplorerUserRole.Developer)>
+        <MudText Typo="Typo.subtitle2" Color="Color.Inherit" Class="ml-4 my-3">Cheats</MudText>
+        <MudNavGroup Title="Player Accounts" Icon="@Icons.Material.Filled.TableRows" HideExpandIcon="true">
+            <MudNavLink Href="/cheats/createdummyplayers" Icon="@Icons.Material.Outlined.PeopleAlt">Create Dummy Players</MudNavLink>
+        </MudNavGroup>
+
+        <MudNavGroup Title="Products" Icon="@Icons.Material.Filled.TableRows" HideExpandIcon="true">
+            <MudNavLink Href="/cheats/createdummyproducts" Icon="@Icons.Material.Outlined.InsertDriveFile">Create Dummy Products</MudNavLink>
+        </MudNavGroup>
+
+        <MudNavLink Href="/utility/playercodeexamples" Icon="@Icons.Material.Outlined.PeopleAlt">Player Code Examples</MudNavLink>
+    </AuthorizeView>
+
+    <AuthorizeView Roles=@nameof(ExplorerUserRole.Admin)>
+        <MudText Typo="Typo.subtitle2" Color="Color.Inherit" Class="ml-4 my-3">Admin</MudText>
+        <MudNavGroup Title="User Accounts" Icon="@Icons.Material.Filled.TableRows" HideExpandIcon="true">
+            <MudNavLink Href="/tables/exploreruser" Icon="@Icons.Material.Outlined.PeopleAlt">Explorer Users</MudNavLink>
+            <MudNavLink Href="/tables/roleassign" Icon="@Icons.Material.Outlined.PeopleAlt">Roles Assigns</MudNavLink>
+        </MudNavGroup>
+    </AuthorizeView>
 
     <MudNavGroup Title="Utility" Icon="@Icons.Material.Outlined.Assignment" HideExpandIcon="true">
-        <MudNavLink Href="/utility/playercodeexamples" Icon="@Icons.Material.Outlined.PeopleAlt">Player Code Examples</MudNavLink>
         <MudNavLink Href="/utility/faq" Icon="@Icons.Material.Outlined.InsertDriveFile">Faq</MudNavLink>
     </MudNavGroup>
-
 </MudNavMenu>
 
 @code {

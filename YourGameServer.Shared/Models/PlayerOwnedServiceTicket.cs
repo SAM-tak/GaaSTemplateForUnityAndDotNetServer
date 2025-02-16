@@ -1,4 +1,3 @@
-#nullable disable
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
@@ -12,11 +11,11 @@ public record PlayerOwnedServiceTicket
     [Display(Name = "Owner Id")]
     public ulong OwnerId { get; set; }
     [ForeignKey("OwnerId"), JsonIgnore]
-    public PlayerAccount Owner { get; init; }
+    public PlayerAccount? Owner { get; init; }
     public int Idx { get; set; }
-    public string ServiceTicketId { get; set; }
+    public string ServiceTicketId { get; set; } = string.Empty;
     [ForeignKey("ServiceTicketId"), JsonIgnore]
-    public ServiceTicket ServiceTicket { get; init; }
+    public ServiceTicket? ServiceTicket { get; init; }
     public ConsumableOrigin Origin { get; set; }
     public ConsumableStatus Status { get; set; }
     public int Quantity { get; set; }

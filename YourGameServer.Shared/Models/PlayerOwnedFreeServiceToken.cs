@@ -1,4 +1,3 @@
-#nullable disable
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
@@ -12,7 +11,7 @@ public record PlayerOwnedFreeServiceToken
     [Display(Name = "Owner Id")]
     public ulong OwnerId { get; set; }
     [ForeignKey("OwnerId"), JsonIgnore]
-    public PlayerAccount Owner { get; init; }
+    public PlayerAccount? Owner { get; init; }
     public int Idx { get; set; }
     public ConsumableOrigin Origin { get; set; }
     public ConsumableStatus Status { get; set; }

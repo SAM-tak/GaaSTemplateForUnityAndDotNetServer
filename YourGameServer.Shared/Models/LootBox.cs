@@ -1,4 +1,3 @@
-#nullable disable
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace YourGameServer.Shared.Models;
@@ -6,16 +5,16 @@ namespace YourGameServer.Shared.Models;
 [Table("LootBoxes")]
 public record LootBox
 {
-    public string Id { get; set; }
-    public string ProductName { get; set; }
-    public string DisplayName { get; set; }
-    public string Description { get; set; }
-    public string IconAddress { get; set; }
-    public string BannerAddress { get; set; }
+    public string Id { get; set; } = string.Empty;
+    public string ProductName { get; set; } = string.Empty;
+    public string DisplayName { get; set; } = string.Empty;
+    public string Description { get; set; } = string.Empty;
+    public string IconAddress { get; set; } = string.Empty;
+    public string BannerAddress { get; set; } = string.Empty;
     public DateTime StartAt { get; set; }
     public DateTime EndAt { get; set; }
-    public string SpecialContent { get; set; }
-    public string RareContent { get; set; }
-    public string UncommonContent { get; set; }
-    public string CommonContent { get; set; }
+    public string SpecialContent { get; set; } = string.Empty;
+    public string RareContent { get; set; } = string.Empty;
+    public string UncommonContent { get; set; } = string.Empty;
+    public string CommonContent { get; set; } = string.Empty;
 }

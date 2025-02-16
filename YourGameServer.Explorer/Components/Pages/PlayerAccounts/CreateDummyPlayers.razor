@@ -45,8 +45,8 @@
             var deviceType = (DeviceType)Random.Shared.Next(2);
             var playerAccount = await AccountOperation.CreateAccountAsync(context, deviceType,
                 deviceType == DeviceType.Android ? faker.System.AndroidId() : faker.System.ApplePushToken());
-            playerAccount.Profile.Name = faker.Name.FullName();
-            playerAccount.Profile.Motto = faker.Lorem.Sentence(8);
+            playerAccount.Profile!.Name = faker.Name.FullName();
+            playerAccount.Profile!.Motto = faker.Lorem.Sentence(8);
         }
         await context.SaveChangesAsync();
         buttonDisabled = false;

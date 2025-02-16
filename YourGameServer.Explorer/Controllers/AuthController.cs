@@ -16,11 +16,15 @@ public class AuthController(IHttpContextAccessor httpContextAccessor, ILogger<Au
     public async Task<IActionResult> LogOut()
     {
         var referer = Request.Headers.TryGetValue("Referer", out var stringValues) ? stringValues.ToString() : null;
-        _logger.LogInformation("User: {User} Referer: {Referer}", _httpContextAccessor.HttpContext?.User?.Identity?.Name, referer);
+        _logger.LogInformation("LogOut|User:{User} AuthenticationType:{AuthenticationType} Claims:{Claims} IsAdmin:{IsAdmin} Referer:{Referer}",
+            _httpContextAccessor.HttpContext?.User?.Identity?.Name,
+            _httpContextAccessor.HttpContext?.User?.Identity?.AuthenticationType,
+            _httpContextAccessor.HttpContext?.User?.Claims,
+            _httpContextAccessor.HttpContext?.User?.IsInRole("Admin"),
+            referer);
         if(referer != null && referer.Contains("Auth/LogOut")) {
             referer = null;
         }
-        //return SignOut(new AuthenticationProperties { RedirectUri = Request.Headers["Referer"] }, "Cookies", "OpenIdConnect");
         await HttpContext.SignOutAsync(OpenIdConnectDefaults.AuthenticationScheme);
         await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
         return Redirect(referer ?? "/");

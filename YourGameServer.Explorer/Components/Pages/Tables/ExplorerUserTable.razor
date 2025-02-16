@@ -1,0 +1,104 @@
+@page "/tables/exploreruser"
+
+@attribute [Authorize(Roles="Admin")]
+
+@using YourGameServer.Explorer.Models
+
+@inject YourGameServer.Explorer.Data.ExplorerDbContext dbContext
+@inject MudBlazor.IDialogService dialogService
+@inject MudBlazor.ISnackbar snackBar
+
+<MudDataGrid T="ExplorerUser" Items="dbContext.ExplorerUsers.Include(x => x.RoleAssigns)" SortMode="SortMode.Single" Filterable="true" QuickFilter="QuickFilter" ReadOnly="false" CommittedItemChanges="@CommittedItemChanges" EditMode="@DataGridEditMode.Form" EditTrigger="@DataGridEditTrigger.Manual">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">@ListPanelText</MudText>
+        <MudSpacer />
+        <MudTextField @bind-Value="_searchString" Placeholder="@PlaceholderText" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" />
+    </ToolBarContent>
+    <Columns>
+        <PropertyColumn Property="x => x.NameIdentifier" Editable="false">
+            <CellTemplate>
+                <MudText>@context.Item.NameIdentifier</MudText>
+            </CellTemplate>
+        </PropertyColumn>
+        <PropertyColumn Property="x => x.Name" />
+        <PropertyColumn Property="x => x.EmailAddress" />
+        <TemplateColumn Title="Roles" Hideable="true" Sortable="false" Filterable="false">
+            <CellTemplate>
+                @foreach(var role in context.Item.RoleAssigns!) {
+                    <MudText>@role.Role.GetDisplayName()</MudText>
+                }
+            </CellTemplate>
+        </TemplateColumn>
+        <PropertyColumn Property="x => x.Since">
+            <EditTemplate>
+                <MudTextField Format="s" InputType="InputType.DateTimeLocal" Label="@(TextHelper.LabelFor<ExplorerUser>(i => i.Since))" @bind-Value="context.Item.Since"/>
+                <MudNumericField T="double" Label="Second" Adornment="Adornment.End" AdornmentText="s" Min="0.0" Max="59.9999999"
+                Value="context.Item.Since.GetSecondPart()" ValueChanged="t => context.Item.Since = context.Item.Since.ReplacedSecondPart(t)" />
+            </EditTemplate>
+        </PropertyColumn>
+        <PropertyColumn Title="@(TextHelper.LabelFor<ExplorerUser>(i => i.LastLogin))" Property="x => x.LastLogin">
+            <EditTemplate>
+                <MudTextField Format="s" InputType="InputType.DateTimeLocal" Label="@(TextHelper.LabelFor<ExplorerUser>(i => i.LastLogin))" @bind-Value="context.Item.LastLogin"/>
+                <MudNumericField T="double" Label="Second" Adornment="Adornment.End" AdornmentText="s" Min="0.0" Max="59.9999999"
+                Value="context.Item.LastLogin.GetSecondPart()" ValueChanged="t => context.Item.LastLogin = context.Item.LastLogin.ReplacedSecondPart(t)" />
+            </EditTemplate>
+        </PropertyColumn>
+        <TemplateColumn Hideable="false" Sortable="false" Filterable="false">
+            <CellTemplate>
+                <MudStack Spacing="1" Justify="Justify.FlexEnd" Row="true">
+                    <MudIconButton Size="Size.Small" Icon="@Icons.Material.Filled.Delete" OnClick="@(async () => await Delete(@context.Item))" />
+                    <MudIconButton Size="Size.Small" Icon="@Icons.Material.Outlined.Edit" OnClick="@context.Actions.StartEditingItemAsync" />
+                </MudStack>
+            </CellTemplate>
+        </TemplateColumn>
+    </Columns>
+    <PagerContent>
+        <MudDataGridPager />
+    </PagerContent>
+</MudDataGrid>
+
+@code {
+    string _searchString = "";
+
+    static readonly string EditPanelId =  $"{nameof(ExplorerUser).ToLower()}-edit-panel";
+    static readonly string EditPanelText = $"Add {nameof(ExplorerUser)}";
+    static readonly string ListPanelText = nameof(ExplorerUser);
+    static readonly string PlaceholderText = $"Search for {nameof(ExplorerUser)}...";
+
+    bool QuickFilter(ExplorerUser x)
+    {
+        if(string.IsNullOrWhiteSpace(_searchString)) return true;
+        if($"{x.NameIdentifier} {x.Name} {x.EmailAddress} {x.Since} {x.LastLogin}".Contains(_searchString)) return true;
+        return false;
+    }
+
+    async Task CommittedItemChanges(ExplorerUser item)
+    {
+        var updatee = await dbContext.ExplorerUsers.FindAsync(item.NameIdentifier);
+        if(updatee != null) {
+            updatee = item;
+            dbContext.Entry(updatee).State = EntityState.Modified;
+            await dbContext.SaveChangesAsync();
+            snackBar.Add($"{nameof(ExplorerUser)} (Id:{item.NameIdentifier}) updated.", Severity.Success);
+        }
+        else {
+            snackBar.Add($"{nameof(ExplorerUser)} (Id:{item.NameIdentifier}) not found.", Severity.Error);
+        }
+    }
+
+    async Task Delete(ExplorerUser x)
+    {
+        var parameters = new DialogParameters();
+        parameters.Add("ContentText", $"Do you really want to delete this records? This process cannot be undone.");
+        parameters.Add("ContentSubText", $"{x}");
+        parameters.Add("ButtonText", "Delete");
+        parameters.Add("Color", Color.Error);
+
+        var dialog = await dialogService.ShowAsync<ConfirmDialog>("Delete", parameters, new() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall });
+        if(!(await dialog.Result)!.Canceled) {
+            dbContext.ExplorerUsers.Remove(x);
+            await dbContext.SaveChangesAsync();
+            snackBar.Add($"{nameof(ExplorerUser)} (id:{x.NameIdentifier}) Deleted.", Severity.Success);
+        }
+    }
+}

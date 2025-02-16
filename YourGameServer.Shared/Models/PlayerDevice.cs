@@ -1,4 +1,3 @@
-#nullable disable
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
@@ -12,12 +11,12 @@ public record PlayerDevice
     [Display(Name = "Owner Id")]
     public ulong OwnerId { get; set; }
     [ForeignKey("OwnerId"), JsonIgnore]
-    public PlayerAccount Owner { get; init; }
+    public PlayerAccount? Owner { get; init; }
     public int Idx { get; set; }
     [Display(Name = "Device Type")]
     public DeviceType DeviceType { get; set; }
     [Display(Name = "Device Identifier")]
-    public string DeviceIdentifier { get; set; }
+    public string DeviceIdentifier { get; set; } = string.Empty;
     [Display(Name = "Since")]
     public DateTime Since { get; set; }
     [Display(Name = "Last Used Date & Time")]

@@ -1,4 +1,3 @@
-#nullable disable
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
@@ -10,16 +9,16 @@ namespace YourGameServer.Shared.Models;
 public record PurchaseOrder
 {
     [Display(Name = "Transaction Id (Store Order ID)")]
-    public string TransactionId { get; set; }
+    public string TransactionId { get; set; } = string.Empty;
     public Store Store { get; set; }
     [Display(Name = "Owner Id")]
     public ulong OwnerId { get; set; }
     [ForeignKey("OwnerId"), JsonIgnore]
-    public PlayerAccount Owner { get; init; }
-    public string ProductId { get; set; }
+    public PlayerAccount? Owner { get; init; }
+    public string ProductId { get; set; } = string.Empty;
     [ForeignKey("ProductId"), JsonIgnore]
-    public Product Product { get; init; }
-    public string Payload { get; set; }
+    public Product? Product { get; init; }
+    public string Payload { get; set; } = string.Empty;
     public PurchasingStatus Status { get; set; }
     public DateTime Since { get; set; }
     public DateTime? LastUpdate { get; set; }

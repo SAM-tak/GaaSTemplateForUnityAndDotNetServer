@@ -1,0 +1,112 @@
+@page "/tables/roleassign"
+
+@attribute [Authorize(Roles="Admin")]
+
+@using YourGameServer.Explorer.Models
+
+@inject YourGameServer.Explorer.Data.ExplorerDbContext dbContext
+@inject MudBlazor.IDialogService dialogService
+@inject MudBlazor.ISnackbar snackBar
+
+<MudExpansionPanel id="@EditPanelId" Text="@EditPanelText" @bind-Expanded="_editPanelExpanded">
+    <EditForm Model="@_newItem" OnValidSubmit="OnValidSubmit">
+        <DataAnnotationsValidator />
+        <MudCard>
+            <MudCardContent>
+                <MudTd>
+                    <MudTextField @bind-Value="_newItem.NameIdentifier" Label="@(TextHelper.LabelFor<RoleAssign>(i => i.NameIdentifier))" />
+                </MudTd>
+                <MudTd>
+                    <MudSelect T="ExplorerUserRole" @bind-Value="_newItem.Role" Label="@(TextHelper.LabelFor<RoleAssign>(i => i.Role))">
+                        @foreach(ExplorerUserRole item in Enum.GetValues(typeof(ExplorerUserRole))) {
+                            <MudSelectItem Value="@item">@item.GetDisplayName()</MudSelectItem>
+                        }
+                    </MudSelect>
+                </MudTd>
+            </MudCardContent>
+            <MudCardActions>
+                <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Success">Create New</MudButton>
+                <MudButton Class="ml-2" Variant="Variant.Filled" OnClick="Clear">Clear</MudButton>
+            </MudCardActions>
+        </MudCard>
+    </EditForm>
+</MudExpansionPanel>
+<br />
+<MudDataGrid T="RoleAssign" Items="dbContext.RoleAssigns" SortMode="SortMode.Single" Filterable="true" QuickFilter="QuickFilter" ReadOnly="true">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">@ListPanelText</MudText>
+        <MudSpacer />
+        <MudTextField @bind-Value="_searchString" Placeholder="@PlaceholderText" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" />
+    </ToolBarContent>
+    <Columns>
+        <PropertyColumn Property="x => x.NameIdentifier" Editable="false">
+            <CellTemplate>
+                <MudText>@context.Item.NameIdentifier</MudText>
+            </CellTemplate>
+        </PropertyColumn>
+        <PropertyColumn Property="x => x.Role" Editable="false" />
+        <TemplateColumn Hideable="false" Sortable="false" Filterable="false">
+            <CellTemplate>
+                <MudStack Spacing="1" Justify="Justify.FlexEnd" Row="true">
+                    <MudIconButton Size="Size.Small" Icon="@Icons.Material.Filled.Delete" OnClick="@(async () => await Delete(@context.Item))" />
+                </MudStack>
+            </CellTemplate>
+        </TemplateColumn>
+    </Columns>
+    <PagerContent>
+        <MudDataGridPager />
+    </PagerContent>
+</MudDataGrid>
+
+@code {
+    bool _editPanelExpanded = false;
+    string _searchString = "";
+
+    RoleAssign _newItem = new();
+
+    static readonly string EditPanelId =  $"{nameof(RoleAssign).ToLower()}-edit-panel";
+    static readonly string EditPanelText = $"Add {nameof(RoleAssign)}";
+    static readonly string ListPanelText = nameof(RoleAssign);
+    static readonly string PlaceholderText = $"Search for {nameof(RoleAssign)}...";
+
+    bool QuickFilter(RoleAssign x)
+    {
+        if(string.IsNullOrWhiteSpace(_searchString)) return true;
+        if($"{x.NameIdentifier} {x.Role}".Contains(_searchString)) return true;
+        return false;
+    }
+
+    async Task OnValidSubmit(EditContext contex)
+    {
+        try {
+            await dbContext.AddAsync(_newItem);
+            await dbContext.SaveChangesAsync();
+            snackBar.Add($"New {nameof(RoleAssign)} (Id:{_newItem.NameIdentifier} Role:{_newItem.Role}) created.", Severity.Success);
+            _newItem = new ();
+        }
+        catch(Exception ex) {
+            snackBar.Add($"Create {nameof(RoleAssign)} (Id:{_newItem.NameIdentifier} Role:{_newItem.Role}) failed. {ex}", Severity.Error);
+        }
+    }
+
+    void Clear()
+    {
+        _newItem = new();
+    }
+
+    async Task Delete(RoleAssign x)
+    {
+        var parameters = new DialogParameters();
+        parameters.Add("ContentText", $"Do you really want to delete this records? This process cannot be undone.");
+        parameters.Add("ContentSubText", $"{x}");
+        parameters.Add("ButtonText", "Delete");
+        parameters.Add("Color", Color.Error);
+
+        var dialog = await dialogService.ShowAsync<ConfirmDialog>("Delete", parameters, new() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall });
+        if(!(await dialog.Result)!.Canceled) {
+            dbContext.RoleAssigns.Remove(x);
+            await dbContext.SaveChangesAsync();
+            snackBar.Add($"{nameof(RoleAssign)} (Id:{x.NameIdentifier} Role:{x.Role}) Deleted.", Severity.Success);
+        }
+    }
+}

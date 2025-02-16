@@ -1,8 +1,10 @@
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using YourGameServer.Explorer.Models;
 
 namespace YourGameServer.Explorer.Data;
 
-public class ExplorerDbContext(DbContextOptions<ExplorerDbContext> options) : IdentityDbContext<ExplorerUser>(options)
+public class ExplorerDbContext(DbContextOptions<ExplorerDbContext> options) : DbContext(options)
 {
+    public DbSet<ExplorerUser> ExplorerUsers { get; init; }
+    public DbSet<RoleAssign> RoleAssigns { get; init; }
 }

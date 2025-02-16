@@ -1,4 +1,3 @@
-#nullable disable
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
@@ -9,7 +8,7 @@ public record PlayerAccount
     [Display(Name = "ID")]
     public ulong Id { get; init; }
     [JsonIgnore]
-    public List<PlayerDevice> DeviceList { get; init; }
+    public List<PlayerDevice>? DeviceList { get; init; }
     [Display(Name = "Current Device Idx")]
     public int CurrentDeviceIdx { get; set; }
     [Display(Name = "Kind")]
@@ -27,7 +26,7 @@ public record PlayerAccount
     [Display(Name = "Expire Date")]
     public DateTime? ExpireDate { get; set; }
     [Display(Name = "Profile")]
-    public PlayerProfile Profile { get; init; }
+    public PlayerProfile? Profile { get; init; }
 
     public override int GetHashCode() => (Id, CurrentDeviceIdx, Status, Since, LastLogin, InactivateDate, BanDate, ExpireDate).GetHashCode();
 

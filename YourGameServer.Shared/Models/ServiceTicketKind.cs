@@ -1,4 +1,3 @@
-#nullable disable
 using System.ComponentModel.DataAnnotations;
 
 namespace YourGameServer.Shared.Models;

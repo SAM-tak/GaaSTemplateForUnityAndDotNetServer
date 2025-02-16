@@ -20,8 +20,6 @@
                             <MudSelectItem Value="@item">@item.GetDisplayName()</MudSelectItem>
                         }
                     </MudSelect>
-                </MudTd>
-                <MudTd>
                     <MudSelect T="ConsumableStatus" @bind-Value="_newItem.Status" Label="@(TextHelper.LabelFor<PlayerOwnedFreeServiceToken>(i => i.Status))">
                         @foreach (ConsumableStatus item in Enum.GetValues(typeof(ConsumableStatus)))
                         {
@@ -31,8 +29,6 @@
                 </MudTd>
                 <MudTd>
                     <MudNumericField @bind-Value="_newItem.Quantity" Label="Quantity" T="int" Min="0" />
-                </MudTd>
-                <MudTd>
                     <MudNumericField @bind-Value="_newItem.Used" Label="Used" T="int" Min="0" />
                 </MudTd>
                 <MudTd>
@@ -199,7 +195,7 @@
         parameters.Add("Color", Color.Error);
 
         var dialog = await dialogService.ShowAsync<ConfirmDialog>("Delete", parameters, new() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall });
-        if(!(dialog?.Result?.Result?.Canceled ?? false)) {
+        if(!(await dialog.Result)!.Canceled) {
             dbContext.PlayerOwnedFreeServiceTokens.Remove(x);
             await dbContext.SaveChangesAsync();
             snackBar.Add($"{nameof(PlayerOwnedFreeServiceToken)} (OwnerId:{_newItem.OwnerId} Idx:{_newItem.Idx}) Deleted.", Severity.Success);

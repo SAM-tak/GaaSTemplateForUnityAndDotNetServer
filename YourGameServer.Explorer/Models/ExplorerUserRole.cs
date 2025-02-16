@@ -7,12 +7,16 @@ public enum ExplorerUserRole
 {
     [Display(Name = "Guest")]
     Guest,
-    [Display(Name = "Administrator")]
+    [Display(Name = "Admin")]
     Admin,
-    [Display(Name = "Developer")]
+    [Display(Name = "Dev")]
     Developer,
+    [Display(Name = "GD")]
+    GameDesigner,
     [Display(Name = "Tester")]
     Tester,
-    [Display(Name = "Financialist")]
-    Financialist,
+    [Display(Name = "Finance")]
+    Finance,
+    [Display(Name = "CS")]
+    CustomerSupport,
 }

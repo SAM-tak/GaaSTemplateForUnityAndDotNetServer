@@ -10,11 +10,28 @@
         <DataAnnotationsValidator />
         <MudCard>
             <MudCardContent>
-                <MudTextField @bind-Value="_newItem.Id" Label="@(TextHelper.LabelFor<Product>(i => i.Id))" />
-                <MudTextField @bind-Value="_newItem.ProductName" Label="@(TextHelper.LabelFor<Product>(i => i.ProductName))" />
-                <MudTextField @bind-Value="_newItem.DisplayName" Label="@(TextHelper.LabelFor<Product>(i => i.DisplayName))" />
-                <MudTextField @bind-Value="_newItem.Description" Label="@(TextHelper.LabelFor<Product>(i => i.Description))" />
-                <MudNumericField @bind-Value="_newItem.IconBlobId" Label="@(TextHelper.LabelFor<Product>(i => i.IconBlobId))" />
+                <MudTd>
+                    <MudTextField @bind-Value="_newItem.Id" Label="@(TextHelper.LabelFor<Product>(i => i.Id))" />
+                </MudTd>
+                <MudTd>
+                    <MudTextField @bind-Value="_newItem.ProductName" Label="@(TextHelper.LabelFor<Product>(i => i.ProductName))" />
+                    <MudSelect T="Store" @bind-Value="_newItem.Store"
+                        Label="@(TextHelper.LabelFor<Product>(i => i.Store))">
+                        @foreach (Store item in Enum.GetValues(typeof(Store)))
+                        {
+                            <MudSelectItem Value="@item">@item.GetDisplayName()</MudSelectItem>
+                        }
+                    </MudSelect>
+                </MudTd>
+                <MudTd>
+                    <MudTextField @bind-Value="_newItem.DisplayName" Label="@(TextHelper.LabelFor<Product>(i => i.DisplayName))" />
+                </MudTd>
+                <MudTd>
+                    <MudTextField @bind-Value="_newItem.Description" Label="@(TextHelper.LabelFor<Product>(i => i.Description))" Style="width:200px;" Lines="3" />
+                </MudTd>
+                <MudTd>
+                    <MudNumericField @bind-Value="_newItem.IconBlobId" Label="@(TextHelper.LabelFor<Product>(i => i.IconBlobId))" />
+                </MudTd>
             </MudCardContent>
             <MudCardActions>
                 <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Success">Create New</MudButton>
@@ -32,6 +49,17 @@
     </ToolBarContent>
     <Columns>
         <PropertyColumn Property="x => x.Id" Editable="false" />
+        <PropertyColumn Property="x => x.Store">
+            <EditTemplate>
+                <MudSelect T="Store" @bind-Value="context.Item.Store"
+                    Label="@(TextHelper.LabelFor<Product>(i => i.Store))">
+                    @foreach (Store item in Enum.GetValues(typeof(Store)))
+                    {
+                        <MudSelectItem Value="@item">@item.GetDisplayName()</MudSelectItem>
+                    }
+                </MudSelect>
+            </EditTemplate>
+        </PropertyColumn>
         <PropertyColumn Property="x => x.ProductName" />
         <PropertyColumn Property="x => x.DisplayName" />
         <PropertyColumn Property="x => x.Description" />

@@ -26,7 +26,7 @@
                     <MudTextField @bind-Value="_newItem.DisplayName" Label="@(TextHelper.LabelFor<ServiceTicket>(i => i.DisplayName))" />
                 </MudTd>
                 <MudTd>
-                    <MudTextField @bind-Value="_newItem.Description" Label="@(TextHelper.LabelFor<ServiceTicket>(i => i.Description))" />
+                    <MudTextField @bind-Value="_newItem.Description" Label="@(TextHelper.LabelFor<ServiceTicket>(i => i.Description))" Lines="3" />
                 </MudTd>
                 <MudTd>
                     <MudNumericField @bind-Value="_newItem.DetailId" Label="@(TextHelper.LabelFor<ServiceTicket>(i => i.DetailId))" />

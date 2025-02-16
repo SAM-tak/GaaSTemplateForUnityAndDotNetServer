@@ -15,6 +15,13 @@ dotnet ef migrations add InitialCreation --project YourGameServer.Shared --start
 dotnet ef database update --project YourGameServer.Shared --startup-project YourGameServer.Game --context SqliteGameDbContext
 ```
 
+## Expolorer Entity Framework Migration Example
+
+```sh
+YourGameServer.Explorer> dotnet ef migrations add InitialCreation --context SqliteExplorerDbContext
+YourGameServer.Explorer> dotnet ef database update --context SqliteExplorerDbContext
+```
+
 ## Test
 
 ```sh

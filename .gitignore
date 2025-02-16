@@ -355,5 +355,9 @@ MigrationBackup/
 /game.db-shm
 /game.db-wal
 
+/YourGameServer.Explorer/explorer.db
+/YourGameServer.Explorer/explorer.db-shm
+/YourGameServer.Explorer/explorer.db-wal
+
 Migrations/
 .config/

@@ -91,7 +91,7 @@ try {
         })
         .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme)
         .AddCookie("OpenIdConnect") // needs for log out process
-        .AddGoogle(options => GoogleAuthentication.SetUpOption(options, builder.Configuration.GetSection("Authentication:Google")
+        .AddGoogle(options => GoogleAuthentication.SetUpOptions(options, builder.Configuration.GetSection("Authentication:Google")
             ?? throw new InvalidOperationException("Google OAuth Settings not found.")));
 
     _ = builder.Services.AddAuthorization(options => {

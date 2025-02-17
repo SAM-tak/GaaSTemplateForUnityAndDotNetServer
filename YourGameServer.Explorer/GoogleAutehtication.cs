@@ -9,7 +9,7 @@ namespace YourGameServer.Explorer;
 
 public static class GoogleAuthentication
 {
-    public static void SetUpOption(GoogleOptions options, IConfigurationSection googleAuthNSection)
+    public static void SetUpOptions(GoogleOptions options, IConfigurationSection googleAuthNSection)
     {
         options.ClientId = googleAuthNSection["ClientId"]
             ?? throw new InvalidOperationException("Google OAuth 'ClientId' not found.");

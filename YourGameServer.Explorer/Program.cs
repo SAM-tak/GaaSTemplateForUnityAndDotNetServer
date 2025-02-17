@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.AspNetCore.Authentication.Google;
 using MudBlazor.Services;
+using MudBlazor.Translations;
 using NLog;
 using NLog.Web;
 using YourGameServer.Shared;
@@ -51,7 +52,7 @@ try {
     builder.Host.UseNLog();
 
     // Set up for log view component
-    builder.Services.AddSingleton<ILogMonitorService, LogMonitorService>();
+    builder.Services.AddSingleton<LogMonitorService>();
 
     builder.Services.AddHttpContextAccessor();
 
@@ -152,6 +153,10 @@ try {
     // Add MudBlazor services
     builder.Services.AddMudServices();
 
+    builder.Services.AddMudTranslations();
+
+    // builder.Services.AddTransient<MudLocalizer, DictionaryMudLocalizer>();
+
     // Add services to the container.
     builder.Services.AddRazorComponents()
         .AddInteractiveServerComponents();
@@ -164,6 +169,14 @@ try {
     app.UseCookiePolicy();
     app.UseAuthentication();
     app.UseAuthorization();
+
+    string[] supportedCultures = ["en-US", "ja-JP", "ko-KR", "ch-ZH"];
+    var localizationOptions = new RequestLocalizationOptions()
+        .SetDefaultCulture(supportedCultures[0])
+        .AddSupportedCultures(supportedCultures)
+        .AddSupportedUICultures(supportedCultures);
+
+    app.UseRequestLocalization(localizationOptions);
 
     // Configure the HTTP request pipeline.
     app.UseHttpsRedirection();

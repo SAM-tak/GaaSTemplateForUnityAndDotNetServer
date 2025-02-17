@@ -1,0 +1,43 @@
+@inject NavigationManager _navigationManager
+@* @inject LanguageService _languageService
+@inject LocalConfigurationService _localConfiguration *@
+
+<MudMenu Icon="@Icons.Material.Outlined.Translate" Color="Color.Inherit" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.BottomCenter" Dense="true">
+    @foreach(var item in _languageService.GetSupportedLanguages())
+    { 
+        @* <MudMenuItem OnClick="(() => ChangeLanguageAsync(item))">@_languageService.ToDisplayString(item)</MudMenuItem> *@
+        <MudMenuItem OnClick="(() => ChangeLanguageAsync(item))">@item.Name</MudMenuItem>
+    }
+</MudMenu>
+
+@code {
+    internal class LanguageService
+    {
+        static LanguageModel[] _supportedLanguages =  [
+            new() { Culture = "en-US", Name = "English" },
+            new() { Culture = "ja-JP", Name = "日本語" },
+            new() { Culture = "ko-KR", Name = "한국어" },
+            new() { Culture = "ch-ZH", Name = "中文" }
+        ];
+
+        public LanguageModel[] GetSupportedLanguages() => _supportedLanguages;
+    }
+
+    LanguageService _languageService = new();
+
+    internal class LanguageModel
+    {
+        public string Culture { get; set; } = string.Empty;
+        public string Name { get; set; } = string.Empty;
+    }
+
+    private async Task ChangeLanguageAsync(LanguageModel selectedLanguage)
+    {
+        @* await LocalStorage.SetAsync<LanguageModel>(StorageDefaultValue.CultureStorage, SelectedLanguage); *@
+        await Task.CompletedTask;
+        System.Globalization.CultureInfo.CurrentCulture = new(selectedLanguage.Culture);
+        System.Globalization.CultureInfo.CurrentUICulture = new(selectedLanguage.Culture);
+        StateHasChanged();
+        _navigationManager.NavigateTo(_navigationManager.Uri, forceLoad: true);
+    }
+}

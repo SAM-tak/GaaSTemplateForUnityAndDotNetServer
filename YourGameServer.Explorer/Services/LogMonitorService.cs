@@ -5,13 +5,7 @@ using System.Collections.Concurrent;
 
 namespace YourGameServer.Explorer.Services;
 
-public interface ILogMonitorService
-{
-    ConcurrentQueue<string> GetLogs();
-    void AddLog(string log);
-}
-
-public class LogMonitorService : ILogMonitorService
+public class LogMonitorService
 {
     readonly ConcurrentQueue<string> _logs = new();
     readonly MemoryTarget _memoryTarget;

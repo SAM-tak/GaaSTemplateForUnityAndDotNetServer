@@ -6,8 +6,8 @@ public static class IHttpContextAccessorExtension
     {
         // Claims.Last "aud: YourGameClient/<PlayerID>/<DeviceID>"
         if(httpContextAccessor != null && httpContextAccessor.HttpContext != null) {
-            var strings = httpContextAccessor.HttpContext.User.Claims.Last().Value[5..].Split('/');
-            if(strings.Length > 2 && ulong.TryParse(strings[1], out playerId) && int.TryParse(strings[2], out deviceIdx)) {
+            var strings = httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(x => x.Type == "aud")?.Value.Split('/');
+            if(strings != null && strings.Length > 2 && ulong.TryParse(strings[1], out playerId) && int.TryParse(strings[2], out deviceIdx)) {
                 return true;
             }
         }
@@ -20,8 +20,8 @@ public static class IHttpContextAccessorExtension
     {
         // Claims.Last "aud: YourGameClient/<PlayerID>/<DeviceID>"
         if(httpContextAccessor != null && httpContextAccessor.HttpContext != null) {
-            var strings = httpContextAccessor.HttpContext.User.Claims.Last().Value[5..].Split('/');
-            if(strings.Length > 2 && ulong.TryParse(strings[1], out var playerId)) {
+            var strings = httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(x => x.Type == "aud")?.Value.Split('/');
+            if(strings != null && strings.Length > 2 && ulong.TryParse(strings[1], out var playerId)) {
                 return playerId;
             }
         }

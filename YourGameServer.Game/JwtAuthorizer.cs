@@ -95,11 +95,12 @@ public static class JwtAuthorizerExtentions
 
             var playerIdString = strings[1];
             var deviceIdString = strings[2];
-            if(!string.IsNullOrEmpty(playerIdString) && !string.IsNullOrEmpty(deviceIdString)
-                && ulong.TryParse(playerIdString, out _) && ulong.TryParse(deviceIdString, out _)) {
-                return true;
+            if(string.IsNullOrWhiteSpace(playerIdString) || string.IsNullOrWhiteSpace(deviceIdString)
+            || !ulong.TryParse(playerIdString, out _) || !ulong.TryParse(deviceIdString, out _)) {
+                return false;
             }
-            return false;
+
+            return true;
         };
         return app;
     }

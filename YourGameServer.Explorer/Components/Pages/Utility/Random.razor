@@ -1,0 +1,33 @@
+@page "/utility/random"
+
+<MudPaper Class="pa-4 mr-16">
+    <MudText Typo="Typo.h6" GutterBottom="true">Random Number</MudText>
+    <MudTable Items="@Elements" Hover="true" Breakpoint="Breakpoint.Sm" LoadingProgressColor="Color.Info">
+        <RowTemplate>
+            <MudTd DataLabel="Key">@context.Key</MudTd>
+            <MudTd DataLabel="Value">@context.Value</MudTd>
+        </RowTemplate>
+    </MudTable>
+</MudPaper>
+
+@code {
+    private IEnumerable<RandomEntry> Elements = new List<RandomEntry>();
+
+    public class RandomEntry
+    {
+        public string Key = string.Empty;
+        public string Value = string.Empty;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var random = new System.Random();
+
+        Elements = new List<RandomEntry>() {
+            new() { Key = "15bit", Value = $"{random.Next(0, ushort.MaxValue)}" },
+            new() { Key = "31bit", Value = $"{random.Next(0, int.MaxValue)}" },
+            new() { Key = "63bit", Value = $"{random.NextInt64(0, long.MaxValue)}" },
+        };
+        await Task.CompletedTask;
+    }
+}

@@ -13,7 +13,7 @@ public static class PlayerAccountOperation
     {
         var curDateTime = DateTime.UtcNow;
         var playerAccount = new PlayerAccount {
-            CurrentDeviceIdx = 1,
+            CurrentDeviceIdx = 0,
             DeviceList = [
                 new () {
                     Idx = 1,

@@ -8,7 +8,7 @@ public class IDCoder_IsSane
     [TestInitialize]
     public void TestInitialize()
     {
-        IDCoder.Initialize();
+        IDCoder.Initialize(234456);
     }
 
     [TestMethod]

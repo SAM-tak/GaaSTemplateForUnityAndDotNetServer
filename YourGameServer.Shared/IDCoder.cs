@@ -7,7 +7,7 @@ public static class IDCoder
     static SqidsEncoder<ulong>? _sqids = null;
     static SqidsEncoder<ulong>? _sqidsForLoginKey = null;
 
-    public static void Initialize(int seed = 234456)
+    public static void Initialize(int seed)
     {
         var alphabets = "abcdefghijknpqrstuvxyz23456789".ToCharArray();
         new Random(seed).Shuffle(alphabets.AsSpan());

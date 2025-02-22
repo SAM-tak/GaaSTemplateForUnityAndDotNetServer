@@ -23,7 +23,8 @@ try {
     builder.Services.AddHttpContextAccessor();
 
     // Setup IDCoder(sqids)
-    IDCoder.Initialize();
+    IDCoder.Initialize(builder.Configuration.GetSection("IDCoder")?.GetValue<int>("Seed")
+        ?? throw new InvalidOperationException("'IDCoder.Seed' settings not found."));
 
     // https://stackoverflow.com/questions/4804086/is-there-any-connection-string-parser-in-c
     var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")

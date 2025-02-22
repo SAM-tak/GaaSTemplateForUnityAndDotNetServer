@@ -10,7 +10,8 @@ using YourGameServer.Shared.Data;
 
 namespace YourGameServer.Game.Services;
 
-public class ChatHub(GameDbContext dbContext, IHttpContextAccessor httpContextAccessor, ILogger<ChatHub> logger) : StreamingHubBase<IChatHub, IChatHubReceiver>, IChatHub
+public class ChatHub(GameDbContext dbContext, IHttpContextAccessor httpContextAccessor, ILogger<ChatHub> logger)
+    : StreamingHubBase<IChatHub, IChatHubReceiver>, IChatHub
 {
     readonly GameDbContext _dbContext = dbContext;
     readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;

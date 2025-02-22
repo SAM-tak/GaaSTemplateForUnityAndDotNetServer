@@ -18,7 +18,7 @@
         <LanguageSelector />
         <MudMenu AnchorOrigin="Origin.TopRight" TransformOrigin="Origin.TopRight" Dense="true" Class="mt-1 ml-4">
             <ActivatorContent>
-                <MudText>@_httpContextAccessor.HttpContext?.User?.Identity?.Name</MudText>
+                <MudText>@_httpContextAccessor.GetName()</MudText>
             </ActivatorContent>
             <ChildContent>
                 @* Dont use Href="/Auth/LogOut", use NavigateTo instead. 'cos Href NavLink make wrong referer *@

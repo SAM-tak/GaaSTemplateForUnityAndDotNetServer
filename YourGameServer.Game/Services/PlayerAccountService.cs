@@ -8,6 +8,7 @@ using YourGameServer.Game.Interface;
 using YourGameServer.Shared;
 using YourGameServer.Shared.Data;
 using YourGameServer.Shared.Models;
+using YourGameServer.Shared.Operations;
 using PlayerAccountStatus = YourGameServer.Game.Interface.PlayerAccountStatus;
 
 namespace YourGameServer.Game.Services;
@@ -23,12 +24,8 @@ public class PlayerAccountService(GameDbContext dbContext, IHttpContextAccessor 
     readonly ILogger<AccountService> _logger = logger;
 
     public async UnaryResult<FormalPlayerAccount> GetPlayerAccount()
-    {
-        var playerId = _httpContextAccessor.GetPlayerId();
-        var playerAccount = await _dbContext.PlayerAccounts.FindAsync(playerId)
-            ?? throw new ReturnStatusException(StatusCode.NotFound, "correspond account was not found.");
-        return FormalPlayerAccountFromPlayerAccount(playerAccount);
-    }
+        => FormalPlayerAccountFromPlayerAccount(await PlayerAccountOperation.GetAsync(_dbContext, _httpContextAccessor.GetPlayerId())
+         ?? throw new ReturnStatusException(StatusCode.NotFound, "correspond account was not found."));
 
     public async UnaryResult<IEnumerable<MaskedPlayerAccount>> GetPlayerAccounts(string[] codes)
     {

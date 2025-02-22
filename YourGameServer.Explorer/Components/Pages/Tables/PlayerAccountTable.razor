@@ -1,8 +1,10 @@
 @page "/tables/playeraccount"
 
-@inject YourGameServer.Shared.Data.GameDbContext dbContext
-@inject MudBlazor.IDialogService dialogService
-@inject MudBlazor.ISnackbar snackBar
+@inject YourGameServer.Shared.Data.GameDbContext _dbContext
+@inject MudBlazor.IDialogService _dialogService
+@inject MudBlazor.ISnackbar _snackBar
+@inject IHttpContextAccessor _httpContextAccessor
+@inject ILogger<PlayerAccountTable> _logger
 
 <MudExpansionPanel id="@EditPanelId" Text="@EditPanelText" @bind-Expanded="_editPanelExpanded">
     <EditForm Model="@_newItem" OnValidSubmit="OnValidSubmit">
@@ -62,7 +64,7 @@
     </EditForm>
 </MudExpansionPanel>
 <br />
-<MudDataGrid T="PlayerAccount" Items="dbContext.PlayerAccounts" SortMode="SortMode.Single" Filterable="true" QuickFilter="QuickFilter" ReadOnly="false" CommittedItemChanges="@CommittedItemChanges" EditMode="@DataGridEditMode.Form" EditTrigger="@DataGridEditTrigger.Manual">
+<MudDataGrid T="PlayerAccount" Items="_dbContext.PlayerAccounts" SortMode="SortMode.Single" Filterable="true" QuickFilter="QuickFilter" ReadOnly="false" CommittedItemChanges="@CommittedItemChanges" EditMode="@DataGridEditMode.Form" EditTrigger="@DataGridEditTrigger.Manual">
     <ToolBarContent>
         <MudText Typo="Typo.h6">@ListPanelText</MudText>
         <MudSpacer />
@@ -170,27 +172,29 @@
     async Task OnValidSubmit(EditContext contex)
     {
         try {
-            await dbContext.AddAsync(_newItem);
-            await dbContext.SaveChangesAsync();
-            snackBar.Add($"New {nameof(PlayerAccount)} (Id:{_newItem.Id}) created.", Severity.Success);
+            await _dbContext.AddAsync(_newItem);
+            await _dbContext.SaveChangesAsync();
+            _logger.LogInformation("{User}|New {Table} (Id:{Id}) created.", _httpContextAccessor.GetNameAndIdentifier(), nameof(PlayerAccount), _newItem.Id);
+            _snackBar.Add($"New {nameof(PlayerAccount)} (Id:{_newItem.Id}) created.", Severity.Success);
             _newItem = new ();
         }
         catch(Exception ex) {
-            snackBar.Add($"Create {nameof(PlayerAccount)} (Id:{_newItem.Id}) failed. {ex}", Severity.Error);
+            _snackBar.Add($"Create {nameof(PlayerAccount)} (Id:{_newItem.Id}) failed. {ex}", Severity.Error);
         }
     }
 
     async Task CommittedItemChanges(PlayerAccount item)
     {
-        var updatee = await dbContext.PlayerAccounts.FindAsync(item.Id);
+        var updatee = await _dbContext.PlayerAccounts.FindAsync(item.Id);
         if(updatee != null) {
             updatee = item;
-            dbContext.Entry(updatee).State = EntityState.Modified;
-            await dbContext.SaveChangesAsync();
-            snackBar.Add($"{nameof(PlayerAccount)} (Id:{item.Id}) updated.", Severity.Success);
+            _dbContext.Entry(updatee).State = EntityState.Modified;
+            await _dbContext.SaveChangesAsync();
+            _logger.LogInformation("{User}|New {Table} (Id:{Id}) updated.", _httpContextAccessor.GetNameAndIdentifier(), nameof(PlayerAccount), item.Id);
+            _snackBar.Add($"{nameof(PlayerAccount)} (Id:{item.Id}) updated.", Severity.Success);
         }
         else {
-            snackBar.Add($"{nameof(PlayerAccount)} (Id:{item.Id}) not found.", Severity.Error);
+            _snackBar.Add($"{nameof(PlayerAccount)} (Id:{item.Id}) not found.", Severity.Error);
         }
     }
 
@@ -199,19 +203,20 @@
         _newItem = new();
     }
 
-    async Task Delete(PlayerAccount x)
+    async Task Delete(PlayerAccount item)
     {
         var parameters = new DialogParameters();
         parameters.Add("ContentText", $"Do you really want to delete this records? This process cannot be undone.");
-        parameters.Add("ContentSubText", $"{x}");
+        parameters.Add("ContentSubText", $"{item}");
         parameters.Add("ButtonText", "Delete");
         parameters.Add("Color", Color.Error);
 
-        var dialog = await dialogService.ShowAsync<ConfirmDialog>("Delete", parameters, new() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall });
+        var dialog = await _dialogService.ShowAsync<ConfirmDialog>("Delete", parameters, new() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall });
         if(!(await dialog.Result)!.Canceled) {
-            dbContext.PlayerAccounts.Remove(x);
-            await dbContext.SaveChangesAsync();
-            snackBar.Add($"{nameof(PlayerAccount)} (id:{x.Id}) Deleted.", Severity.Success);
+            _dbContext.PlayerAccounts.Remove(item);
+            await _dbContext.SaveChangesAsync();
+            _logger.LogInformation("{User}|New {Table} (Id:{Id}) deleted.", _httpContextAccessor.GetNameAndIdentifier(), nameof(PlayerAccount), item.Id);
+            _snackBar.Add($"{nameof(PlayerAccount)} (id:{item.Id}) deleted.", Severity.Success);
         }
     }
 }

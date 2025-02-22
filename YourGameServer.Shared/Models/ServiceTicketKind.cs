@@ -6,6 +6,10 @@ public enum ServiceTicketKind
 {
     [Display(Name = "Loot Box")]
     LootBox,
-    [Display(Name = "Foo Bar")]
-    FooBar,
+    [Display(Name = "Character")]
+    Character,
+    [Display(Name = "Character Fragment")]
+    CharacterFragment,
+    [Display(Name = "Gold")]
+    Gold,
 }

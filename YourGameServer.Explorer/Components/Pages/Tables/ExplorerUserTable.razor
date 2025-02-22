@@ -4,11 +4,13 @@
 
 @using YourGameServer.Explorer.Models
 
-@inject YourGameServer.Explorer.Data.ExplorerDbContext dbContext
-@inject MudBlazor.IDialogService dialogService
-@inject MudBlazor.ISnackbar snackBar
+@inject YourGameServer.Explorer.Data.ExplorerDbContext _dbContext
+@inject MudBlazor.IDialogService _dialogService
+@inject MudBlazor.ISnackbar _snackBar
+@inject IHttpContextAccessor _httpContextAccessor
+@inject ILogger<ExplorerUserTable> _logger
 
-<MudDataGrid T="User" Items="dbContext.Users.Include(x => x.RoleAssigns)" SortMode="SortMode.Single" Filterable="true" QuickFilter="QuickFilter" ReadOnly="false" CommittedItemChanges="@CommittedItemChanges" EditMode="@DataGridEditMode.Form" EditTrigger="@DataGridEditTrigger.Manual">
+<MudDataGrid T="User" Items="_dbContext.Users.Include(x => x.RoleAssigns)" SortMode="SortMode.Single" Filterable="true" QuickFilter="QuickFilter" ReadOnly="false" CommittedItemChanges="@CommittedItemChanges" EditMode="@DataGridEditMode.Form" EditTrigger="@DataGridEditTrigger.Manual">
     <ToolBarContent>
         <MudText Typo="Typo.h6">@ListPanelText</MudText>
         <MudSpacer />
@@ -74,31 +76,33 @@
 
     async Task CommittedItemChanges(User item)
     {
-        var updatee = await dbContext.Users.FindAsync(item.NameIdentifier);
+        var updatee = await _dbContext.Users.FindAsync(item.NameIdentifier);
         if(updatee != null) {
             updatee = item;
-            dbContext.Entry(updatee).State = EntityState.Modified;
-            await dbContext.SaveChangesAsync();
-            snackBar.Add($"{nameof(User)} (Id:{item.NameIdentifier}) updated.", Severity.Success);
+            _dbContext.Entry(updatee).State = EntityState.Modified;
+            await _dbContext.SaveChangesAsync();
+            _logger.LogInformation("{User}|{Table} (Id:{itemNameIdentifier}) updated.", _httpContextAccessor.GetNameAndIdentifier(), nameof(User), item.NameIdentifier);
+            _snackBar.Add($"{nameof(User)} (Id:{item.NameIdentifier}) updated.", Severity.Success);
         }
         else {
-            snackBar.Add($"{nameof(User)} (Id:{item.NameIdentifier}) not found.", Severity.Error);
+            _snackBar.Add($"{nameof(User)} (Id:{item.NameIdentifier}) not found.", Severity.Error);
         }
     }
 
-    async Task Delete(User x)
+    async Task Delete(User item)
     {
         var parameters = new DialogParameters();
         parameters.Add("ContentText", $"Do you really want to delete this records? This process cannot be undone.");
-        parameters.Add("ContentSubText", $"{x}");
+        parameters.Add("ContentSubText", $"{item}");
         parameters.Add("ButtonText", "Delete");
         parameters.Add("Color", Color.Error);
 
-        var dialog = await dialogService.ShowAsync<ConfirmDialog>("Delete", parameters, new() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall });
+        var dialog = await _dialogService.ShowAsync<ConfirmDialog>("Delete", parameters, new() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall });
         if(!(await dialog.Result)!.Canceled) {
-            dbContext.Users.Remove(x);
-            await dbContext.SaveChangesAsync();
-            snackBar.Add($"{nameof(User)} (id:{x.NameIdentifier}) Deleted.", Severity.Success);
+            _dbContext.Users.Remove(item);
+            await _dbContext.SaveChangesAsync();
+            _logger.LogInformation("{User}|{Table} (Id:{itemNameIdentifier}) deleted.", _httpContextAccessor.GetNameAndIdentifier(), nameof(User), item.NameIdentifier);
+            _snackBar.Add($"{nameof(User)} (id:{item.NameIdentifier}) deleted.", Severity.Success);
         }
     }
 }

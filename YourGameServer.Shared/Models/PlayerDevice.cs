@@ -17,6 +17,7 @@ public record PlayerDevice
     public DeviceType DeviceType { get; set; }
     [Display(Name = "Device Identifier")]
     public string DeviceIdentifier { get; set; } = string.Empty;
+    public Store OfficialStore { get; set; }
     [Display(Name = "Since")]
     public DateTime Since { get; set; }
     [Display(Name = "Last Used Date & Time")]

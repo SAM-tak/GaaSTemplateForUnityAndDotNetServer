@@ -11,6 +11,7 @@ using YourGameServer.Shared.Data;
 using YourGameServer.Shared.Models;
 using YourGameServer.Shared.Operations;
 using DeviceType = YourGameServer.Shared.Models.DeviceType;
+using Store = YourGameServer.Shared.Models.Store;
 
 namespace YourGameServer.Game.Services;
 
@@ -140,7 +141,8 @@ public class AccountService(GameDbContext dbContext, JwtAuthorizer jwt, IHttpCon
     {
         _logger.LogInformation("SignUp {SignUp}", signup);
         if(!string.IsNullOrWhiteSpace(signup.DeviceIdentifier)) {
-            var playerAccount = await CreateAccountAsync(_dbContext, signup);
+            var playerAccount = await PlayerAccountOperation.CreateAsync(_dbContext, (DeviceType)signup.DeviceType, (Store)signup.OfficialStore, signup.DeviceIdentifier);
+            await _dbContext.SaveChangesAsync();
             return new SignUpRequestResult {
                 Token = $"Bearer {_jwt.CreateToken(playerAccount.Id, playerAccount.CurrentDeviceIdx, out var period)}",
                 Period = period,
@@ -149,12 +151,5 @@ public class AccountService(GameDbContext dbContext, JwtAuthorizer jwt, IHttpCon
             };
         }
         throw new ReturnStatusException(StatusCode.InvalidArgument, "Device Identifier is invalid.");
-    }
-
-    public static async Task<PlayerAccount> CreateAccountAsync(GameDbContext context, SignUpRequest accountCreationModel)
-    {
-        var playerAccount = await AccountOperation.CreateAccountAsync(context, (DeviceType)accountCreationModel.DeviceType, accountCreationModel.DeviceIdentifier);
-        await context.SaveChangesAsync();
-        return playerAccount;
     }
 }

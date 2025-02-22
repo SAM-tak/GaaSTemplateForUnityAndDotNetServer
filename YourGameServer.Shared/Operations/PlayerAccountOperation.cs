@@ -7,9 +7,9 @@ namespace YourGameServer.Shared.Operations;
 
 // Implements RPC service in the server project.
 // The implementation class must inherit `ServiceBase<IMyFirstService>` and `IMyFirstService`
-public static class AccountOperation
+public static class PlayerAccountOperation
 {
-    public static async Task<PlayerAccount> CreateAccountAsync(GameDbContext context, DeviceType deviceType, string deviceIdentifier)
+    public static async Task<PlayerAccount> CreateAsync(GameDbContext context, DeviceType deviceType, Store officialStore, string deviceIdentifier)
     {
         var curDateTime = DateTime.UtcNow;
         var playerAccount = new PlayerAccount {
@@ -19,6 +19,7 @@ public static class AccountOperation
                     Idx = 1,
                     DeviceType = deviceType,
                     DeviceIdentifier = deviceIdentifier,
+                    OfficialStore = officialStore,
                     Since = curDateTime,
                     LastUsed = curDateTime,
                 }
@@ -32,4 +33,8 @@ public static class AccountOperation
         await context.AddAsync(playerAccount);
         return playerAccount;
     }
+
+    public static async Task<PlayerAccount> GetAsync(GameDbContext dbContext, ulong playerId)
+        => await dbContext.PlayerAccounts.FindAsync(playerId);
+
 }

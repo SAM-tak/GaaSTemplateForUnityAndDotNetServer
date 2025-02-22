@@ -4,9 +4,11 @@
 
 @using YourGameServer.Explorer.Models
 
-@inject YourGameServer.Explorer.Data.ExplorerDbContext dbContext
-@inject MudBlazor.IDialogService dialogService
-@inject MudBlazor.ISnackbar snackBar
+@inject YourGameServer.Explorer.Data.ExplorerDbContext _dbContext
+@inject MudBlazor.IDialogService _dialogService
+@inject MudBlazor.ISnackbar _snackBar
+@inject IHttpContextAccessor _httpContextAccessor
+@inject ILogger<RoleAssignTable> _logger
 
 <MudExpansionPanel id="@EditPanelId" Text="@EditPanelText" @bind-Expanded="_editPanelExpanded">
     <EditForm Model="@_newItem" OnValidSubmit="OnValidSubmit">
@@ -32,7 +34,7 @@
     </EditForm>
 </MudExpansionPanel>
 <br />
-<MudDataGrid T="RoleAssign" Items="dbContext.RoleAssigns" SortMode="SortMode.Single" Filterable="true" QuickFilter="QuickFilter" ReadOnly="true">
+<MudDataGrid T="RoleAssign" Items="_dbContext.RoleAssigns" SortMode="SortMode.Single" Filterable="true" QuickFilter="QuickFilter" ReadOnly="true">
     <ToolBarContent>
         <MudText Typo="Typo.h6">@ListPanelText</MudText>
         <MudSpacer />
@@ -79,13 +81,15 @@
     async Task OnValidSubmit(EditContext contex)
     {
         try {
-            await dbContext.AddAsync(_newItem);
-            await dbContext.SaveChangesAsync();
-            snackBar.Add($"New {nameof(RoleAssign)} (Id:{_newItem.NameIdentifier} Role:{_newItem.Role}) created.", Severity.Success);
+            await _dbContext.AddAsync(_newItem);
+            await _dbContext.SaveChangesAsync();
+            _logger.LogInformation("{User}|{Table} (Id:{itemNameIdentifier}) Role:{Role}) created.",
+                _httpContextAccessor.GetNameAndIdentifier(), nameof(User), _newItem.NameIdentifier, _newItem.Role);
+            _snackBar.Add($"New {nameof(RoleAssign)} (Id:{_newItem.NameIdentifier} Role:{_newItem.Role}) created.", Severity.Success);
             _newItem = new ();
         }
         catch(Exception ex) {
-            snackBar.Add($"Create {nameof(RoleAssign)} (Id:{_newItem.NameIdentifier} Role:{_newItem.Role}) failed. {ex}", Severity.Error);
+            _snackBar.Add($"Create {nameof(RoleAssign)} (Id:{_newItem.NameIdentifier} Role:{_newItem.Role}) failed. {ex}", Severity.Error);
         }
     }
 
@@ -102,11 +106,13 @@
         parameters.Add("ButtonText", "Delete");
         parameters.Add("Color", Color.Error);
 
-        var dialog = await dialogService.ShowAsync<ConfirmDialog>("Delete", parameters, new() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall });
+        var dialog = await _dialogService.ShowAsync<ConfirmDialog>("Delete", parameters, new() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall });
         if(!(await dialog.Result)!.Canceled) {
-            dbContext.RoleAssigns.Remove(x);
-            await dbContext.SaveChangesAsync();
-            snackBar.Add($"{nameof(RoleAssign)} (Id:{x.NameIdentifier} Role:{x.Role}) Deleted.", Severity.Success);
+            _dbContext.RoleAssigns.Remove(x);
+            await _dbContext.SaveChangesAsync();
+            _logger.LogInformation("{User}|{Table} (Id:{itemNameIdentifier}) Role:{Role}) deleted.",
+                _httpContextAccessor.GetNameAndIdentifier(), nameof(User), x.NameIdentifier, x.Role);
+            _snackBar.Add($"{nameof(RoleAssign)} (Id:{x.NameIdentifier} Role:{x.Role}) deleted.", Severity.Success);
         }
     }
 }

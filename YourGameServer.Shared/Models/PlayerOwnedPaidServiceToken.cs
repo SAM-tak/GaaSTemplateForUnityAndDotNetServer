@@ -19,7 +19,7 @@ public record PlayerOwnedPaidServiceToken
     public Product? Product { get; init; }
     [Display(Name = "Transaction Id (Store Order ID)")]
     public string TransactionId { get; set; } = string.Empty;
-    public ConsumableOrigin Origin { get; set; }
+    public Store Store { get; set; }
     public ConsumableStatus Status { get; set; }
     public int Quantity { get; set; }
     public int Used { get; set; }
@@ -29,7 +29,7 @@ public record PlayerOwnedPaidServiceToken
     public DateTime? InvalidateDate { get; set; }
     public DateTime? ExpireDate { get; set; }
 
-    public override int GetHashCode() => (OwnerId, Idx, ProductId, TransactionId, Origin, Status, Quantity, Used, Period, LastUsedDate, InvalidateDate, ExpireDate).GetHashCode();
+    public override int GetHashCode() => (OwnerId, Idx, ProductId, TransactionId, Store, Status, Quantity, Used, Period, LastUsedDate, InvalidateDate, ExpireDate).GetHashCode();
 
-    public override string ToString() => $"{nameof(OwnerId)}={OwnerId}, {nameof(Idx)}={Idx}, {nameof(ProductId)}={ProductId}, {nameof(TransactionId)}={TransactionId}, {nameof(Origin)}={Origin}, {nameof(Status)}={Status}, {nameof(Quantity)}={Quantity}, {nameof(Used)}={Used}, {nameof(Period)}={Period}, {nameof(LastUsedDate)}={LastUsedDate}, {nameof(InvalidateDate)}={InvalidateDate}, {nameof(ExpireDate)}={ExpireDate}";
+    public override string ToString() => $"{nameof(OwnerId)}={OwnerId}, {nameof(Idx)}={Idx}, {nameof(ProductId)}={ProductId}, {nameof(TransactionId)}={TransactionId}, {nameof(Store)}={Store}, {nameof(Status)}={Status}, {nameof(Quantity)}={Quantity}, {nameof(Used)}={Used}, {nameof(Period)}={Period}, {nameof(LastUsedDate)}={LastUsedDate}, {nameof(InvalidateDate)}={InvalidateDate}, {nameof(ExpireDate)}={ExpireDate}";
 }

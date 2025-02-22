@@ -43,7 +43,8 @@
         for(int i = 0; i < Count; ++i) {
             var faker = fakers[Random.Shared.Next(fakers.Length)];
             var deviceType = (DeviceType)Random.Shared.Next(2);
-            var playerAccount = await AccountOperation.CreateAccountAsync(context, deviceType,
+            var playerAccount = await PlayerAccountOperation.CreateAsync(context, deviceType,
+                deviceType == DeviceType.Android ? Store.GooglePlay : Store.AppStore,
                 deviceType == DeviceType.Android ? faker.System.AndroidId() : faker.System.ApplePushToken());
             playerAccount.Profile!.Name = faker.Name.FullName();
             playerAccount.Profile!.Motto = faker.Lorem.Sentence(8);

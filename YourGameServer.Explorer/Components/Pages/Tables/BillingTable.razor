@@ -167,8 +167,7 @@
         try {
             await _dbContext.AddAsync(_newItem);
             await _dbContext.SaveChangesAsync();
-            _logger.LogInformation("{User}|New {Table} (TransactionId:{TransactionId}) created.",
-                _httpContextAccessor.GetNameAndIdentifier(), nameof(Billing), _newItem.TransactionId);
+            _logger.LogInformation("{User}|New {Table} ({Billing}) created.", _httpContextAccessor.GetNameAndIdentifier(), nameof(Billing), _newItem);
             _snackBar.Add($"New {nameof(Billing)} (TransactionId:{_newItem.TransactionId}) created.", Severity.Success);
             _newItem = new ();
         }
@@ -184,8 +183,7 @@
             updatee = item;
             _dbContext.Entry(updatee).State = EntityState.Modified;
             await _dbContext.SaveChangesAsync();
-            _logger.LogInformation("{User}|{Table} (TransactionId:{TransactionId}) updated.",
-                _httpContextAccessor.GetNameAndIdentifier(), nameof(Billing), item.TransactionId);
+            _logger.LogInformation("{User}|{Table} ({Billing}) updated.", _httpContextAccessor.GetNameAndIdentifier(), nameof(Billing), item);
             _snackBar.Add($"{nameof(Billing)} (TransactionId:{item.TransactionId}) updated.", Severity.Success);
         }
         else {
@@ -210,8 +208,7 @@
         if(!(await dialog.Result)!.Canceled) {
             _dbContext.Billings.Remove(item);
             await _dbContext.SaveChangesAsync();
-            _logger.LogInformation("{User}|{Table} (TransactionId:{TransactionId}) deleted.",
-                _httpContextAccessor.GetNameAndIdentifier(), nameof(Billing), item.TransactionId);
+            _logger.LogInformation("{User}|{Table} ({Billing}) deleted.", _httpContextAccessor.GetNameAndIdentifier(), nameof(Billing), item);
             _snackBar.Add($"{nameof(Billing)} (TransactionId:{item.TransactionId}) deleted.", Severity.Success);
         }
     }

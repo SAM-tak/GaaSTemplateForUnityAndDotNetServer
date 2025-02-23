@@ -11,7 +11,7 @@ public record Billing
     [Display(Name = "Transaction Id (Store Order ID)")]
     public string TransactionId { get; set; } = string.Empty;
     public Store Store { get; set; }
-    [Display(Name = "Owner Id")]
+    [Display(Name = "Player Id")]
     public ulong PlayerId { get; set; }
     [ForeignKey("PlayerId"), JsonIgnore]
     public PlayerAccount? Owner { get; init; }

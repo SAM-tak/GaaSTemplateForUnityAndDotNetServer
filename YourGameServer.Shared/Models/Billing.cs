@@ -12,8 +12,8 @@ public record Billing
     public string TransactionId { get; set; } = string.Empty;
     public Store Store { get; set; }
     [Display(Name = "Owner Id")]
-    public ulong OwnerId { get; set; }
-    [ForeignKey("OwnerId"), JsonIgnore]
+    public ulong PlayerId { get; set; }
+    [ForeignKey("PlayerId"), JsonIgnore]
     public PlayerAccount? Owner { get; init; }
     public string ProductId { get; set; } = string.Empty;
     [ForeignKey("ProductId"), JsonIgnore]
@@ -24,7 +24,7 @@ public record Billing
     public DateTime? LastUpdate { get; set; }
     public DateTime? ConsumedAt { get; set; }
 
-    public override int GetHashCode() => (TransactionId, Store, OwnerId, ProductId, Status, Since, LastUpdate).GetHashCode();
+    public override int GetHashCode() => (TransactionId, Store, PlayerId, ProductId, Status, Since, LastUpdate).GetHashCode();
 
-    public override string ToString() => $"{nameof(TransactionId)}={TransactionId}, {nameof(Store)}={Store}, {nameof(OwnerId)}={OwnerId}, {nameof(ProductId)}={ProductId}, {nameof(Status)}={Status}, {nameof(Since)}={Since}, {nameof(LastUpdate)}={LastUpdate}, {nameof(ConsumedAt)}={ConsumedAt}";
+    public override string ToString() => $"{nameof(TransactionId)}={TransactionId}, {nameof(Store)}={Store}, {nameof(PlayerId)}={PlayerId}, {nameof(ProductId)}={ProductId}, {nameof(Status)}={Status}, {nameof(Since)}={Since}, {nameof(LastUpdate)}={LastUpdate}, {nameof(ConsumedAt)}={ConsumedAt}";
 }

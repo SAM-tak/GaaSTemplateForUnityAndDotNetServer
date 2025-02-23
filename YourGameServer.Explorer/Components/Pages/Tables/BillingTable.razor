@@ -37,7 +37,7 @@
                     </MudSelect>
                 </MudTd>
                 <MudTd>
-                    <MudTextField @bind-Value="_newItem.OwnerId" Label="@(TextHelper.LabelFor<Billing>(i => i.OwnerId))" />
+                    <MudTextField @bind-Value="_newItem.PlayerId" Label="@(TextHelper.LabelFor<Billing>(i => i.PlayerId))" />
                 </MudTd>
                 <MudTd>
                     <MudTextField Format="s" Label="@(TextHelper.LabelFor<Billing>(i => i.Since))" InputType="InputType.DateTimeLocal" @bind-Value="_newItem.Since"/>
@@ -81,7 +81,7 @@
                 </MudSelect>
             </EditTemplate>
         </PropertyColumn>
-        <PropertyColumn Title="Owner Id" Property="x => x.OwnerId" />
+        <PropertyColumn Title="Player Id" Property="x => x.PlayerId" />
         <PropertyColumn Title="Product Id" Property="x => x.ProductId">
             <EditTemplate>
                 <MudSelect T="string" @bind-Value="context.Item.ProductId" Label="@(TextHelper.LabelFor<Billing>(i => i.ProductId))">
@@ -157,7 +157,7 @@
 
         if(x.Payload.Contains(_searchString, StringComparison.OrdinalIgnoreCase)) return true;
 
-        if($"{x.Store} {x.OwnerId} {x.Status}".Contains(_searchString)) return true;
+        if($"{x.Store} {x.PlayerId} {x.Status}".Contains(_searchString)) return true;
 
         return false;
     }

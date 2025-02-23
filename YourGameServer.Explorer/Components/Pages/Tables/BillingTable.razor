@@ -5,7 +5,7 @@
 @inject MudBlazor.IDialogService _dialogService
 @inject MudBlazor.ISnackbar _snackBar
 @inject IHttpContextAccessor _httpContextAccessor
-@inject ILogger<PurchaseOrderTable> _logger
+@inject ILogger<BillingTable> _logger
 
 <MudExpansionPanel id="@EditPanelId" Text="@EditPanelText" @bind-Expanded="_editPanelExpanded">
     <EditForm Model="@_newItem" OnValidSubmit="OnValidSubmit">
@@ -13,23 +13,23 @@
         <MudCard>
             <MudCardContent>
                 <MudTd>
-                    <MudTextField @bind-Value="_newItem.TransactionId" Label="@(TextHelper.LabelFor<PurchaseOrder>(i => i.TransactionId))" />
-                    <MudSelect T="Store" @bind-Value="_newItem.Store" Label="@(TextHelper.LabelFor<PurchaseOrder>(i => i.Store))">
+                    <MudTextField @bind-Value="_newItem.TransactionId" Label="@(TextHelper.LabelFor<Billing>(i => i.TransactionId))" />
+                    <MudSelect T="Store" @bind-Value="_newItem.Store" Label="@(TextHelper.LabelFor<Billing>(i => i.Store))">
                         @foreach (Store item in Enum.GetValues(typeof(Store)))
                         {
                             <MudSelectItem Value="@item">@item.GetDisplayName()</MudSelectItem>
                         }
                     </MudSelect>
-                    <MudTextField @bind-Value="_newItem.Payload" Label="@(TextHelper.LabelFor<PurchaseOrder>(i => i.Payload))" />
+                    <MudTextField @bind-Value="_newItem.Payload" Label="@(TextHelper.LabelFor<Billing>(i => i.Payload))" />
                 </MudTd>
                 <MudTd>
-                    <MudSelect T="string" @bind-Value="_newItem.ProductId" Label="@(TextHelper.LabelFor<PurchaseOrder>(i => i.ProductId))">
+                    <MudSelect T="string" @bind-Value="_newItem.ProductId" Label="@(TextHelper.LabelFor<Billing>(i => i.ProductId))">
                         @foreach (var id in _dbContext.Products.Select(x => x.Id))
                         {
                             <MudSelectItem Value="@id">@id</MudSelectItem>
                         }
                     </MudSelect>
-                    <MudSelect T="PurchasingStatus" @bind-Value="_newItem.Status" Label="@(TextHelper.LabelFor<PurchaseOrder>(i => i.Status))">
+                    <MudSelect T="PurchasingStatus" @bind-Value="_newItem.Status" Label="@(TextHelper.LabelFor<Billing>(i => i.Status))">
                         @foreach (PurchasingStatus item in Enum.GetValues(typeof(PurchasingStatus)))
                         {
                             <MudSelectItem Value="@item">@item.GetDisplayName()</MudSelectItem>
@@ -37,20 +37,20 @@
                     </MudSelect>
                 </MudTd>
                 <MudTd>
-                    <MudTextField @bind-Value="_newItem.OwnerId" Label="@(TextHelper.LabelFor<PurchaseOrder>(i => i.OwnerId))" />
+                    <MudTextField @bind-Value="_newItem.OwnerId" Label="@(TextHelper.LabelFor<Billing>(i => i.OwnerId))" />
                 </MudTd>
                 <MudTd>
-                    <MudTextField Format="s" Label="@(TextHelper.LabelFor<PurchaseOrder>(i => i.Since))" InputType="InputType.DateTimeLocal" @bind-Value="_newItem.Since"/>
+                    <MudTextField Format="s" Label="@(TextHelper.LabelFor<Billing>(i => i.Since))" InputType="InputType.DateTimeLocal" @bind-Value="_newItem.Since"/>
                     <MudNumericField T="double" Label="Second" Adornment="Adornment.End" AdornmentText="s" Min="0.0" Max="59.9999999"
                     Value="_newItem.Since.GetSecondPart()" ValueChanged="t => _newItem.Since = _newItem.Since.ReplacedSecondPart(t)" />
                 </MudTd>
                 <MudTd>
-                    <MudTextField Format="s" Label="@(TextHelper.LabelFor<PurchaseOrder>(i => i.LastUpdate))" InputType="InputType.DateTimeLocal" @bind-Value="_newItem.LastUpdate"/>
+                    <MudTextField Format="s" Label="@(TextHelper.LabelFor<Billing>(i => i.LastUpdate))" InputType="InputType.DateTimeLocal" @bind-Value="_newItem.LastUpdate"/>
                     <MudNumericField T="double?" Label="Second" Adornment="Adornment.End" AdornmentText="s" Min="0.0" Max="59.9999999"
                     Value="_newItem.LastUpdate?.GetSecondPart()" ValueChanged="t => _newItem.LastUpdate = _newItem.LastUpdate?.ReplacedSecondPart(t)" />
                 </MudTd>
                 <MudTd>
-                    <MudTextField Format="s" Label="@(TextHelper.LabelFor<PurchaseOrder>(i => i.ConsumedAt))" InputType="InputType.DateTimeLocal" @bind-Value="_newItem.ConsumedAt"/>
+                    <MudTextField Format="s" Label="@(TextHelper.LabelFor<Billing>(i => i.ConsumedAt))" InputType="InputType.DateTimeLocal" @bind-Value="_newItem.ConsumedAt"/>
                     <MudNumericField T="double?" Label="Second" Adornment="Adornment.End" AdornmentText="s" Min="0.0" Max="59.9999999"
                     Value="_newItem.ConsumedAt?.GetSecondPart()" ValueChanged="t => _newItem.ConsumedAt = _newItem.ConsumedAt?.ReplacedSecondPart(t)" />
                 </MudTd>
@@ -63,7 +63,7 @@
     </EditForm>
 </MudExpansionPanel>
 <br />
-<MudDataGrid T="PurchaseOrder" Items="_dbContext.PurchaseOrders" SortMode="SortMode.Single" Filterable="true" QuickFilter="QuickFilter" ReadOnly="false" CommittedItemChanges="@CommittedItemChanges" EditMode="@DataGridEditMode.Form" EditTrigger="@DataGridEditTrigger.Manual">
+<MudDataGrid T="Billing" Items="_dbContext.Billings" SortMode="SortMode.Single" Filterable="true" QuickFilter="QuickFilter" ReadOnly="false" CommittedItemChanges="@CommittedItemChanges" EditMode="@DataGridEditMode.Form" EditTrigger="@DataGridEditTrigger.Manual">
     <ToolBarContent>
         <MudText Typo="Typo.h6">@ListPanelText</MudText>
         <MudSpacer />
@@ -73,7 +73,7 @@
         <PropertyColumn Title="Transaction Id" Property="x => x.TransactionId" Editable="false" />
         <PropertyColumn Property="x => x.Store">
             <EditTemplate>
-                <MudSelect T="Store" @bind-Value="context.Item.Store" Label="@(TextHelper.LabelFor<PurchaseOrder>(i => i.Store))">
+                <MudSelect T="Store" @bind-Value="context.Item.Store" Label="@(TextHelper.LabelFor<Billing>(i => i.Store))">
                     @foreach (Store item in Enum.GetValues(typeof(Store)))
                     {
                         <MudSelectItem Value="@item">@item.GetDisplayName()</MudSelectItem>
@@ -84,7 +84,7 @@
         <PropertyColumn Title="Owner Id" Property="x => x.OwnerId" />
         <PropertyColumn Title="Product Id" Property="x => x.ProductId">
             <EditTemplate>
-                <MudSelect T="string" @bind-Value="context.Item.ProductId" Label="@(TextHelper.LabelFor<PurchaseOrder>(i => i.ProductId))">
+                <MudSelect T="string" @bind-Value="context.Item.ProductId" Label="@(TextHelper.LabelFor<Billing>(i => i.ProductId))">
                     @foreach (var id in _dbContext.Products.Select(x => x.Id))
                     {
                         <MudSelectItem Value="@id">@id</MudSelectItem>
@@ -95,7 +95,7 @@
         <PropertyColumn Property="x => x.Payload" />
         <PropertyColumn Property="x => x.Status">
             <EditTemplate>
-                <MudSelect T="PurchasingStatus" @bind-Value="context.Item.Status" Label="@(TextHelper.LabelFor<PurchaseOrder>(i => i.Status))">
+                <MudSelect T="PurchasingStatus" @bind-Value="context.Item.Status" Label="@(TextHelper.LabelFor<Billing>(i => i.Status))">
                     @foreach (PurchasingStatus item in Enum.GetValues(typeof(PurchasingStatus)))
                     {
                         <MudSelectItem Value="@item">@item.GetDisplayName()</MudSelectItem>
@@ -105,21 +105,21 @@
         </PropertyColumn>
         <PropertyColumn Property="x => x.Since">
             <EditTemplate>
-                <MudTextField Format="s" Label="@(TextHelper.LabelFor<PurchaseOrder>(i => i.Since))" InputType="InputType.DateTimeLocal" @bind-Value="context.Item.Since"/>
+                <MudTextField Format="s" Label="@(TextHelper.LabelFor<Billing>(i => i.Since))" InputType="InputType.DateTimeLocal" @bind-Value="context.Item.Since"/>
                 <MudNumericField T="double" Label="Second" Adornment="Adornment.End" AdornmentText="s" Min="0.0" Max="59.9999999"
                 Value="context.Item.Since.GetSecondPart()" ValueChanged="t => context.Item.Since = context.Item.Since.ReplacedSecondPart(t)" />
             </EditTemplate>
         </PropertyColumn>
         <PropertyColumn Title="Last Update" Property="x => x.LastUpdate">
             <EditTemplate>
-                <MudTextField Format="s" Label="@(TextHelper.LabelFor<PurchaseOrder>(i => i.LastUpdate))" InputType="InputType.DateTimeLocal" @bind-Value="context.Item.LastUpdate"/>
+                <MudTextField Format="s" Label="@(TextHelper.LabelFor<Billing>(i => i.LastUpdate))" InputType="InputType.DateTimeLocal" @bind-Value="context.Item.LastUpdate"/>
                 <MudNumericField T="double?" Label="Second" Adornment="Adornment.End" AdornmentText="s" Min="0.0" Max="59.9999999"
                 Value="context.Item.LastUpdate?.GetSecondPart()" ValueChanged="t => context.Item.LastUpdate = context.Item.LastUpdate?.ReplacedSecondPart(t)" />
             </EditTemplate>
         </PropertyColumn>
         <PropertyColumn Title="Consumed At" Property="x => x.ConsumedAt">
             <EditTemplate>
-                <MudTextField Format="s" Label="@(TextHelper.LabelFor<PurchaseOrder>(i => i.ConsumedAt))" InputType="InputType.DateTimeLocal" @bind-Value="context.Item.ConsumedAt"/>
+                <MudTextField Format="s" Label="@(TextHelper.LabelFor<Billing>(i => i.ConsumedAt))" InputType="InputType.DateTimeLocal" @bind-Value="context.Item.ConsumedAt"/>
                 <MudNumericField T="double?" Label="Second" Adornment="Adornment.End" AdornmentText="s" Min="0.0" Max="59.9999999"
                 Value="context.Item.ConsumedAt?.GetSecondPart()" ValueChanged="t => context.Item.ConsumedAt = context.Item.ConsumedAt?.ReplacedSecondPart(t)" />
             </EditTemplate>
@@ -141,13 +141,13 @@
 @code {
     bool _editPanelExpanded = false;
     string _searchString = "";
-    PurchaseOrder _newItem = new();
+    Billing _newItem = new();
 
-    static readonly string EditPanelId =  $"{nameof(PurchaseOrder).ToLower()}-edit-panel";
-    static readonly string EditPanelText = $"Add {nameof(PurchaseOrder)}";
-    static readonly string ListPanelText = nameof(PurchaseOrder);
+    static readonly string EditPanelId =  $"{nameof(Billing).ToLower()}-edit-panel";
+    static readonly string EditPanelText = $"Add {nameof(Billing)}";
+    static readonly string ListPanelText = nameof(Billing);
 
-    private bool QuickFilter(PurchaseOrder x)
+    private bool QuickFilter(Billing x)
     {
         if(string.IsNullOrWhiteSpace(_searchString)) return true;
 
@@ -168,28 +168,28 @@
             await _dbContext.AddAsync(_newItem);
             await _dbContext.SaveChangesAsync();
             _logger.LogInformation("{User}|New {Table} (TransactionId:{TransactionId}) created.",
-                _httpContextAccessor.GetNameAndIdentifier(), nameof(PurchaseOrder), _newItem.TransactionId);
-            _snackBar.Add($"New {nameof(PurchaseOrder)} (TransactionId:{_newItem.TransactionId}) created.", Severity.Success);
+                _httpContextAccessor.GetNameAndIdentifier(), nameof(Billing), _newItem.TransactionId);
+            _snackBar.Add($"New {nameof(Billing)} (TransactionId:{_newItem.TransactionId}) created.", Severity.Success);
             _newItem = new ();
         }
         catch(Exception ex) {
-            _snackBar.Add($"Create {nameof(PurchaseOrder)} (TransactionId:{_newItem.TransactionId}) failed. {ex}", Severity.Error);
+            _snackBar.Add($"Create {nameof(Billing)} (TransactionId:{_newItem.TransactionId}) failed. {ex}", Severity.Error);
         }
     }
 
-    async Task CommittedItemChanges(PurchaseOrder item)
+    async Task CommittedItemChanges(Billing item)
     {
-        var updatee = await _dbContext.PurchaseOrders.FindAsync(item.TransactionId);
+        var updatee = await _dbContext.Billings.FindAsync(item.TransactionId);
         if(updatee != null) {
             updatee = item;
             _dbContext.Entry(updatee).State = EntityState.Modified;
             await _dbContext.SaveChangesAsync();
             _logger.LogInformation("{User}|{Table} (TransactionId:{TransactionId}) updated.",
-                _httpContextAccessor.GetNameAndIdentifier(), nameof(PurchaseOrder), item.TransactionId);
-            _snackBar.Add($"{nameof(PurchaseOrder)} (TransactionId:{item.TransactionId}) updated.", Severity.Success);
+                _httpContextAccessor.GetNameAndIdentifier(), nameof(Billing), item.TransactionId);
+            _snackBar.Add($"{nameof(Billing)} (TransactionId:{item.TransactionId}) updated.", Severity.Success);
         }
         else {
-            _snackBar.Add($"{nameof(PurchaseOrder)} (TransactionId:{item.TransactionId}) not found.", Severity.Error);
+            _snackBar.Add($"{nameof(Billing)} (TransactionId:{item.TransactionId}) not found.", Severity.Error);
         }
     }
 
@@ -198,7 +198,7 @@
         _newItem = new();
     }
 
-    async Task Delete(PurchaseOrder item)
+    async Task Delete(Billing item)
     {
         var parameters = new DialogParameters();
         parameters.Add("ContentText", $"Do you really want to delete this records? This process cannot be undone.");
@@ -208,11 +208,11 @@
 
         var dialog = await _dialogService.ShowAsync<ConfirmDialog>("Delete", parameters, new() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall });
         if(!(await dialog.Result)!.Canceled) {
-            _dbContext.PurchaseOrders.Remove(item);
+            _dbContext.Billings.Remove(item);
             await _dbContext.SaveChangesAsync();
             _logger.LogInformation("{User}|{Table} (TransactionId:{TransactionId}) deleted.",
-                _httpContextAccessor.GetNameAndIdentifier(), nameof(PurchaseOrder), item.TransactionId);
-            _snackBar.Add($"{nameof(PurchaseOrder)} (TransactionId:{item.TransactionId}) deleted.", Severity.Success);
+                _httpContextAccessor.GetNameAndIdentifier(), nameof(Billing), item.TransactionId);
+            _snackBar.Add($"{nameof(Billing)} (TransactionId:{item.TransactionId}) deleted.", Severity.Success);
         }
     }
 }

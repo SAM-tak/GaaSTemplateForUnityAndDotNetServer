@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 namespace YourGameServer.Shared.Models;
 
 [PrimaryKey(nameof(TransactionId), nameof(Store))]
-public record PurchaseOrder
+public record Billing
 {
     [Display(Name = "Transaction Id (Store Order ID)")]
     public string TransactionId { get; set; } = string.Empty;

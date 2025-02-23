@@ -109,6 +109,13 @@
         </PropertyColumn>
         <PropertyColumn Property="x => x.Quantity" />
         <PropertyColumn Property="x => x.Used" />
+        <PropertyColumn Property="x => x.Since">
+            <EditTemplate>
+                <MudTextField Format="s" Label="@(TextHelper.LabelFor<PlayerOwnedServiceTicket>(i => i.Since))" InputType="InputType.DateTimeLocal" @bind-Value="context.Item.Since"/>
+                <MudNumericField T="double" Label="Second" Adornment="Adornment.End" AdornmentText="s" Min="0.0" Max="59.9999999"
+                Value="context.Item.Since.GetSecondPart()" ValueChanged="t => context.Item.Since = context.Item.Since.ReplacedSecondPart(t)" />
+            </EditTemplate>
+        </PropertyColumn>
         <PropertyColumn Property="x => x.Period">
             <EditTemplate>
                 <MudTextField Format="s" Label="@(TextHelper.LabelFor<PlayerOwnedServiceTicket>(i => i.Period))" InputType="InputType.DateTimeLocal" @bind-Value="context.Item.Period"/>
@@ -174,6 +181,7 @@
         try {
             using var transaction = _dbContext.Database.BeginTransaction(System.Data.IsolationLevel.Serializable);
             _newItem.Idx = (await _dbContext.PlayerOwnedServiceTickets.Where(i => i.OwnerId == _newItem.OwnerId).MaxAsync(x => (int?)x.Idx) ?? 0) + 1;
+            _newItem.Since = DateTime.UtcNow;
             await _dbContext.AddAsync(_newItem);
             await _dbContext.SaveChangesAsync();
             await transaction.CommitAsync();

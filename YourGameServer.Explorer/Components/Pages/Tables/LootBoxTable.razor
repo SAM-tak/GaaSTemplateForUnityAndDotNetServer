@@ -12,24 +12,60 @@
         <DataAnnotationsValidator />
         <MudCard>
             <MudCardContent>
-                <MudTd>
-                    <MudTextField @bind-Value="_newItem.Id" Label="@(TextHelper.LabelFor<LootBox>(i => i.Id))" />
-                </MudTd>
-                <MudTd>
-                    <MudTextField @bind-Value="_newItem.ProductName" Label="@(TextHelper.LabelFor<LootBox>(i => i.ProductName))" />
-                </MudTd>
-                <MudTd DataLabel="DisplayName">
-                    <MudTextField @bind-Value="_newItem.DisplayName" Label="@(TextHelper.LabelFor<LootBox>(i => i.DisplayName))" />
-                </MudTd>
-                <MudTd DataLabel="Description">
-                    <MudTextField @bind-Value="_newItem.Description" Label="@(TextHelper.LabelFor<LootBox>(i => i.Description))" />
-                </MudTd>
-                <MudTd DataLabel="IconAddress">
-                    <MudTextField @bind-Value="_newItem.IconAddress" Label="@(TextHelper.LabelFor<LootBox>(i => i.IconAddress))" />
-                </MudTd>
-                <MudTd DataLabel="BannerAddress">
-                    <MudTextField @bind-Value="_newItem.BannerAddress" Label="@(TextHelper.LabelFor<LootBox>(i => i.BannerAddress))" />
-                </MudTd>
+                <MudTr>
+                    <MudTd>
+                        <MudTextField @bind-Value="_newItem.Id" Label="@(TextHelper.LabelFor<LootBox>(i => i.Id))" />
+                    </MudTd>
+                    <MudTd>
+                        <MudTextField @bind-Value="_newItem.ProductName" Label="@(TextHelper.LabelFor<LootBox>(i => i.ProductName))" />
+                    </MudTd>
+                    <MudTd DataLabel="DisplayName">
+                        <MudTextField @bind-Value="_newItem.DisplayName" Label="@(TextHelper.LabelFor<LootBox>(i => i.DisplayName))" />
+                    </MudTd>
+                    <MudTd DataLabel="Description">
+                        <MudTextField @bind-Value="_newItem.Description" Label="@(TextHelper.LabelFor<LootBox>(i => i.Description))" />
+                    </MudTd>
+                    <MudTd DataLabel="IconAddress">
+                        <MudTextField @bind-Value="_newItem.IconAddress" Label="@(TextHelper.LabelFor<LootBox>(i => i.IconAddress))" />
+                    </MudTd>
+                    <MudTd DataLabel="BannerAddress">
+                        <MudTextField @bind-Value="_newItem.BannerAddress" Label="@(TextHelper.LabelFor<LootBox>(i => i.BannerAddress))" />
+                    </MudTd>
+                    <MudTd>
+                        <MudTextField Format="s" Label="@(TextHelper.LabelFor<LootBox>(i => i.StartAt))"
+                            InputType="InputType.DateTimeLocal" @bind-Value="_newItem.StartAt" />
+                        <MudNumericField T="double?" Label="Second" Adornment="Adornment.End" AdornmentText="s"
+                            Min="0.0" Max="59.9999999" Value="_newItem.StartAt.GetSecondPart()"
+                            ValueChanged="t => _newItem.StartAt = _newItem.StartAt.ReplacedSecondPart(t)" />
+                    </MudTd>
+                    <MudTd>
+                        <MudTextField Format="s" Label="@(TextHelper.LabelFor<LootBox>(i => i.EndAt))"
+                            InputType="InputType.DateTimeLocal" @bind-Value="_newItem.EndAt" />
+                        <MudNumericField T="double?" Label="Second" Adornment="Adornment.End" AdornmentText="s"
+                            Min="0.0" Max="59.9999999" Value="_newItem.EndAt.GetSecondPart()"
+                            ValueChanged="t => _newItem.EndAt = _newItem.EndAt.ReplacedSecondPart(t)" />
+                    </MudTd>
+                </MudTr>
+                <MudTr>
+                    <MudTd>
+                        <MudTextField @bind-Value="_newItem.FeaturedContent" Label="@(TextHelper.LabelFor<LootBox>(i => i.FeaturedContent))" />
+                    </MudTd>
+                    <MudTd>
+                        <MudTextField @bind-Value="_newItem.LegendaryContent" Label="@(TextHelper.LabelFor<LootBox>(i => i.LegendaryContent))" />
+                    </MudTd>
+                    <MudTd>
+                        <MudTextField @bind-Value="_newItem.EpicContent" Label="@(TextHelper.LabelFor<LootBox>(i => i.EpicContent))" />
+                    </MudTd>
+                    <MudTd>
+                        <MudTextField @bind-Value="_newItem.RareContent" Label="@(TextHelper.LabelFor<LootBox>(i => i.RareContent))" />
+                    </MudTd>
+                    <MudTd>
+                        <MudTextField @bind-Value="_newItem.UncommonContent" Label="@(TextHelper.LabelFor<LootBox>(i => i.UncommonContent))" />
+                    </MudTd>
+                    <MudTd>
+                        <MudTextField @bind-Value="_newItem.CommonContent" Label="@(TextHelper.LabelFor<LootBox>(i => i.CommonContent))" />
+                    </MudTd>
+                </MudTr>
             </MudCardContent>
             <MudCardActions>
                 <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Success">Create New</MudButton>
@@ -54,6 +90,30 @@
         <PropertyColumn Property="x => x.Description" />
         <PropertyColumn Title="Icon Address" Property="x => x.IconAddress" />
         <PropertyColumn Title="Banner Address" Property="x => x.BannerAddress" />
+        <PropertyColumn Property="x => x.StartAt">
+            <EditTemplate>
+                <MudTextField Format="s" Label="@(TextHelper.LabelFor<LootBox>(i => i.StartAt))"
+                    InputType="InputType.DateTimeLocal" @bind-Value="context.Item.StartAt" />
+                <MudNumericField T="double?" Label="Second" Adornment="Adornment.End" AdornmentText="s" Min="0.0"
+                    Max="59.9999999" Value="context.Item.StartAt.GetSecondPart()"
+                    ValueChanged="t => context.Item.StartAt = context.Item.StartAt.ReplacedSecondPart(t)" />
+            </EditTemplate>
+        </PropertyColumn>
+        <PropertyColumn Property="x => x.EndAt">
+            <EditTemplate>
+                <MudTextField Format="s" Label="@(TextHelper.LabelFor<LootBox>(i => i.EndAt))"
+                    InputType="InputType.DateTimeLocal" @bind-Value="context.Item.EndAt" />
+                <MudNumericField T="double?" Label="Second" Adornment="Adornment.End" AdornmentText="s" Min="0.0"
+                    Max="59.9999999" Value="context.Item.EndAt.GetSecondPart()"
+                    ValueChanged="t => context.Item.EndAt = context.Item.EndAt.ReplacedSecondPart(t)" />
+            </EditTemplate>
+        </PropertyColumn>
+        <PropertyColumn Title="Featured" Property="x => x.FeaturedContent" />
+        <PropertyColumn Title="Legendary" Property="x => x.LegendaryContent" />
+        <PropertyColumn Title="Epic" Property="x => x.EpicContent" />
+        <PropertyColumn Title="Rare" Property="x => x.RareContent" />
+        <PropertyColumn Title="Uncommon" Property="x => x.UncommonContent" />
+        <PropertyColumn Title="Common" Property="x => x.CommonContent" />
         <TemplateColumn Sortable="false" Filterable="false">
             <CellTemplate>
                 <MudStack Spacing="1" Justify="Justify.FlexEnd" Row="true">

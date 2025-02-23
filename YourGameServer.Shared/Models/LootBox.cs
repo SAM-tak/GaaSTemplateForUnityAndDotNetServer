@@ -13,7 +13,9 @@ public record LootBox
     public string BannerAddress { get; set; } = string.Empty;
     public DateTime StartAt { get; set; }
     public DateTime EndAt { get; set; }
-    public string SpecialContent { get; set; } = string.Empty;
+    public string FeaturedContent { get; set; } = string.Empty;
+    public string LegendaryContent { get; set; } = string.Empty;
+    public string EpicContent { get; set; } = string.Empty;
     public string RareContent { get; set; } = string.Empty;
     public string UncommonContent { get; set; } = string.Empty;
     public string CommonContent { get; set; } = string.Empty;

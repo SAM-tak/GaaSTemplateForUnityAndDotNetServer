@@ -96,7 +96,7 @@ public static class TokenOperation
         }
         while(amount > 0) {
             if(paidCount > 0) {
-                var item = await paidTokens.OrderBy(x => x.Since).FirstAsync();
+                var item = await paidTokens.OrderBy(x => x.Since).ThenBy(x => x.Store >= Store.Stripe).FirstAsync();
                 if(item.Quantity - item.Used > amount) {
                     amount = 0;
                     item.Used += amount;

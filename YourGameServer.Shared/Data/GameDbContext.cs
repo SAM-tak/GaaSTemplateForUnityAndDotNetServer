@@ -18,11 +18,13 @@ public class GameDbContext(DbContextOptions<GameDbContext> options) : DbContext(
 
     public DbSet<PlayerOwnedServiceTicket> PlayerOwnedServiceTickets { get; init; }
 
+    public DbSet<PlayerLootBoxState> PlayerLootBoxStates { get; init; }
+
     public DbSet<Product> Products { get; init; }
 
     public DbSet<ServiceTicket> ServiceTickets { get; init; }
 
     public DbSet<LootBox> LootBoxes { get; init; }
 
-    public DbSet<PurchaseOrder> PurchaseOrders { get; init; }
+    public DbSet<Billing> Billings { get; init; }
 }

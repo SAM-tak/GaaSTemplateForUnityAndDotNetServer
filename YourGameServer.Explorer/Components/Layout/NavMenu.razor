@@ -11,23 +11,24 @@
         <MudNavLink Href="/tables/playerownedfreeservicetoken" Icon="@Icons.Material.Outlined.PeopleAlt">Player Owned Free Service Tokens</MudNavLink>
         <MudNavLink Href="/tables/playerownedpaidservicetoken" Icon="@Icons.Material.Outlined.PeopleAlt">Player Owned Paid Service Tokens</MudNavLink>
         <MudNavLink Href="/tables/playerownedserviceticket" Icon="@Icons.Material.Outlined.PeopleAlt">Player Owned Service Tickets</MudNavLink>
+        <MudNavLink Href="/tables/playerlootboxstate" Icon="@Icons.Material.Outlined.PeopleAlt">Player Loot Box States</MudNavLink>
     </MudNavGroup>
 
     <MudNavGroup Title="Products" Icon="@Icons.Material.Filled.TableRows" HideExpandIcon="true">
+        <MudNavLink Href="/tables/billing" Icon="@Icons.Material.Outlined.PeopleAlt">Billings</MudNavLink>
         <MudNavLink Href="/tables/product" Icon="@Icons.Material.Outlined.PeopleAlt">Products</MudNavLink>
         <MudNavLink Href="/tables/serviceticket" Icon="@Icons.Material.Outlined.PeopleAlt">Service Tickets</MudNavLink>
         <MudNavLink Href="/tables/lootbox" Icon="@Icons.Material.Outlined.PeopleAlt">Loot Boxes</MudNavLink>
-        <MudNavLink Href="/tables/purchaseorder" Icon="@Icons.Material.Outlined.PeopleAlt">Purchase Orders</MudNavLink>
     </MudNavGroup>
 
     <AuthorizeView Roles=@nameof(UserRole.Developer)>
-        <MudText Typo="Typo.subtitle2" Color="Color.Inherit" Class="ml-4 my-3">Cheats</MudText>
+        <MudText Typo="Typo.subtitle2" Color="Color.Inherit" Class="ml-4 my-3">Development</MudText>
         <MudNavGroup Title="Player Accounts" Icon="@Icons.Material.Filled.TableRows" HideExpandIcon="true">
-            <MudNavLink Href="/cheats/createdummyplayers" Icon="@Icons.Material.Outlined.PeopleAlt">Create Dummy Players</MudNavLink>
+            <MudNavLink Href="/dev/createdummyplayers" Icon="@Icons.Material.Outlined.PeopleAlt">Create Dummy Players</MudNavLink>
         </MudNavGroup>
 
         <MudNavGroup Title="Products" Icon="@Icons.Material.Filled.TableRows" HideExpandIcon="true">
-            <MudNavLink Href="/cheats/createdummyproducts" Icon="@Icons.Material.Outlined.InsertDriveFile">Create Dummy Products</MudNavLink>
+            <MudNavLink Href="/dev/createdummyproducts" Icon="@Icons.Material.Outlined.InsertDriveFile">Create Dummy Products</MudNavLink>
         </MudNavGroup>
 
         <MudNavLink Href="/utility/playercodeexamples" Icon="@Icons.Material.Outlined.PeopleAlt">Player Code Examples</MudNavLink>

@@ -1,0 +1,176 @@
+@page "/tables/playerlootboxstate"
+
+@inject YourGameServer.Shared.Data.GameDbContext _dbContext
+@inject MudBlazor.IScrollManager _scrollManager
+@inject MudBlazor.IDialogService _dialogService
+@inject MudBlazor.ISnackbar _snackBar
+@inject IHttpContextAccessor _httpContextAccessor
+@inject ILogger<PlayerLootBoxStateTable> _logger
+
+<MudExpansionPanel id="@EditPanelId" Text="@EditPanelText" @bind-Expanded="_editPanelExpanded">
+    <EditForm Model="@_newItem" OnValidSubmit="OnValidSubmit">
+        <DataAnnotationsValidator />
+        <MudCard>
+            <MudCardContent>
+                <MudTr>
+                    <MudTd>
+                        <MudNumericField @bind-Value="_newItem.OwnerId" Label="@(TextHelper.LabelFor<PlayerLootBoxState>(i => i.OwnerId))" T="ulong" Min="0" />
+                        <MudSelect T="string" @bind-Value="_newItem.LootBoxId" Label="@(TextHelper.LabelFor<PlayerLootBoxState>(i => i.LootBoxId))">
+                            @foreach (var id in _dbContext.LootBoxes.Select(x => x.Id))
+                            {
+                                <MudSelectItem Value="@id">@id</MudSelectItem>
+                            }
+                        </MudSelect>
+                    </MudTd>
+                    <MudTd>
+                        <MudTextField Format="s" Label="@(TextHelper.LabelFor<PlayerLootBoxState>(i => i.LastOpenDate))" InputType="InputType.DateTimeLocal" @bind-Value="_newItem.LastOpenDate"/>
+                        <MudNumericField T="double?" Label="Second" Adornment="Adornment.End" AdornmentText="s" Min="0.0" Max="59.9999999"
+                        Value="_newItem.LastOpenDate?.GetSecondPart()" ValueChanged="t => _newItem.LastOpenDate = _newItem.LastOpenDate?.ReplacedSecondPart(t)" />
+                    </MudTd>
+                </MudTr>
+                <MudTr>
+                    <MudTd>
+                        <MudTextField @bind-Value="_newItem.FeaturedHistory" Label="@(TextHelper.LabelFor<PlayerLootBoxState>(i => i.FeaturedHistory))" />
+                    </MudTd>
+                    <MudTd>
+                        <MudTextField @bind-Value="_newItem.LegendaryHistory" Label="@(TextHelper.LabelFor<PlayerLootBoxState>(i => i.LegendaryHistory))" />
+                    </MudTd>
+                    <MudTd>
+                        <MudTextField @bind-Value="_newItem.EpicHistory" Label="@(TextHelper.LabelFor<PlayerLootBoxState>(i => i.EpicHistory))" />
+                    </MudTd>
+                    <MudTd>
+                        <MudTextField @bind-Value="_newItem.RareHistory" Label="@(TextHelper.LabelFor<PlayerLootBoxState>(i => i.RareHistory))" />
+                    </MudTd>
+                    <MudTd>
+                        <MudTextField @bind-Value="_newItem.UncommonHistory" Label="@(TextHelper.LabelFor<PlayerLootBoxState>(i => i.UncommonHistory))" />
+                    </MudTd>
+                    <MudTd>
+                        <MudTextField @bind-Value="_newItem.CommonHistory" Label="@(TextHelper.LabelFor<PlayerLootBoxState>(i => i.CommonHistory))" />
+                    </MudTd>
+                </MudTr>
+            </MudCardContent>
+            <MudCardActions>
+                <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Success">Create New</MudButton>
+                <MudButton Class="ml-2" Variant="Variant.Filled" OnClick="Clear">Clear</MudButton>
+            </MudCardActions>
+        </MudCard>
+    </EditForm>
+</MudExpansionPanel>
+<br />
+<MudDataGrid T="PlayerLootBoxState" Items="_dbContext.PlayerLootBoxStates" SortMode="SortMode.Single" Filterable="true" QuickFilter="QuickFilter" ReadOnly="false" CommittedItemChanges="@CommittedItemChanges" EditMode="@DataGridEditMode.Form" EditTrigger="@DataGridEditTrigger.Manual">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">@ListPanelText</MudText>
+        <MudSpacer />
+        <MudTextField @bind-Value="_searchString" Placeholder="Search for PlayerProfiles..." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" />
+    </ToolBarContent>
+    <Columns>
+        <PropertyColumn Title="Owner Id" Property="x => x.OwnerId" Editable="false" />
+        <PropertyColumn Title="Loot Box Id" Property="x => x.LootBoxId" Editable="false" />
+        <PropertyColumn Property="x => x.OpenCount" />
+        <PropertyColumn Property="x => x.Since">
+            <EditTemplate>
+                <MudTextField Format="s" Label="@(TextHelper.LabelFor<PlayerLootBoxState>(i => i.Since))" InputType="InputType.DateTimeLocal" @bind-Value="context.Item.Since"/>
+                <MudNumericField T="double" Label="Second" Adornment="Adornment.End" AdornmentText="s" Min="0.0" Max="59.9999999"
+                Value="context.Item.Since.GetSecondPart()" ValueChanged="t => context.Item.Since = context.Item.Since.ReplacedSecondPart(t)" />
+            </EditTemplate>
+        </PropertyColumn>
+        <PropertyColumn Title="Last Used Date" Property="x => x.LastOpenDate">
+            <EditTemplate>
+                <MudTextField Format="s" Label="@(TextHelper.LabelFor<PlayerLootBoxState>(i => i.LastOpenDate))" InputType="InputType.DateTimeLocal" @bind-Value="context.Item.LastOpenDate"/>
+                <MudNumericField T="double?" Label="Second" Adornment="Adornment.End" AdornmentText="s" Min="0.0" Max="59.9999999"
+                Value="context.Item.LastOpenDate?.GetSecondPart()" ValueChanged="t => context.Item.LastOpenDate = context.Item.LastOpenDate?.ReplacedSecondPart(t)" />
+            </EditTemplate>
+        </PropertyColumn>
+        <PropertyColumn Title="Featured" Property="x => x.FeaturedHistory" />
+        <PropertyColumn Title="Legendary" Property="x => x.LegendaryHistory" />
+        <PropertyColumn Title="Epic" Property="x => x.EpicHistory" />
+        <PropertyColumn Title="Rare" Property="x => x.RareHistory" />
+        <PropertyColumn Title="Uncommon" Property="x => x.UncommonHistory" />
+        <PropertyColumn Title="Common" Property="x => x.CommonHistory" />
+        <TemplateColumn Sortable="false" Filterable="false">
+            <CellTemplate>
+                <MudStack Spacing="1" Justify="Justify.FlexEnd" Row="true">
+                    <MudIconButton Size="Size.Small" Icon="@Icons.Material.Filled.Delete" OnClick="@(async () => await Delete(@context.Item))" />
+                    <MudIconButton Size="Size.Small" Icon="@Icons.Material.Outlined.Edit" OnClick="@context.Actions.StartEditingItemAsync" />
+                </MudStack>
+            </CellTemplate>
+        </TemplateColumn>
+    </Columns>
+    <PagerContent>
+        <MudDataGridPager />
+    </PagerContent>
+</MudDataGrid>
+
+@code {
+    bool _editPanelExpanded = false;
+    string _searchString = "";
+    PlayerLootBoxState _newItem = new();
+
+    static readonly string EditPanelId =  $"{nameof(PlayerLootBoxState).ToLower()}-edit-panel";
+    static readonly string EditPanelText = $"Add {nameof(PlayerLootBoxState)}";
+    static readonly string ListPanelText = nameof(PlayerLootBoxState);
+
+    private bool QuickFilter(PlayerLootBoxState x)
+    {
+        if (string.IsNullOrWhiteSpace(_searchString)) return true;
+
+        if ($"{x.OwnerId} {x.LootBoxId} {x.Since} {x.LastOpenDate}".Contains(_searchString)) return true;
+
+        return false;
+    }
+
+    async Task OnValidSubmit(EditContext contex)
+    {
+        try {
+            _newItem.Since = DateTime.UtcNow;
+            await _dbContext.AddAsync(_newItem);
+            await _dbContext.SaveChangesAsync();
+            _logger.LogInformation("{User}|New {Table} (OwnerId:{OwnerId}  Idx:{Idx}) created.",
+                _httpContextAccessor.GetNameAndIdentifier(), nameof(PlayerLootBoxState), _newItem.OwnerId, _newItem.LootBoxId);
+            _snackBar.Add($"New {nameof(PlayerLootBoxState)} (OwnerId:{_newItem.OwnerId} LootBoxId:{_newItem.LootBoxId}) created.", Severity.Success);
+            _newItem = new ();
+        }
+        catch(Exception ex) {
+            _snackBar.Add($"Create {nameof(PlayerLootBoxState)} (OwnerId:{_newItem.OwnerId} LootBoxId:{_newItem.LootBoxId}) failed. {ex}", Severity.Error);
+        }
+    }
+
+    async Task CommittedItemChanges(PlayerLootBoxState item)
+    {
+        var updatee = await _dbContext.PlayerLootBoxStates.FindAsync(item.OwnerId, item.LootBoxId);
+        if(updatee != null) {
+            updatee = item;
+            _dbContext.Entry(updatee).State = EntityState.Modified;
+            await _dbContext.SaveChangesAsync();
+            _logger.LogInformation("{User}|{Table} (OwnerId:{OwnerId}  LootBoxId:{LootBoxId}) updated.",
+                _httpContextAccessor.GetNameAndIdentifier(), nameof(PlayerLootBoxState), item.OwnerId, item.LootBoxId);
+            _snackBar.Add($"{nameof(PlayerLootBoxState)} (OwnerId:{item.OwnerId} LootBoxId:{item.LootBoxId}) updated.", Severity.Success);
+        }
+        else {
+            _snackBar.Add($"{nameof(PlayerLootBoxState)} (OwnerId:{item.OwnerId} LootBoxId:{item.LootBoxId}) not found.", Severity.Error);
+        }
+    }
+
+    void Clear()
+    {
+        _newItem = new();
+    }
+
+    async Task Delete(PlayerLootBoxState item)
+    {
+        var parameters = new DialogParameters();
+        parameters.Add("ContentText", $"Do you really want to delete this records? This process cannot be undone.");
+        parameters.Add("ContentSubText", $"{item}");
+        parameters.Add("ButtonText", "Delete");
+        parameters.Add("Color", Color.Error);
+
+        var dialog = await _dialogService.ShowAsync<ConfirmDialog>("Delete", parameters, new() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall });
+        if(!(await dialog.Result)!.Canceled) {
+            _dbContext.PlayerLootBoxStates.Remove(item);
+            await _dbContext.SaveChangesAsync();
+            _logger.LogInformation("{User}|{Table} (OwnerId:{OwnerId}  LootBoxId:{LootBoxId}) deleted.",
+                _httpContextAccessor.GetNameAndIdentifier(), nameof(PlayerLootBoxState), item.OwnerId, item.LootBoxId);
+            _snackBar.Add($"{nameof(PlayerLootBoxState)} (OwnerId:{_newItem.OwnerId} LootBoxId:{_newItem.LootBoxId}) deleted.", Severity.Success);
+        }
+    }
+}

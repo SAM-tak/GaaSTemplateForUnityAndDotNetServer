@@ -8,7 +8,7 @@ public enum Store
     NotSpecified,
     // Official stores
     [Display(Name = "App Store")]
-    AppStore = 1,
+    AppStore,
     [Display(Name = "Google Play")]
     GooglePlay,
     [Display(Name = "Kindle Store")]
@@ -29,9 +29,10 @@ public enum Store
     UPlay,
     [Display(Name = "DMM")]
     DMM,
+    StartOfExternalStore = 1000,
     // External payment services
     [Display(Name = "Stripe")]
-    Stripe = 1000,
+    Stripe = StartOfExternalStore,
     [Display(Name = "PayPal")]
     PayPal,
     [Display(Name = "Braintree")]

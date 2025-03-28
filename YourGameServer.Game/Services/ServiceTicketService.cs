@@ -20,11 +20,12 @@ public class ServiceTicketService(GameDbContext dbContext, IHttpContextAccessor 
     readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
     readonly ILogger<AccountService> _logger = logger;
 
+    [FromTypeFilter(typeof(VerifyToken))]
     public async UnaryResult<IEnumerable<Interface.ServiceTicket>> GetTickets() => await GetTicketsAsync(_dbContext);
 
     public async UnaryResult<IEnumerable<OwnedServiceTicket>> GetOwnedTickets() => await GetOwnedTicketsAsync(_dbContext, _httpContextAccessor.GetPlayerId());
 
-    public async UnaryResult<IEnumerable<Interface.ServiceTicket>> GetTicketsAsync(GameDbContext dbContext)
+    public static async UnaryResult<IEnumerable<Interface.ServiceTicket>> GetTicketsAsync(GameDbContext dbContext)
         => await dbContext.ServiceTickets.Select(x => ToProtocol(x)).ToListAsync()
             ?? throw new ReturnStatusException(StatusCode.NotFound, "no service ticket defines.");
 

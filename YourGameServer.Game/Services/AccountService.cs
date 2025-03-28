@@ -38,8 +38,8 @@ public class AccountService(GameDbContext dbContext, JwtAuthorizer jwt, IHttpCon
         try {
             id = IDCoder.Decode(param.LoginKey);
         }
-        catch(Exception) {
-            throw new ReturnStatusException(StatusCode.InvalidArgument, "invalid login key.");
+        catch(Exception e) {
+            throw new ReturnStatusException(StatusCode.InvalidArgument, $"invalid login key. {e}");
         }
         var playerAccount = await _dbContext.PlayerAccounts.FindAsync(id);
         if(playerAccount is not null) {

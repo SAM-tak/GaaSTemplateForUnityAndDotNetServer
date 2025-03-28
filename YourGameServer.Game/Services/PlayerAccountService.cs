@@ -14,7 +14,7 @@ namespace YourGameServer.Game.Services;
 
 // Implements RPC service in the server project.
 // The implementation class must inherit `ServiceBase<IMyFirstService>` and `IMyFirstService`
-[FromTypeFilter(typeof(VerifyTokenAndAccount))]
+[FromTypeFilter(typeof(VerifyToken))]
 public class PlayerAccountService(GameDbContext dbContext, IHttpContextAccessor httpContextAccessor, ILogger<AccountService> logger)
     : ServiceBase<IPlayerAccountService>, IPlayerAccountService
 {
@@ -41,12 +41,15 @@ public class PlayerAccountService(GameDbContext dbContext, IHttpContextAccessor 
         try {
             idsecrets = codes.Select(IDCoder.DecodeFromPlayerCode).ToDictionary(x => x.Item1, x => x.Item2);
         }
-        catch(Exception) {
-            throw new ReturnStatusException(StatusCode.InvalidArgument, "invalid player code included.");
+        catch(Exception e) {
+            throw new ReturnStatusException(StatusCode.InvalidArgument, $"invalid player code included. {e}");
         }
 
         if(idsecrets != null && idsecrets.Count != 0) {
-            // 'when executing service method 'GetPlayerAccounts'.System.InvalidOperationException: The LINQ expression 'DbSet<PlayerAccount>() .Where(p => __ids_0.ContainsKey(p.Id) && (int)__ids_0.get_Item(p.Id) == (int)p.Secret && (int)(PlayerAccountStatus)p.Status < 2)' could not be translated. '
+            // when executing service method 'GetPlayerAccounts'.System.InvalidOperationException:
+            // The LINQ expression
+            // 'DbSet<PlayerAccount>().Where(p => __idsecrets_0.ContainsKey(p.Id) && (int)__idsecrets_0.get_Item(p.Id) == (int)p.Secret && (int)(PlayerAccountStatus)p.Status < 2)'
+            // could not be translated. 
             var ids = idsecrets.Keys;
             return (await _dbContext.PlayerAccounts.Include(i => i.Profile)
                 .Where(i => ids.Contains(i.Id) && (PlayerAccountStatus)i.Status < PlayerAccountStatus.Banned)

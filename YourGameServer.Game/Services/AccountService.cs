@@ -135,15 +135,14 @@ public class AccountService(GameDbContext dbContext, JwtAuthorizer jwt, IHttpCon
     /// <summary>
     /// Request renew secret
     /// </summary>
-    /// <returns>new token</returns>
+    /// <returns>new player code</returns>
     [FromTypeFilter(typeof(VerifyTokenAndAccount))]
     public async UnaryResult<string> RenewSecret()
     {
         var playerId = _httpContextAccessor.GetPlayerId();
         _logger.LogInformation("{PlayerId}|RenewSecret", playerId);
-        var playerAccount = await PlayerAccountOperation.GetAsync(_dbContext, playerId);
+        var playerAccount = await PlayerAccountOperation.RenewSecret(_dbContext, playerId);
         if(playerAccount is not null) {
-            playerAccount.Secret = (ushort)new Random().Next(0, ushort.MaxValue + 1);
             await _dbContext.SaveChangesAsync();
             return playerAccount.Code;
         }

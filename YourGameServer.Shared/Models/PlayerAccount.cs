@@ -7,7 +7,7 @@ public record PlayerAccount
 {
     [Display(Name = "ID")]
     public ulong Id { get; init; }
-    [Display(Name = "Secret")] // for expire existing player code for protect player's private
+    [Display(Name = "Secret")] // for expire existing player code for protect player's privacy
     public ushort Secret { get; set; }
     [JsonIgnore]
     public List<PlayerDevice>? DeviceList { get; init; }

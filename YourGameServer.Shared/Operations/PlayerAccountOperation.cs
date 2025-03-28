@@ -9,11 +9,13 @@ namespace YourGameServer.Shared.Operations;
 // The implementation class must inherit `ServiceBase<IMyFirstService>` and `IMyFirstService`
 public static class PlayerAccountOperation
 {
+    static readonly Random _random = new();
+
     public static async Task<PlayerAccount> CreateAsync(GameDbContext context, DeviceType deviceType, Store officialStore, string deviceIdentifier)
     {
         var curDateTime = DateTime.UtcNow;
         var playerAccount = new PlayerAccount {
-            Secret = (ushort)new Random().Next(0, ushort.MaxValue + 1),
+            Secret = (ushort)_random.Next(0, ushort.MaxValue + 1),
             CurrentDeviceIdx = 0,
             DeviceList = [
                 new () {
@@ -35,7 +37,13 @@ public static class PlayerAccountOperation
         return playerAccount;
     }
 
-    public static async Task<PlayerAccount> GetAsync(GameDbContext dbContext, ulong playerId)
-        => await dbContext.PlayerAccounts.FindAsync(playerId);
-
+    public static async Task<PlayerAccount> RenewSecret(GameDbContext dbContext, ulong playerId)
+    {
+        var playerAccount = await dbContext.PlayerAccounts.FindAsync(playerId);
+        if(playerAccount is not null) {
+            playerAccount.Secret = (ushort)_random.Next(0, ushort.MaxValue + 1);
+            return playerAccount;
+        }
+        return null;
+    }
 }

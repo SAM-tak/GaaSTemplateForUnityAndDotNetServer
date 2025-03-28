@@ -5,55 +5,48 @@
     <MudTable Items="@Elements" Hover="true" Breakpoint="Breakpoint.Sm" LoadingProgressColor="Color.Info">
         <HeaderContent>
             <MudTh>Id</MudTh>
+            <MudTh>Login Key</MudTh>
             <MudTh>Player Code</MudTh>
         </HeaderContent>
         <RowTemplate>
             <MudTd DataLabel="Id">@context.Id.ToString("#,0")</MudTd>
+            <MudTd DataLabel="Login Key">@context.Key</MudTd>
             <MudTd DataLabel="Player Code">@context.Code</MudTd>
         </RowTemplate>
     </MudTable>
 </MudPaper>
 
 @code {
-    private IEnumerable<CodeExample> Elements = new List<CodeExample>();
+    private List<CodeExample> Elements = new();
 
     public class CodeExample
     {
         public ulong Id;
+        public string Key = string.Empty;
         public string Code = string.Empty;
     }
 
     protected override async Task OnInitializedAsync()
     {
         const ushort Secret = 12345;
-        var codes = new List<CodeExample>();
-        for(ulong id = 0; id < 3; ++id) {
-            codes.Add(new() { Id = id, Code = IDCoder.EncodeForPlayerCode(id, Secret).ToHyphened() });
+        for(ulong id = 1; id < 4; ++id) {
+            Elements.Add(new() { Id = id, Key = IDCoder.Encode(id), Code = IDCoder.EncodeForPlayerCode(id, Secret).ToHyphened() });
         }
-        for (ulong id = 9999; id < 10002; ++id) {
-            codes.Add(new() { Id = id, Code = IDCoder.EncodeForPlayerCode(id, Secret).ToHyphened() });
+        for(ulong id = 10000; id < 10003; ++id) {
+            Elements.Add(new() { Id = id, Key = IDCoder.Encode(id), Code = IDCoder.EncodeForPlayerCode(id, Secret).ToHyphened() });
         }
-        for (ulong id = 499999; id < 500002; ++id) {
-            codes.Add(new() { Id = id, Code = IDCoder.EncodeForPlayerCode(id, Secret).ToHyphened() });
+        for(ulong id = 500000; id < 500003; ++id) {
+            Elements.Add(new() { Id = id, Key = IDCoder.Encode(id), Code = IDCoder.EncodeForPlayerCode(id, Secret).ToHyphened() });
         }
-        @* var maxLetter = IDCoder.Encode(ulong.MaxValue, Secret).Length;
-        ulong lower = 1, upper = 2;
-        for(int i = IDCoder.Encode(1, Secret).Length; i < maxLetter; ++i) {
-            while(IDCoder.Encode(upper, Secret).Length < i + 1) upper *= 100;
-            while(upper - lower > 1) {
-                var mid = lower + (upper - lower) / 2;
-                if(IDCoder.Encode(mid, Secret).Length == i) lower = mid;
-                else upper = mid;
-            }
-            codes.Add(new() { Id = lower, Code = IDCoder.Encode(lower, Secret).ToHyphened() });
-            codes.Add(new() { Id = upper, Code = IDCoder.Encode(upper, Secret).ToHyphened() });
-            lower = upper;
-        } *@
-        for(int i = 0; i < 3; ++i) {
-            ulong id = ulong.MaxValue - 3 + (ulong)i;
-            codes.Add(new() { Id = id, Code = IDCoder.EncodeForPlayerCode(id, Secret).ToHyphened() });
+        for(ulong id = 10000000; id < 10000003; ++id) {
+            Elements.Add(new() { Id = id, Key = IDCoder.Encode(id), Code = IDCoder.EncodeForPlayerCode(id, Secret).ToHyphened() });
         }
-        Elements = codes;
+        for(ulong id = 100000000; id < 100000003; ++id) {
+            Elements.Add(new() { Id = id, Key = IDCoder.Encode(id), Code = IDCoder.EncodeForPlayerCode(id, Secret).ToHyphened() });
+        }
+        for(ulong id = ulong.MaxValue - 2; id >= ulong.MaxValue - 2 && id <= ulong.MaxValue; ++id) {
+            Elements.Add(new() { Id = id, Key = IDCoder.Encode(id), Code = IDCoder.EncodeForPlayerCode(id, Secret).ToHyphened() });
+        }
         await Task.CompletedTask;
     }
 }

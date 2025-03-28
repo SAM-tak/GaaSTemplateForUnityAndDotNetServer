@@ -24,9 +24,9 @@
         var random = new System.Random();
 
         Elements = new List<RandomEntry>() {
-            new() { Key = "15bit", Value = $"{random.Next(0, ushort.MaxValue)}" },
-            new() { Key = "31bit", Value = $"{random.Next(0, int.MaxValue)}" },
-            new() { Key = "63bit", Value = $"{random.NextInt64(0, long.MaxValue)}" },
+            new() { Key = "16bit", Value = $"{random.Next(0, ushort.MaxValue + 1)}" },
+            new() { Key = "32bit", Value = $"{random.Next()}" },
+            new() { Key = "64bit", Value = $"{random.NextInt64()}" },
         };
         await Task.CompletedTask;
     }

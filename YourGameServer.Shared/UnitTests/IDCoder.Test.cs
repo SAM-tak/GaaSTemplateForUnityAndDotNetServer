@@ -23,13 +23,13 @@ public class IDCoder_IsSane
     }
 
     [TestMethod]
-    public void CanDecodeLoginKeyCorrectly()
+    public void CanDecodePlayerCodeCorrectly()
     {
-        ulong oid = 301;
-        Assert.IsTrue((int)((oid >> 8) & 0xFFFFFFF) >= 0);
-        Assert.IsTrue((int)((oid >> 40) & 0xFFFFFFF) >= 0);
-        var hashids = IDCoder.EncodeForLoginKey(oid);
-        var id = IDCoder.DecodeFromLoginKey(hashids);
+        (ulong, ushort) oid = (301, 12345);
+        Assert.IsTrue((int)((oid.Item1 >> 8) & 0xFFFFFFF) >= 0);
+        Assert.IsTrue((int)((oid.Item1 >> 40) & 0xFFFFFFF) >= 0);
+        var hashids = IDCoder.EncodeForPlayerCode(oid.Item1, oid.Item2);
+        var id = IDCoder.DecodeFromPlayerCode(hashids);
         Assert.AreEqual(oid, id, $"decoded id should be same with origin. {oid} : {id}, {hashids}");
     }
 

@@ -13,6 +13,7 @@ public static class PlayerAccountOperation
     {
         var curDateTime = DateTime.UtcNow;
         var playerAccount = new PlayerAccount {
+            Secret = (ushort)new Random().Next(0, ushort.MaxValue + 1),
             CurrentDeviceIdx = 0,
             DeviceList = [
                 new () {

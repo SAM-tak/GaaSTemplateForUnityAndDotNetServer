@@ -7,6 +7,8 @@ public record PlayerAccount
 {
     [Display(Name = "ID")]
     public ulong Id { get; init; }
+    [Display(Name = "Secret")] // for expire existing player code for protect player's private
+    public ushort Secret { get; set; }
     [JsonIgnore]
     public List<PlayerDevice>? DeviceList { get; init; }
     [Display(Name = "Current Device Idx")]
@@ -30,7 +32,7 @@ public record PlayerAccount
 
     public override int GetHashCode() => (Id, CurrentDeviceIdx, Status, Since, LastLogin, InactivateDate, BanDate, ExpireDate).GetHashCode();
 
-    public string LoginKey => IDCoder.EncodeForLoginKey(Id);
+    public string LoginKey => IDCoder.Encode(Id);
 
-    public string Code => IDCoder.Encode(Id);
+    public string Code => IDCoder.EncodeForPlayerCode(Id, Secret);
 }

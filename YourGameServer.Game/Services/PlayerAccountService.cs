@@ -25,7 +25,7 @@ public class PlayerAccountService(GameDbContext dbContext, IHttpContextAccessor 
 
     public async UnaryResult<FormalPlayerAccount> GetPlayerAccount()
         => FormalPlayerAccountFromPlayerAccount(await PlayerAccountOperation.GetAsync(_dbContext, _httpContextAccessor.GetPlayerId())
-         ?? throw new ReturnStatusException(StatusCode.NotFound, "correspond account was not found."));
+        ?? throw new ReturnStatusException(StatusCode.NotFound, "correspond account was not found."));
 
     public async UnaryResult<IEnumerable<MaskedPlayerAccount>> GetPlayerAccounts(string[] codes)
     {
@@ -35,22 +35,27 @@ public class PlayerAccountService(GameDbContext dbContext, IHttpContextAccessor 
             throw new ReturnStatusException(StatusCode.NotFound, "correspond account was not found.");
         }
         if(codes == null) {
-            throw new ReturnStatusException(StatusCode.InvalidArgument, "codes is null.");
+            throw new ReturnStatusException(StatusCode.InvalidArgument, "codes are null.");
         }
 
-        ulong[] ids;
+        Dictionary<ulong, ushort> idsecrets;
         try {
-            ids = [.. codes.Select(IDCoder.Decode)];
+            idsecrets = codes.Select(IDCoder.DecodeFromPlayerCode).ToDictionary(x => x.Item1, x => x.Item2);
         }
         catch(Exception) {
-            throw new ReturnStatusException(StatusCode.InvalidArgument, "invalid player codes included.");
+            throw new ReturnStatusException(StatusCode.InvalidArgument, "invalid player code included.");
         }
 
-        if(ids != null && ids.Length > 0) {
-            return await _dbContext.PlayerAccounts.Include(i => i.Profile)
+        if(idsecrets != null && idsecrets.Count != 0) {
+            // 'when executing service method 'GetPlayerAccounts'.System.InvalidOperationException: The LINQ expression 'DbSet<PlayerAccount>() .Where(p => __ids_0.ContainsKey(p.Id) && (int)__ids_0.get_Item(p.Id) == (int)p.Secret && (int)(PlayerAccountStatus)p.Status < 2)' could not be translated. '
+            var ids = idsecrets.Keys;
+            return (await _dbContext.PlayerAccounts.Include(i => i.Profile)
                 .Where(i => ids.Contains(i.Id) && (PlayerAccountStatus)i.Status < PlayerAccountStatus.Banned)
-                .Select(i => MaskedPlayerAccountFromPlayerAccount(i)).ToListAsync();
+                .ToListAsync())
+                .Where(x => x.Secret == idsecrets[x.Id])
+                .Select(MaskedPlayerAccountFromPlayerAccount);
         }
+
         return null;
     }
 

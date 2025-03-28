@@ -36,7 +36,7 @@ public class AccountService(GameDbContext dbContext, JwtAuthorizer jwt, IHttpCon
         _logger.LogInformation("Login {Param}", param);
         ulong id = 0;
         try {
-            id = IDCoder.DecodeFromLoginKey(param.LoginKey);
+            id = IDCoder.Decode(param.LoginKey);
         }
         catch(Exception) {
             throw new ReturnStatusException(StatusCode.InvalidArgument, "invalid login key.");
@@ -128,6 +128,24 @@ public class AccountService(GameDbContext dbContext, JwtAuthorizer jwt, IHttpCon
                 await _dbContext.SaveChangesAsync();
                 return new Nil();
             }
+        }
+        throw new ReturnStatusException(StatusCode.NotFound, "correspond account was not found.");
+    }
+
+    /// <summary>
+    /// Request renew secret
+    /// </summary>
+    /// <returns>new token</returns>
+    [FromTypeFilter(typeof(VerifyTokenAndAccount))]
+    public async UnaryResult<string> RenewSecret()
+    {
+        var playerId = _httpContextAccessor.GetPlayerId();
+        _logger.LogInformation("{PlayerId}|RenewSecret", playerId);
+        var playerAccount = await PlayerAccountOperation.GetAsync(_dbContext, playerId);
+        if(playerAccount is not null) {
+            playerAccount.Secret = (ushort)new Random().Next(0, ushort.MaxValue + 1);
+            await _dbContext.SaveChangesAsync();
+            return playerAccount.Code;
         }
         throw new ReturnStatusException(StatusCode.NotFound, "correspond account was not found.");
     }

@@ -25,32 +25,33 @@
 
     protected override async Task OnInitializedAsync()
     {
+        const ushort Secret = 12345;
         var codes = new List<CodeExample>();
         for(ulong id = 0; id < 3; ++id) {
-            codes.Add(new() { Id = id, Code = IDCoder.Encode(id).ToHyphened() });
+            codes.Add(new() { Id = id, Code = IDCoder.EncodeForPlayerCode(id, Secret).ToHyphened() });
         }
         for (ulong id = 9999; id < 10002; ++id) {
-            codes.Add(new() { Id = id, Code = IDCoder.Encode(id).ToHyphened() });
+            codes.Add(new() { Id = id, Code = IDCoder.EncodeForPlayerCode(id, Secret).ToHyphened() });
         }
         for (ulong id = 499999; id < 500002; ++id) {
-            codes.Add(new() { Id = id, Code = IDCoder.Encode(id).ToHyphened() });
+            codes.Add(new() { Id = id, Code = IDCoder.EncodeForPlayerCode(id, Secret).ToHyphened() });
         }
-        var maxLetter = IDCoder.Encode(ulong.MaxValue).Length;
+        @* var maxLetter = IDCoder.Encode(ulong.MaxValue, Secret).Length;
         ulong lower = 1, upper = 2;
-        for(int i = IDCoder.Encode(1).Length; i < maxLetter; ++i) {
-            while(IDCoder.Encode(upper).Length < i + 1) upper *= 2;
+        for(int i = IDCoder.Encode(1, Secret).Length; i < maxLetter; ++i) {
+            while(IDCoder.Encode(upper, Secret).Length < i + 1) upper *= 100;
             while(upper - lower > 1) {
                 var mid = lower + (upper - lower) / 2;
-                if(IDCoder.Encode(mid).Length == i) lower = mid;
+                if(IDCoder.Encode(mid, Secret).Length == i) lower = mid;
                 else upper = mid;
             }
-            codes.Add(new() { Id = lower, Code = IDCoder.Encode(lower).ToHyphened() });
-            codes.Add(new() { Id = upper, Code = IDCoder.Encode(upper).ToHyphened() });
+            codes.Add(new() { Id = lower, Code = IDCoder.Encode(lower, Secret).ToHyphened() });
+            codes.Add(new() { Id = upper, Code = IDCoder.Encode(upper, Secret).ToHyphened() });
             lower = upper;
-        }
+        } *@
         for(int i = 0; i < 3; ++i) {
             ulong id = ulong.MaxValue - 3 + (ulong)i;
-            codes.Add(new() { Id = id, Code = IDCoder.Encode(id).ToHyphened() });
+            codes.Add(new() { Id = id, Code = IDCoder.EncodeForPlayerCode(id, Secret).ToHyphened() });
         }
         Elements = codes;
         await Task.CompletedTask;

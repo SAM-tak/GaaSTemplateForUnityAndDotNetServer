@@ -12,6 +12,9 @@
         <MudCard>
             <MudCardContent>
                 <MudTd>
+                    <MudNumericField T="ushort" @bind-Value="@_newItem.Secret" Min="0" Label="@(TextHelper.LabelFor<PlayerAccount>(i => i.Secret))" />
+                </MudTd>
+                <MudTd>
                     <MudNumericField T="int" @bind-Value="@_newItem.CurrentDeviceIdx" Min="0" Label="@(TextHelper.LabelFor<PlayerAccount>(i => i.CurrentDeviceIdx))" />
                 </MudTd>
                 <MudTd>
@@ -74,6 +77,11 @@
         <PropertyColumn Property="x => x.Id" Editable="false">
             <CellTemplate>
                 <MudText>@context.Item.Id</MudText>
+            </CellTemplate>
+        </PropertyColumn>
+        <PropertyColumn Property="x => x.Secret">
+            <CellTemplate>
+                <MudText>@context.Item.Secret</MudText>
             </CellTemplate>
         </PropertyColumn>
         <TemplateColumn Title="Key / Code" Hideable="true" Sortable="false" Filterable="false">
@@ -165,7 +173,7 @@
     bool QuickFilter(PlayerAccount x)
     {
         if (string.IsNullOrWhiteSpace(_searchString)) return true;
-        if ($"{x.Id} {x.LoginKey} {x.Code} {x.Code.ToHyphened()} {x.Since} {x.LastLogin}".Contains(_searchString)) return true;
+        if ($"{x.Id} {x.Secret} {x.LoginKey} {x.Code} {x.Code.ToHyphened()} {x.Since} {x.LastLogin}".Contains(_searchString)) return true;
         return false;
     }
 

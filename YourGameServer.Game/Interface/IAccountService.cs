@@ -29,6 +29,12 @@ namespace YourGameServer.Game.Interface // Unity cannot use file-scope namespace
         UnaryResult<RenewTokenRequestResult> RenewToken();
 
         /// <summary>
+        /// 
+        /// </summary>
+        /// <returns>New player code</returns>
+        UnaryResult<string> RenewSecret();
+
+        /// <summary>
         /// Log out
         /// </summary>
         /// <returns>none</returns>

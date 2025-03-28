@@ -54,17 +54,18 @@ public class VerifyTokenAndAccount(JwtAuthorizer jwt, IHttpContextAccessor httpC
 
         using var scope = context.ServiceProvider.CreateScope();
         var dbContext = scope.ServiceProvider.GetService<GameDbContext>();
-        if(dbContext != null && _httpContextAccessor.HttpContext != null) {
-            if(_httpContextAccessor.TryGetPlayerIdAndDeviceIdx(out var playerId, out var deviceIdx)) {
-                var playerAccount = await dbContext.PlayerAccounts.FirstOrDefaultAsync(x => x.Id == playerId)
-                    ?? throw new ReturnStatusException(Grpc.Core.StatusCode.Unauthenticated, "Player account is not found.");
-                if(playerAccount.CurrentDeviceIdx != deviceIdx) {
-                    throw new ReturnStatusException(Grpc.Core.StatusCode.Unauthenticated, "Logged in by other device.");
-                }
-                if(playerAccount.Status >= PlayerAccountStatus.Banned) {
-                    throw new ReturnStatusException(Grpc.Core.StatusCode.Unauthenticated, "Player account is invalid.");
-                }
+        if(dbContext != null && _httpContextAccessor.HttpContext != null && _httpContextAccessor.TryGetPlayerIdAndDeviceIdx(out var playerId, out var deviceIdx)) {
+            var playerAccount = await dbContext.PlayerAccounts.FirstOrDefaultAsync(x => x.Id == playerId)
+                ?? throw new ReturnStatusException(Grpc.Core.StatusCode.Unauthenticated, "Player account is not found.");
+            if(playerAccount.CurrentDeviceIdx != deviceIdx) {
+                throw new ReturnStatusException(Grpc.Core.StatusCode.Unauthenticated, "Logged in by other device.");
             }
+            if(playerAccount.Status >= PlayerAccountStatus.Banned) {
+                throw new ReturnStatusException(Grpc.Core.StatusCode.Unauthenticated, "Player account is invalid.");
+            }
+        }
+        else {
+            throw new ReturnStatusException(Grpc.Core.StatusCode.Unauthenticated, "Can't verify player account.");
         }
 
         await next(context);

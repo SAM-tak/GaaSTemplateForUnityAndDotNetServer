@@ -23,12 +23,12 @@ public class ServiceTokenService(GameDbContext dbContext, IHttpContextAccessor h
 
     public async UnaryResult<OwnedServiceTokens> GetOwnedTokens()
     {
-        if(_httpContextAccessor.TryGetPlayerIdAndDeviceIdx(out var playerId, out var deviceIdx)) {
-            var device = await _dbContext.PlayerDevices.FindAsync(playerId, deviceIdx)
-                ?? throw new ReturnStatusException(StatusCode.FailedPrecondition, "correspond account has no valid device.");
-            return await GetOwnedServiceTokensAsync(_dbContext, playerId, device.OfficialStore);
+        if(!_httpContextAccessor.TryGetPlayerIdAndDeviceIdx(out var playerId, out var deviceIdx)) {
+            throw new ReturnStatusException(StatusCode.InvalidArgument, "invalid header.");
         }
-        throw new ReturnStatusException(StatusCode.InvalidArgument, "invalid header.");
+        var device = await _dbContext.PlayerDevices.FindAsync(playerId, deviceIdx)
+            ?? throw new ReturnStatusException(StatusCode.FailedPrecondition, "correspond account has no valid device.");
+        return await GetOwnedServiceTokensAsync(_dbContext, playerId, device.OfficialStore);
     }
 
     public static async UnaryResult<OwnedServiceTokens> GetOwnedServiceTokensAsync(GameDbContext dbContext, ulong playerId, Store store) => new() {

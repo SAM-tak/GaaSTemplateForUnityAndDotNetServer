@@ -45,33 +45,34 @@ public class ChatHub(GameDbContext dbContext, IHttpContextAccessor httpContextAc
     [FromTypeFilter(typeof(VerifyToken))]
     public async Task LeaveAsync()
     {
-        if(_room is not null) {
-            await _room.RemoveAsync(Context);
-            _joinedPlayerId.Remove(_httpContextAccessor.GetPlayerId());
-            Broadcast(_room).OnLeave(new() { PlayerName = _playerName, PlayerCode = _playerCode });
+        if(_room is null) {
+            return;
         }
+        await _room.RemoveAsync(Context);
+        _joinedPlayerId.Remove(_httpContextAccessor.GetPlayerId());
+        Broadcast(_room).OnLeave(new() { PlayerName = _playerName, PlayerCode = _playerCode });
     }
 
     [FromTypeFilter(typeof(VerifyToken))]
     public async Task SendMessageAsync(string message)
     {
-        if(_room is not null) {
-            if(message.StartsWith("/global ", StringComparison.InvariantCultureIgnoreCase)) {
-                Broadcast(_room).OnRecievedMessage(new() {
-                    Member = new() { PlayerName = _playerName, PlayerCode = _playerCode },
-                    DateTime = DateTime.UtcNow,
-                    Message = message["/global ".Length..]
-                });
-            }
-            else {
-                Broadcast(_room).OnRecievedMessage(new() {
-                    Member = new() { PlayerName = _playerName, PlayerCode = _playerCode },
-                    DateTime = DateTime.UtcNow,
-                    Message = message
-                });
-            }
+        if(_room is null) {
+            return;
         }
-
+        if(message.StartsWith("/global ", StringComparison.InvariantCultureIgnoreCase)) {
+            Broadcast(_room).OnRecievedMessage(new() {
+                Member = new() { PlayerName = _playerName, PlayerCode = _playerCode },
+                DateTime = DateTime.UtcNow,
+                Message = message["/global ".Length..]
+            });
+        }
+        else {
+            Broadcast(_room).OnRecievedMessage(new() {
+                Member = new() { PlayerName = _playerName, PlayerCode = _playerCode },
+                DateTime = DateTime.UtcNow,
+                Message = message
+            });
+        }
         await Task.CompletedTask;
     }
 

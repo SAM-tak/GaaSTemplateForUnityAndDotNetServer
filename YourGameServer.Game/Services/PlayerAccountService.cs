@@ -45,20 +45,19 @@ public class PlayerAccountService(GameDbContext dbContext, IHttpContextAccessor 
             throw new ReturnStatusException(StatusCode.InvalidArgument, $"invalid player code included. {e}");
         }
 
-        if(idsecrets != null && idsecrets.Count != 0) {
-            // when executing service method 'GetPlayerAccounts'.System.InvalidOperationException:
-            // The LINQ expression
-            // 'DbSet<PlayerAccount>().Where(p => __idsecrets_0.ContainsKey(p.Id) && (int)__idsecrets_0.get_Item(p.Id) == (int)p.Secret && (int)(PlayerAccountStatus)p.Status < 2)'
-            // could not be translated. 
-            var ids = idsecrets.Keys;
-            return (await _dbContext.PlayerAccounts.Include(i => i.Profile)
-                .Where(i => ids.Contains(i.Id) && (PlayerAccountStatus)i.Status < PlayerAccountStatus.Banned)
-                .ToListAsync())
-                .Where(x => x.Secret == idsecrets[x.Id])
-                .Select(MaskedPlayerAccountFromPlayerAccount);
+        if(idsecrets == null || idsecrets.Count == 0) {
+            return null;
         }
 
-        return null;
+        // when executing service method 'GetPlayerAccounts'.System.InvalidOperationException:
+        // The LINQ expression
+        // 'DbSet<PlayerAccount>().Where(p => __idsecrets_0.ContainsKey(p.Id) && (int)__idsecrets_0.get_Item(p.Id) == (int)p.Secret && (int)(PlayerAccountStatus)p.Status < 2)'
+        // could not be translated. 
+        return (await _dbContext.PlayerAccounts.Include(i => i.Profile)
+            .Where(i => idsecrets.Keys.Contains(i.Id) && (PlayerAccountStatus)i.Status < PlayerAccountStatus.Banned)
+            .ToListAsync())
+            .Where(x => x.Secret == idsecrets[x.Id])
+            .Select(MaskedPlayerAccountFromPlayerAccount);
     }
 
     public async UnaryResult<IEnumerable<MaskedPlayerAccount>> FindPlayerAccounts(int maxCount)
@@ -68,14 +67,13 @@ public class PlayerAccountService(GameDbContext dbContext, IHttpContextAccessor 
         if(!await _dbContext.PlayerAccounts.AnyAsync()) {
             throw new ReturnStatusException(StatusCode.NotFound, "correspond account was not found.");
         }
-
-        if(maxCount > 0) {
-            return await _dbContext.PlayerAccounts.Include(i => i.Profile)
-                .Where(i => i.Id != playerId && (PlayerAccountStatus)i.Status < PlayerAccountStatus.Banned)
-                .OrderBy(x => EF.Functions.Random()).Take(maxCount)
-                .Select(i => MaskedPlayerAccountFromPlayerAccount(i)).ToListAsync();
+        if(maxCount == 0) {
+            return null;
         }
-        return null;
+        return await _dbContext.PlayerAccounts.Include(i => i.Profile)
+            .Where(i => i.Id != playerId && (PlayerAccountStatus)i.Status < PlayerAccountStatus.Banned)
+            .OrderBy(x => EF.Functions.Random()).Take(maxCount)
+            .Select(i => MaskedPlayerAccountFromPlayerAccount(i)).ToListAsync();
     }
 
     public static MaskedPlayerAccount MaskedPlayerAccountFromPlayerAccount(PlayerAccount playerAccount) => new()

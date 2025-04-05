@@ -68,7 +68,7 @@ public class AccountService(GameDbContext dbContext, JwtAuthorizer jwt, IHttpCon
             // add new device.
             playerDevice = new PlayerDevice {
                 OwnerId = playerAccount.Id,
-                Idx = await playerDevices.MaxAsync(x => x.Idx),
+                Idx = await playerDevices.MaxAsync(x => x.Idx) + 1,
                 DeviceType = (DeviceType)param.DeviceType,
                 DeviceIdentifier = param.NewDeviceIdentifier,
                 OfficialStore = playerDevice.OfficialStore,

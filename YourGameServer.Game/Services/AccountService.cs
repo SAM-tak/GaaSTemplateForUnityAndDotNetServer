@@ -59,10 +59,11 @@ public class AccountService(GameDbContext dbContext, JwtAuthorizer jwt, IHttpCon
             var currentPlatformDevices = playerDevices.Where(x => x.DeviceType == (DeviceType)param.DeviceType);
             var currentPlatformDeviceCount = await currentPlatformDevices.CountAsync() + 1;
             // remove old devices if over capacity.
-            var maxDeviceCountPerPlayer = _config.GetSection("YourGameServer")?.GetValue<int>("MaxDeviceCountPerPlayer") ?? 3;
-            if(maxDeviceCountPerPlayer > 0 && maxDeviceCountPerPlayer < 3) maxDeviceCountPerPlayer = 3;
-            if(maxDeviceCountPerPlayer > 0 && currentPlatformDeviceCount > maxDeviceCountPerPlayer) {
-                _dbContext.PlayerDevices.RemoveRange(currentPlatformDevices.OrderBy(x => x.LastUsed).Take(currentPlatformDeviceCount - maxDeviceCountPerPlayer));
+            var maxDeviceCountPerPlayerPerPlatform = _config.GetSection("YourGameServer")?.GetValue<int>("MaxDeviceCountPerPlayerPerPlatform") ?? 3;
+            // 0 or minus means infinity. but less 3 count seems too smaller, limits minimum count to 3.
+            if(maxDeviceCountPerPlayerPerPlatform > 0 && maxDeviceCountPerPlayerPerPlatform < 3) maxDeviceCountPerPlayerPerPlatform = 3;
+            if(maxDeviceCountPerPlayerPerPlatform > 0 && currentPlatformDeviceCount > maxDeviceCountPerPlayerPerPlatform) {
+                _dbContext.PlayerDevices.RemoveRange(currentPlatformDevices.OrderBy(x => x.LastUsed).Take(currentPlatformDeviceCount - maxDeviceCountPerPlayerPerPlatform));
             }
             // add new device.
             playerDevice = new PlayerDevice {
